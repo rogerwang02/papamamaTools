@@ -1,0 +1,71 @@
+<!--pages/emergency/index.wxml-->
+<view class="container">
+  <!-- 顶部安全栏 -->
+  <view class="safety-bar">
+    <text class="safety-icon">⚠️</text>
+    <text class="safety-text">此页面仅供紧急情况下医疗/救援人员查看</text>
+  </view>
+
+  <!-- 加载中状态 -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-icon">⏳</view>
+    <text class="loading-text">正在加载急救信息...</text>
+  </view>
+
+  <!-- 有数据时显示内容 -->
+  <view wx:elif="{{cardData}}" class="content-wrapper">
+    <!-- 身份核验区 -->
+    <view class="identity-card">
+      <view class="avatar-area">
+        <view class="avatar-placeholder">
+          <text class="avatar-icon">👤</text>
+        </view>
+      </view>
+      <view class="identity-info">
+        <view class="name-row">
+          <text class="identity-name">{{cardData.name}}</text>
+          <text class="identity-badge">已实名存档</text>
+        </view>
+        <text class="identity-detail">{{cardData.age}}岁</text>
+      </view>
+    </view>
+
+    <!-- 关键医疗信息区 -->
+    <view class="medical-info-section">
+      <!-- 血型区块 -->
+      <view class="blood-type-card">
+        <view class="blood-type-icon">🩸</view>
+        <text class="blood-type-value">{{cardData.blood_type}}</text>
+      </view>
+
+      <!-- 病史/过敏区块 -->
+      <view class="conditions-card" wx:if="{{cardData.conditions}}">
+        <text class="conditions-title">⚠️ 重要病史与过敏源</text>
+        <view class="conditions-content">
+          <!-- 标签化显示 -->
+          <view class="conditions-tags" wx:if="{{conditionsTags.length > 0}}">
+            <view class="conditions-tag" wx:for="{{conditionsTags}}" wx:key="index">{{item}}</view>
+          </view>
+          <!-- 如果没有标签（旧数据兼容），显示原始文本 -->
+          <text class="conditions-text" wx:else>{{cardData.conditions}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载完成但没有数据时显示错误 -->
+  <view wx:else class="error-container">
+    <text class="error-icon">❌</text>
+    <text class="error-text">信息获取失败或已失效</text>
+    <button class="back-btn" bindtap="onGoBack">返回首页</button>
+  </view>
+
+  <!-- 底部固定行动栏 -->
+  <view class="bottom-action-bar" wx:if="{{cardData}}">
+    <button class="emergency-call-btn" bindtap="onMakePhoneCall">
+      <text class="emergency-call-icon">📞</text>
+      <text class="emergency-call-text">拨打紧急联系人电话</text>
+    </button>
+  </view>
+</view>
+

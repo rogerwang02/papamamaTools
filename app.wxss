@@ -1,0 +1,12 @@
+/**app.wxss**/
+page {
+  background-color: #F5F5F5;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* 覆盖微信小程序默认按钮宽度 */
+button:not([size='mini']),
+.wx-button:not([size='mini']) {
+  width: 220px !important;
+}
+

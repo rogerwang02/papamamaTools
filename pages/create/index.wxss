@@ -1,0 +1,248 @@
+/* pages/create/index.wxss */
+.container {
+  min-height: 100vh;
+  padding: 40rpx 30rpx;
+  background-color: #F5F5F5;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 60rpx;
+}
+
+.title {
+  display: block;
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.subtitle {
+  display: block;
+  font-size: 28rpx;
+  color: #666;
+}
+
+.form-container {
+  background-color: #fff;
+  border-radius: 20rpx;
+  padding: 40rpx 30rpx;
+  margin-bottom: 40rpx;
+}
+
+.form-item {
+  margin-bottom: 40rpx;
+}
+
+.form-item:last-child {
+  margin-bottom: 0;
+}
+
+.label {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.input {
+  width: 100%;
+  height: 88rpx;
+  background-color: #F8F8F8;
+  border-radius: 12rpx;
+  padding: 0 24rpx;
+  font-size: 32rpx;
+  color: #333;
+  box-sizing: border-box;
+}
+
+.picker {
+  width: 100%;
+  height: 88rpx;
+  background-color: #F8F8F8;
+  border-radius: 12rpx;
+  padding: 0 24rpx;
+  display: flex;
+  align-items: center;
+  font-size: 32rpx;
+  color: #333;
+}
+
+.picker.placeholder {
+  color: #999;
+}
+
+.picker::after {
+  content: '>';
+  float: right;
+  margin-left: auto;
+  color: #999;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 200rpx;
+  background-color: #F8F8F8;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  font-size: 32rpx;
+  color: #333;
+  box-sizing: border-box;
+  line-height: 1.6;
+}
+
+.form-tip {
+  display: block;
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 16rpx;
+  line-height: 1.5;
+}
+
+.submit-btn {
+  width: 100%;
+  height: 100rpx;
+  background: linear-gradient(135deg, #FF6B00 0%, #FF8C00 100%);
+  color: #fff;
+  font-size: 36rpx;
+  font-weight: bold;
+  border-radius: 50rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 40rpx;
+  box-shadow: 0 8rpx 20rpx rgba(255, 107, 0, 0.3);
+}
+
+.submit-btn[disabled] {
+  background: #ccc;
+  box-shadow: none;
+}
+
+.submit-btn::after {
+  border: none;
+}
+
+/* 二维码模态框样式 */
+.qr-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+}
+
+.qr-modal.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.qr-modal-content {
+  width: 85%;
+  max-width: 600rpx;
+  background-color: #fff;
+  border-radius: 24rpx;
+  overflow: hidden;
+  transform: scale(0.9);
+  transition: transform 0.3s;
+}
+
+.qr-modal.show .qr-modal-content {
+  transform: scale(1);
+}
+
+.qr-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 40rpx 30rpx 20rpx;
+  border-bottom: 2rpx solid #F0F0F0;
+}
+
+.qr-modal-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.qr-modal-close {
+  font-size: 48rpx;
+  color: #999;
+  line-height: 1;
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qr-modal-body {
+  padding: 40rpx 30rpx;
+  text-align: center;
+}
+
+.qr-modal-desc {
+  display: block;
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 30rpx;
+}
+
+.qr-code-image {
+  width: 500rpx;
+  height: 500rpx;
+  margin: 0 auto 20rpx;
+  background-color: #F8F8F8;
+  border-radius: 12rpx;
+}
+
+.qr-modal-tip {
+  display: block;
+  font-size: 24rpx;
+  color: #999;
+}
+
+.qr-modal-footer {
+  padding: 20rpx 30rpx 40rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.qr-btn {
+  width: 100%;
+  height: 88rpx;
+  border-radius: 44rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+}
+
+.qr-btn::after {
+  border: none;
+}
+
+.save-btn {
+  background: linear-gradient(135deg, #FF6B00 0%, #FF8C00 100%);
+  color: #fff;
+  box-shadow: 0 6rpx 20rpx rgba(255, 107, 0, 0.3);
+}
+
+.view-btn {
+  background-color: #F0F0F0;
+  color: #333;
+}
+

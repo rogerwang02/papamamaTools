@@ -1,0 +1,46 @@
+{
+  "pages": [
+    "pages/home/index",
+    "pages/toolbox/index",
+    "pages/profile/index",
+    "pages/create/index",
+    "pages/emergency/index",
+    "pages/share/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "银发医靠",
+    "navigationBarBackgroundColor": "#FF6B00",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#F5F5F5"
+  },
+  "tabBar": {
+    "color": "#7A7E83",
+    "selectedColor": "#FF6B00",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/home/index",
+        "text": "首页",
+        "iconPath": "assets/tabs/home.png",
+        "selectedIconPath": "assets/tabs/home-active.png"
+      },
+      {
+        "pagePath": "pages/toolbox/index",
+        "text": "工具箱",
+        "iconPath": "assets/tabs/tool.png",
+        "selectedIconPath": "assets/tabs/tool-active.png"
+      },
+      {
+        "pagePath": "pages/profile/index",
+        "text": "我的",
+        "iconPath": "assets/tabs/user.png",
+        "selectedIconPath": "assets/tabs/user-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "cloud": true
+}
+

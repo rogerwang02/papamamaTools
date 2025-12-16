@@ -1,0 +1,88 @@
+<!--pages/home/index.wxml-->
+<view class="container">
+  <!-- 顶部欢迎语 -->
+  <view class="header">
+    <text class="welcome-title">早安，守护者</text>
+    <text class="welcome-subtitle">今天也要关注家人的健康哦</text>
+  </view>
+
+  <!-- 核心区域：卡片状态 -->
+  <view class="card-section">
+    <!-- 状态 A: 加载中 -->
+    <view wx:if="{{loading}}" class="loading-container">
+      <view class="loading-icon">⏳</view>
+      <text class="loading-text">加载中...</text>
+    </view>
+
+    <!-- 状态 B: 未创建卡片 -->
+    <view wx:elif="{{!cardInfo}}" class="empty-card" bindtap="onCreateCard">
+      <view class="empty-card-left">
+        <view class="empty-icon">🛡️</view>
+      </view>
+      <view class="empty-card-right">
+        <text class="empty-title">立即制作安心急救卡</text>
+        <text class="empty-desc">关键时刻，让爱有备无患</text>
+      </view>
+    </view>
+
+    <!-- 状态 C: 已创建卡片 -->
+    <view wx:else class="card-container">
+      <!-- 卡片头部 -->
+      <view class="card-header">
+        <text class="card-header-title">🚑 急救卡预览</text>
+        <view class="card-status">
+          <view class="status-dot"></view>
+          <text class="status-text">已激活</text>
+        </view>
+      </view>
+
+      <!-- 卡片内容 -->
+      <view class="card-content">
+        <!-- 姓名（超大号） -->
+        <view class="card-name">{{cardInfo.name}}</view>
+        
+        <!-- 关键信息（两列布局） -->
+        <view class="card-info-grid">
+          <view class="card-info-col">
+            <text class="card-info-label">血型</text>
+            <text class="card-info-value blood-type">{{cardInfo.blood_type}}</text>
+          </view>
+          <view class="card-info-col">
+            <text class="card-info-label">病史</text>
+            <text class="card-info-value conditions">{{cardInfo.conditions || '无'}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 底部按钮区 -->
+      <view class="card-actions">
+        <button class="card-btn edit-btn" bindtap="onEditCard">编辑信息</button>
+        <button class="card-btn qr-btn" bindtap="onShowQRCode">展示二维码</button>
+      </view>
+
+      <!-- 删除按钮 -->
+      <view class="card-delete">
+        <button class="delete-btn" bindtap="onDeleteCard">删除此卡</button>
+      </view>
+
+      <!-- 模拟扫描二维码按钮 -->
+      <view class="card-scan">
+        <button class="scan-btn" bindtap="onSimulateScan">模拟扫描二维码</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 健康提醒区域 -->
+  <view class="reminder-section" wx:if="{{!loading}}">
+    <view class="reminder-header">
+      <text class="reminder-title">健康提醒</text>
+    </view>
+    <view class="reminder-list">
+      <view class="reminder-item" wx:for="{{reminders}}" wx:key="index">
+        <text class="reminder-icon">{{item.icon}}</text>
+        <text class="reminder-text">{{item.text}}</text>
+      </view>
+    </view>
+  </view>
+</view>
+

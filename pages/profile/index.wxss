@@ -1,0 +1,78 @@
+/* pages/profile/index.wxss */
+.container {
+  min-height: 100vh;
+  background-color: #F5F5F5;
+}
+
+.profile-header {
+  background: linear-gradient(135deg, #FF6B00 0%, #FF8C00 100%);
+  padding: 80rpx 0 60rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-bottom-left-radius: 40rpx;
+  border-bottom-right-radius: 40rpx;
+}
+
+.avatar-wrapper {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 6rpx solid rgba(255, 255, 255, 0.3);
+  margin-bottom: 30rpx;
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.user-info {
+  margin-top: 20rpx;
+}
+
+.nickname {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #fff;
+}
+
+.menu-section {
+  margin-top: -60rpx;
+  background-color: #fff;
+  border-radius: 20rpx 20rpx 0 0;
+  padding: 20rpx 0;
+  position: relative;
+  z-index: 1;
+  padding-top: 80rpx;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 32rpx 30rpx;
+  border-bottom: 1rpx solid #F0F0F0;
+}
+
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+.menu-icon {
+  font-size: 40rpx;
+  margin-right: 24rpx;
+}
+
+.menu-text {
+  flex: 1;
+  font-size: 32rpx;
+  color: #333;
+}
+
+.menu-arrow {
+  font-size: 32rpx;
+  color: #999;
+}
+

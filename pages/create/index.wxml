@@ -1,0 +1,112 @@
+<!--pages/create/index.wxml-->
+<view class="container">
+  <view class="header">
+    <text class="title">{{editId ? '编辑卡片信息' : '创建紧急联系卡'}}</text>
+    <text class="subtitle">{{editId ? '修改卡片信息，确保信息准确无误' : '为老人填写基本信息，关键时刻能救命'}}</text>
+  </view>
+
+  <view class="form-container">
+    <view class="form-item">
+      <text class="label">老人姓名 *</text>
+      <input 
+        class="input" 
+        placeholder="请输入老人姓名" 
+        value="{{formData.name}}"
+        bindinput="onNameInput"
+        maxlength="20"
+      />
+    </view>
+
+    <view class="form-item">
+      <text class="label">年龄 *</text>
+      <input 
+        class="input" 
+        type="number" 
+        placeholder="请输入年龄" 
+        value="{{formData.age}}"
+        bindinput="onAgeInput"
+      />
+    </view>
+
+    <view class="form-item">
+      <text class="label">血型 *</text>
+      <picker 
+        mode="selector" 
+        range="{{bloodTypes}}" 
+        value="{{bloodTypeIndex}}"
+        bindchange="onBloodTypeChange"
+      >
+        <view class="picker {{formData.blood_type ? '' : 'placeholder'}}">
+          {{formData.blood_type || '请选择血型'}}
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <text class="label">主要病史/过敏史</text>
+      <text class="form-tip">不同病史、过敏史等可用逗号或换行分隔</text>
+      <textarea 
+        class="textarea" 
+        placeholder="请输入主要病史、过敏史等信息（如：高血压、糖尿病、对青霉素过敏等）" 
+        value="{{formData.conditions}}"
+        bindinput="onConditionsInput"
+        maxlength="200"
+        auto-height
+      />
+    </view>
+
+    <view class="form-item">
+      <text class="label">家属称呼 *</text>
+      <input 
+        class="input" 
+        placeholder="如：儿子、女儿等" 
+        value="{{formData.contact_name}}"
+        bindinput="onContactNameInput"
+        maxlength="10"
+      />
+    </view>
+
+    <view class="form-item">
+      <text class="label">家属电话 *</text>
+      <input 
+        class="input" 
+        type="number" 
+        placeholder="请输入家属联系电话" 
+        value="{{formData.contact_phone}}"
+        bindinput="onContactPhoneInput"
+        maxlength="11"
+      />
+    </view>
+  </view>
+
+  <button class="submit-btn" bindtap="onSubmit" disabled="{{isSubmitting || isGeneratingQR}}">
+    {{isGeneratingQR ? '生成中...' : (isSubmitting ? '保存中...' : (editId ? '保存修改' : '生成安心卡'))}}
+  </button>
+</view>
+
+<!-- 二维码展示模态框 -->
+<view class="qr-modal {{showQRModal ? 'show' : ''}}" catchtap="onCloseQRModal">
+  <view class="qr-modal-content" catchtap="stopPropagation">
+    <view class="qr-modal-header">
+      <text class="qr-modal-title">📱 专属急救二维码</text>
+      <text class="qr-modal-close" bindtap="onCloseQRModal">✕</text>
+    </view>
+    
+    <view class="qr-modal-body">
+      <text class="qr-modal-desc">扫描二维码即可查看紧急医疗信息</text>
+      <image 
+        class="qr-code-image" 
+        src="{{qrCodeFileID}}" 
+        mode="aspectFit"
+        show-menu-by-longpress="{{true}}"
+      />
+      <text class="qr-modal-tip">长按图片也可以保存到相册</text>
+    </view>
+
+    <view class="qr-modal-footer">
+      <button class="qr-btn save-btn" bindtap="onSaveQRCode">保存图片到相册</button>
+      <button class="qr-btn view-btn" bindtap="onViewEmergencyCard">查看急救卡</button>
+    </view>
+  </view>
+</view>
+

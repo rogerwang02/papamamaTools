@@ -1,0 +1,31 @@
+<!--pages/toolbox/index.wxml-->
+<view class="container">
+  <view class="header">
+    <text class="title">工具箱</text>
+    <text class="subtitle">为您提供贴心的健康工具</text>
+  </view>
+
+  <view class="grid-container">
+    <view class="grid-item" bindtap="onToolClick" data-tool="torch">
+      <view class="grid-item-inner">
+        <view class="tool-icon">🔦</view>
+        <text class="tool-name">大字手电筒</text>
+      </view>
+    </view>
+
+    <view class="grid-item" bindtap="onToolClick" data-tool="hospital">
+      <view class="grid-item-inner">
+        <view class="tool-icon">🏥</view>
+        <text class="tool-name">医院导航</text>
+      </view>
+    </view>
+
+    <view class="grid-item" bindtap="onToolClick" data-tool="medicine">
+      <view class="grid-item-inner">
+        <view class="tool-icon">💊</view>
+        <text class="tool-name">药品提醒</text>
+      </view>
+    </view>
+  </view>
+</view>
+

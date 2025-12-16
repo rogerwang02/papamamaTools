@@ -1,0 +1,76 @@
+<!--pages/share/index.wxml-->
+<view class="container">
+  <!-- Canvas 预览区域 -->
+  <view class="canvas-wrapper">
+    <view class="canvas-container">
+      <canvas 
+        type="2d" 
+        id="preview-canvas" 
+        class="preview-canvas"
+        style="width: {{canvasStyleWidth}}; height: {{canvasStyleHeight}};"
+      ></canvas>
+    </view>
+  </view>
+
+  <!-- Tab 切换按钮 -->
+  <view class="tab-bar">
+    <view 
+      class="tab-item {{currentMode === 'print' ? 'active' : ''}}" 
+      bindtap="onTabChange" 
+      data-mode="print"
+    >
+      <text class="tab-icon">🖨️</text>
+      <text class="tab-text">实体打印版</text>
+    </view>
+    <view 
+      class="tab-item {{currentMode === 'wallpaper' ? 'active' : ''}}" 
+      bindtap="onTabChange" 
+      data-mode="wallpaper"
+    >
+      <text class="tab-icon">📱</text>
+      <text class="tab-text">手机壁纸版</text>
+    </view>
+  </view>
+
+  <!-- 底部操作区 -->
+  <view class="action-area">
+    <!-- 打印版操作区 -->
+    <view wx:if="{{currentMode === 'print'}}" class="print-actions">
+      <view class="safety-tip">
+        <text class="tip-text">温馨提示：此二维码仅包含紧急联系方式，不含身份证等敏感隐私，请放心扫码。</text>
+      </view>
+      <button class="save-btn print-btn" bindtap="onSavePrintImage">保存打印图片</button>
+    </view>
+
+    <!-- 壁纸版操作区 -->
+    <view wx:else class="wallpaper-actions">
+      <view class="bg-selector">
+        <view class="bg-option" bindtap="onUploadPhoto">
+          <text class="bg-option-icon">📸</text>
+          <text class="bg-option-text">上传照片</text>
+        </view>
+        <view class="bg-option" bindtap="onSelectDefaultBg">
+          <text class="bg-option-icon">🎨</text>
+          <text class="bg-option-text">选择默认背景</text>
+        </view>
+      </view>
+
+      <!-- 默认背景选择器 -->
+      <view wx:if="{{showDefaultBgSelector}}" class="default-bg-list">
+        <view 
+          class="default-bg-item {{selectedBgIndex === index ? 'selected' : ''}}"
+          wx:for="{{defaultBackgrounds}}" 
+          wx:key="index"
+          bindtap="onSelectBg"
+          data-index="{{index}}"
+        >
+          <view class="bg-thumbnail" style="background-color: {{item.color}};"></view>
+          <text class="bg-name">{{item.name}}</text>
+        </view>
+      </view>
+
+      <button class="save-btn wallpaper-btn" bindtap="onSaveWallpaperImage">保存壁纸图片</button>
+    </view>
+  </view>
+</view>
+

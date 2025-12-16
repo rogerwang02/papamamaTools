@@ -1,0 +1,221 @@
+/* pages/share/index.wxss */
+.container {
+  min-height: 100vh;
+  background-color: #F5F5F5;
+  padding: 20rpx;
+  padding-bottom: 40rpx;
+  padding-top: 20rpx;
+}
+
+/* Canvas 预览区域 */
+.canvas-wrapper {
+  background-color: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 30rpx 20rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 2rpx 16rpx rgba(0, 0, 0, 0.08);
+}
+
+/* === 1. 画布容器 (紧凑版) === */
+.canvas-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* 减少上下间距，把内容往上提 */
+  padding: 10rpx 0; 
+  /* 移除不必要的 min-height，避免强制撑开 */
+  min-height: auto;
+  /* 确保容器本身不带色 */
+  background-color: transparent;
+}
+
+.preview-canvas {
+  box-shadow: 0 10rpx 30rpx rgba(0,0,0,0.15);
+  border-radius: 16rpx;
+  transition: all 0.3s ease;
+  display: block;
+  background-color: #FFFFFF;
+  max-width: 100%;
+  height: auto;
+}
+
+/* === 2. 模式切换按钮组 (扁平化横排) === */
+.tab-bar {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 30rpx;
+  /* 关键：强制背景透明，去掉突兀的白条 */
+  background-color: transparent !important;
+  /* 移除 box-shadow 和 border-radius，因为不再有容器背景 */
+  /* 关键：大幅减少与上方 Canvas 的距离 */
+  margin-top: 20rpx; 
+  margin-bottom: 20rpx;
+}
+
+.tab-item {
+  flex: 1;
+  /* 强制固定高度，变瘦 */
+  height: 88rpx; 
+  display: flex;
+  /* 关键：水平排列 (Row) */
+  flex-direction: row; 
+  align-items: center;
+  justify-content: center;
+  /* 确保按钮本身有背景色 */
+  background-color: #FFFFFF; /* 默认白色背景 */
+  border-radius: 12rpx;
+  margin: 0 12rpx;
+  transition: all 0.2s;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06); /* 给按钮添加阴影，增强浮起效果 */
+}
+
+.tab-item.active {
+  background-color: #FF6B00;
+  color: #FFFFFF;
+  font-weight: bold;
+}
+
+.tab-icon {
+  width: 36rpx;
+  height: 36rpx;
+  /* 图标在文字左边，右侧留间距 */
+  margin-right: 12rpx;
+  margin-bottom: 0; /* 移除底部间距 */
+  line-height: 1;
+}
+
+.tab-text {
+  font-size: 28rpx;
+  line-height: 1;
+  color: #666;
+  font-weight: 500;
+}
+
+.tab-item.active .tab-text {
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+/* === 3. 底部操作区 (确保紧凑) === */
+.action-area {
+  background-color: #FFFFFF;
+  border-radius: 20rpx;
+  padding: 40rpx 30rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+  margin-bottom: 30rpx; /* 留一点底边距即可 */
+}
+
+/* 打印版操作区 */
+.safety-tip {
+  background-color: #FFF5E6;
+  border-left: 4rpx solid #FF6B00;
+  padding: 24rpx;
+  border-radius: 8rpx;
+  margin-bottom: 30rpx;
+}
+
+.tip-text {
+  font-size: 24rpx;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* 壁纸版操作区 */
+.bg-selector {
+  display: flex;
+  gap: 20rpx;
+  margin-bottom: 30rpx;
+}
+
+.bg-option {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30rpx 20rpx;
+  background-color: #F8F8F8;
+  border-radius: 12rpx;
+  border: 2rpx solid #E0E0E0;
+}
+
+.bg-option-icon {
+  font-size: 48rpx;
+  margin-bottom: 12rpx;
+}
+
+.bg-option-text {
+  font-size: 26rpx;
+  color: #333;
+}
+
+/* 默认背景列表 */
+.default-bg-list {
+  display: flex;
+  gap: 20rpx;
+  margin-bottom: 30rpx;
+  flex-wrap: wrap;
+}
+
+.default-bg-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: calc(33.33% - 14rpx);
+}
+
+.bg-thumbnail {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 12rpx;
+  border: 3rpx solid transparent;
+  margin-bottom: 12rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+.default-bg-item.selected .bg-thumbnail {
+  border-color: #FF6B00;
+  box-shadow: 0 4rpx 12rpx rgba(255, 107, 0, 0.3);
+}
+
+.bg-name {
+  font-size: 22rpx;
+  color: #666;
+  text-align: center;
+}
+
+.default-bg-item.selected .bg-name {
+  color: #FF6B00;
+  font-weight: 600;
+}
+
+/* 保存按钮 */
+.save-btn {
+  width: 100%;
+  height: 100rpx;
+  border-radius: 50rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20rpx;
+}
+
+.save-btn::after {
+  border: none;
+}
+
+.print-btn {
+  background: linear-gradient(135deg, #FF6B00 0%, #FF8C00 100%);
+  color: #FFFFFF;
+  box-shadow: 0 8rpx 20rpx rgba(255, 107, 0, 0.3);
+}
+
+.wallpaper-btn {
+  background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+  color: #FFFFFF;
+  box-shadow: 0 8rpx 20rpx rgba(74, 144, 226, 0.3);
+}
+
