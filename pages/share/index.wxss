@@ -16,6 +16,21 @@
   box-shadow: 0 2rpx 16rpx rgba(0, 0, 0, 0.08);
 }
 
+/* 壁纸模式：移除 padding 和背景，确保 Canvas 渲染为完整的 750rpx 宽度 */
+.wallpaper-mode-wrapper {
+  padding: 0 !important; /* 移除 padding 以允许 750rpx 完整宽度 */
+  background-color: transparent !important; /* 与容器背景融合 */
+  box-shadow: none !important; /* 移除阴影样式，壁纸预览更干净 */
+  border-radius: 0 !important; /* 移除圆角 */
+  margin-bottom: 24rpx; /* 保留底部间距 */
+}
+
+/* 确保 canvas 容器在壁纸模式下允许完整宽度 */
+.wallpaper-mode-wrapper .canvas-container {
+  width: 100%;
+  padding: 0; /* 移除容器内边距 */
+}
+
 /* === 1. 画布容器 (紧凑版) === */
 .canvas-container {
   width: 100%;
@@ -53,39 +68,34 @@
   /* 不设置 touch-action: none，允许页面正常滚动 */
 }
 
-/* 二维码区域的视觉代理覆盖层（拖拽时显示，避免 Canvas 重绘） */
-/* KEY FIX: 始终存在于 DOM 中，默认不可见但可交互（透明热点），避免销毁重建导致的闪烁 */
+/* 二维码浮动层（Floating Widget） */
 .qr-widget-overlay {
   position: absolute;
-  z-index: 100;
+  /* 确保高 z-index 以在顶层并接收触摸事件 */
+  z-index: 999;
   
-  /* 匹配 Canvas 绘制效果：渐变背景（白色到淡橙色） */
+  /* 匹配 Canvas 设计 */
   background: linear-gradient(180deg, #FFFFFF 0%, #FFF0E5 100%);
-  border-radius: 20rpx;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.3);
+  border-radius: 40rpx; /* 约 20px */
+  box-shadow: 0 8rpx 30rpx rgba(0, 0, 0, 0.3);
   
+  /* Flex 布局 */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  box-sizing: border-box;
-  padding: 20rpx;
   
-  /* KEY FIX: 默认状态是不可见但可交互（透明热点） */
-  opacity: 0;
-  pointer-events: auto;
-  transition: opacity 0.1s ease; /* 平滑过渡 */
-}
-
-/* 拖拽激活状态，完全可见并作为视觉代理 */
-.qr-widget-overlay.draggable-active {
+  /* 内容内边距 */
+  padding: 20rpx;
+  box-sizing: border-box;
+  
+  /* 确保可见和可交互 */
   opacity: 1;
-  /* 可选：添加轻微缩放效果，提供视觉反馈 */
-  transform: scale(1.02);
-  box-shadow: 0 8rpx 30rpx rgba(0, 0, 0, 0.4);
+  pointer-events: auto;
+  transition: none; /* 移除过渡以实现即时拖拽 */
 }
 
-/* Widget 内容容器 */
+/* 内容容器 */
 .widget-content {
   width: 100%;
   height: 100%;
@@ -97,14 +107,16 @@
 
 /* 二维码图片 */
 .widget-qr {
-  width: 230rpx; /* 匹配 qrSize (widgetWidth - 40 = 270 - 40 = 230) */
-  height: 230rpx;
-  margin-top: 20rpx;
+  /* 增大二维码尺寸，竖版壁纸需要更大的二维码 */
+  width: 320rpx;
+  height: 320rpx;
+  margin-top: 0;
 }
 
 /* 文字组 */
 .widget-text-group {
-  margin-top: 50rpx;
+  /* 与二维码的间距 */
+  margin-top: 15rpx;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -115,10 +127,14 @@
 /* 文字样式 */
 .widget-text-title,
 .widget-text-desc {
-  font-size: 22rpx;
+  /* 增大字体并确保单行显示，避免折成多行 */
+  font-size: 26rpx;
   font-weight: bold;
-  color: #000000;
-  line-height: 1.2;
+  color: #000;
+  line-height: 1.4;
+  white-space: nowrap; /* 防止文字换行 */
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* === 2. 模式切换按钮组 (扁平化横排) === */
@@ -298,4 +314,3 @@
   color: #FFFFFF;
   box-shadow: 0 8rpx 20rpx rgba(74, 144, 226, 0.3);
 }
-

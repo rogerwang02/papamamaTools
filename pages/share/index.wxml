@@ -1,19 +1,31 @@
 <!--pages/share/index.wxml-->
 <view class="container">
   <!-- Canvas 预览区域 -->
-  <view class="canvas-wrapper">
-    <view 
-      class="canvas-container {{currentMode === 'wallpaper' ? 'draggable-container' : ''}}"
-      bindtouchstart="onCanvasTouchStart"
-      catchtouchmove="onCanvasTouchMove"
-      bindtouchend="onCanvasTouchEnd"
-    >
+  <view class="canvas-wrapper {{currentMode === 'wallpaper' ? 'wallpaper-mode-wrapper' : ''}}">
+    <view class="canvas-container">
       <canvas 
         type="2d" 
         id="preview-canvas" 
-        class="preview-canvas {{currentMode === 'wallpaper' ? 'draggable-canvas' : ''}}"
+        class="preview-canvas"
         style="width: {{canvasStyleWidth}}; height: {{canvasStyleHeight}};"
       ></canvas>
+      <!-- 二维码 Widget 浮动层（壁纸模式下显示） -->
+      <view 
+        wx:if="{{currentMode === 'wallpaper' && qrWidgetX !== null && qrWidgetY !== null}}"
+        class="qr-widget-overlay"
+        style="left: {{qrWidgetOverlayLeft}}px; top: {{qrWidgetOverlayTop}}px; width: {{qrWidgetOverlayWidth}}px; height: {{qrWidgetOverlayHeight}}px; opacity: 1;"
+        catchtouchstart="onQRWidgetTouchStart"
+        catchtouchmove="onQRWidgetTouchMove"
+        catchtouchend="onQRWidgetTouchEnd"
+      >
+        <view class="widget-content">
+          <image wx:if="{{qrCodePath}}" class="widget-qr" src="{{qrCodePath}}" mode="aspectFit"></image>
+          <view class="widget-text-group">
+            <text class="widget-text-title">请在机主需要帮助时</text>
+            <text class="widget-text-desc">扫码查看紧急联系人</text>
+          </view>
+        </view>
+      </view>
     </view>
   </view>
 
@@ -77,4 +89,3 @@
     </view>
   </view>
 </view>
-
