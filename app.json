@@ -41,6 +41,7 @@
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json",
-  "cloud": true
+  "cloud": true,
+  "lazyCodeLoading": "requiredComponents"
 }
 

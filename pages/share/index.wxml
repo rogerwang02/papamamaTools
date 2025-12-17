@@ -2,11 +2,16 @@
 <view class="container">
   <!-- Canvas 预览区域 -->
   <view class="canvas-wrapper">
-    <view class="canvas-container">
+    <view 
+      class="canvas-container {{currentMode === 'wallpaper' ? 'draggable-container' : ''}}"
+      bindtouchstart="onCanvasTouchStart"
+      catchtouchmove="onCanvasTouchMove"
+      bindtouchend="onCanvasTouchEnd"
+    >
       <canvas 
         type="2d" 
         id="preview-canvas" 
-        class="preview-canvas"
+        class="preview-canvas {{currentMode === 'wallpaper' ? 'draggable-canvas' : ''}}"
         style="width: {{canvasStyleWidth}}; height: {{canvasStyleHeight}};"
       ></canvas>
     </view>
@@ -59,13 +64,12 @@
       <view wx:if="{{showDefaultBgSelector}}" class="default-bg-list">
         <view 
           class="default-bg-item {{selectedBgIndex === index ? 'selected' : ''}}"
-          wx:for="{{defaultBackgrounds}}" 
+          wx:for="{{defaultWallpapers}}" 
           wx:key="index"
           bindtap="onSelectBg"
           data-index="{{index}}"
         >
-          <view class="bg-thumbnail" style="background-color: {{item.color}};"></view>
-          <text class="bg-name">{{item.name}}</text>
+          <image class="bg-thumbnail" src="{{item}}" mode="aspectFill"></image>
         </view>
       </view>
 

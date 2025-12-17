@@ -13,12 +13,32 @@ Page({
     selectedBgPath: '',
     showDefaultBgSelector: false,
     selectedBgIndex: -1,
-    defaultBackgrounds: [
-      { name: '经典蓝', color: '#4A90E2' },
-      { name: '温暖橙', color: '#FF6B00' },
-      { name: '清新绿', color: '#52C41A' }
-    ]
+    // 默认壁纸图片路径（从 pages/share/ 到 assets/ 的相对路径）
+    defaultWallpapers: [
+      '../../assets/p1.jpg',
+      '../../assets/p2.jpg',
+      '../../assets/p3.jpg'
+    ],
+    // 二维码 widget 位置（用于拖拽功能）
+    qrWidgetX: null, // Canvas 坐标系的 X
+    qrWidgetY: null, // Canvas 坐标系的 Y
+    isDragging: false, // 是否正在拖拽
+    touchStartX: 0, // 触摸开始时的 X 坐标（屏幕坐标）
+    touchStartY: 0, // 触摸开始时的 Y 坐标（屏幕坐标）
+    qrWidgetStartX: 0, // 拖拽开始时 widget 的 X 坐标（Canvas 坐标）
+    qrWidgetStartY: 0, // 拖拽开始时 widget 的 Y 坐标（Canvas 坐标）
+    // 图片路径追踪（用于判断是否需要重新加载）
+    lastBgImagePath: '', // 上次加载的背景图片路径
+    lastQRCodePath: '', // 上次加载的二维码路径
+    touchStartInQRWidget: false // 触摸是否在二维码 widget 区域内开始
   },
+
+  // 实例变量：缓存图片对象（不能存储在 data 中，因为 setData 无法序列化 Native Image 对象）
+  bgImageCache: null, // 缓存的背景图片对象
+  qrImageCache: null, // 缓存的二维码图片对象
+  // 节流定时器和缓存
+  redrawTimer: null, // Canvas 重绘的定时器（用于节流）
+  canvasRectCache: null, // 缓存的 Canvas 位置信息
 
   // 更新Canvas尺寸（根据模式）
   updateCanvasSize(mode) {
@@ -207,8 +227,16 @@ Page({
       // [壁纸模式] 自适应高度
       cssW = 750; // 全屏宽度
       
-      // 根据图片确定高度
-      const bgImage = this.data.selectedBgPath || '';
+      // 根据图片确定高度（如果没有选择背景，默认使用第一张图片）
+      let bgImage = this.data.selectedBgPath;
+      if (!bgImage || bgImage.startsWith('#')) {
+        // 如果没有选择背景或者是颜色值，使用默认第一张图片
+        bgImage = this.data.defaultWallpapers[0];
+        this.setData({
+          selectedBgPath: bgImage,
+          selectedBgIndex: 0
+        });
+      }
       
       if (bgImage && !bgImage.startsWith('#')) {
         try {
@@ -232,13 +260,25 @@ Page({
           logH = 1334;
         }
       } else {
-        // 默认颜色背景 (高屏比例)
+        // 如果仍然是颜色值（不应该发生），使用默认高比例
         cssH = 1200;
         logW = 750;
         logH = 1334;
       }
 
       this.applyCanvasSize(mode, cssW, cssH, logW, logH);
+      
+      // 切换到壁纸模式时，如果二维码位置未初始化，使用默认位置
+      if (this.data.qrWidgetX === null || this.data.qrWidgetY === null) {
+        const widgetWidth = 270;
+        const widgetHeight = 270 - 40 + 100;
+        const defaultX = logW - widgetWidth - 40;
+        const defaultY = logH - widgetHeight - 240;
+        this.setData({
+          qrWidgetX: defaultX,
+          qrWidgetY: defaultY
+        });
+      }
     }
   },
 
@@ -401,7 +441,7 @@ Page({
   },
 
   // 绘制壁纸版 (Contain模式 - 保证完整显示)
-  async drawWallpaperMode(canvas, ctx, qrCodePath, bgImagePath) {
+  async drawWallpaperMode(canvas, ctx, qrCodePath, bgImagePath, skipImageLoad = false) {
     // 从 data 获取 Canvas 尺寸（现在 Canvas 尺寸等于图片尺寸）
     const width = this.data.canvasWidth;
     const height = this.data.canvasHeight;
@@ -412,38 +452,67 @@ Page({
     // === 1. 绘制背景色 ===
     const defaultBgColor = (bgImagePath && bgImagePath.startsWith('#')) 
                           ? bgImagePath 
-                          : '#FF6B00'; // 默认橙色
+                          : '#FFFFFF'; // 默认白色
     ctx.fillStyle = defaultBgColor;
     ctx.fillRect(0, 0, width, height);
 
-    // === 2. 绘制图片 (简单填充 - 因为 Canvas 尺寸现在等于图片尺寸) ===
+    // === 2. 绘制图片 (使用实例变量缓存，避免闪烁) ===
     if (bgImagePath && !bgImagePath.startsWith('#')) {
       try {
-        const bgImage = canvas.createImage();
-        await new Promise((resolve) => { 
-          bgImage.onload = resolve; 
-          bgImage.src = bgImagePath; 
-        });
+        // 使用实例变量（不能存储在 data 中，因为 setData 无法序列化 Native Image 对象）
+        let bgImage = this.bgImageCache;
         
-        // 直接在 0,0 位置绘制，填满整个 Canvas
-        ctx.drawImage(bgImage, 0, 0, width, height);
+        // 如果没有缓存或者背景路径改变了，需要重新加载
+        if (!skipImageLoad && (!bgImage || this.data.lastBgImagePath !== bgImagePath)) {
+          bgImage = canvas.createImage();
+          await new Promise((resolve, reject) => { 
+            bgImage.onload = resolve;
+            bgImage.onerror = reject;
+            bgImage.src = bgImagePath; 
+          });
+          // 存储到实例变量（NOT DATA）
+          this.bgImageCache = bgImage;
+          this.setData({ lastBgImagePath: bgImagePath });
+        }
+        
+        // 如果有缓存的图片，直接使用
+        if (bgImage) {
+          // 直接在 0,0 位置绘制，填满整个 Canvas
+          ctx.drawImage(bgImage, 0, 0, width, height);
+        }
       } catch(e) {
         console.error('背景图绘制失败', e);
       }
     }
 
-    // === 3. 绘制右下角小部件 ===
-    // 固定可读尺寸，适用于 750px 宽度
+    // === 3. 绘制二维码小部件（可拖拽）===
+    // 纯白色背景 + 二维码 + 提示语
     const widgetWidth = 270; 
     const qrSize = widgetWidth - 40; 
-    const widgetHeight = qrSize + 70;
+    const widgetHeight = qrSize + 100;
     
-    // 位置：右下角，带边距
-    const cardX = width - widgetWidth - 40;
-    const cardY = height - widgetHeight - 40;
+    // 位置：使用保存的位置，如果没有则使用默认位置（右下角）
+    let cardX, cardY;
+    if (this.data.qrWidgetX !== null && this.data.qrWidgetY !== null) {
+      // 使用保存的位置
+      cardX = this.data.qrWidgetX;
+      cardY = this.data.qrWidgetY;
+    } else {
+      // 默认位置：右下角，带边距
+      cardX = width - widgetWidth - 40;
+      cardY = height - widgetHeight - 240;
+      // 保存默认位置到 data
+      this.setData({
+        qrWidgetX: cardX,
+        qrWidgetY: cardY
+      });
+    }
 
-    // 1. 白色卡片
-    ctx.fillStyle = '#FFFFFF';
+    // 1. 渐变色卡片
+    const gradient = ctx.createLinearGradient(cardX, cardY, cardX, cardY + widgetHeight);
+    gradient.addColorStop(0, '#FFFFFF'); 
+    gradient.addColorStop(1, '#FFF0E5'); // 淡橙色
+    ctx.fillStyle = gradient;
     ctx.shadowColor = 'rgba(0, 0, 0, 0.3)'; // 更深的阴影以提高可见性
     ctx.shadowBlur = 20;
     ctx.shadowOffsetY = 4;
@@ -451,15 +520,29 @@ Page({
     ctx.fill();
     ctx.shadowColor = 'transparent';
 
-    // 2. QR 码
+    // 2. QR 码（使用实例变量缓存，避免闪烁）
     if (qrCodePath) {
         try {
-            const qrImage = canvas.createImage();
-            await new Promise((resolve) => { 
-              qrImage.onload = resolve; 
-              qrImage.src = qrCodePath; 
-            });
-            ctx.drawImage(qrImage, cardX + 20, cardY + 20, qrSize, qrSize);
+            // 使用实例变量（不能存储在 data 中，因为 setData 无法序列化 Native Image 对象）
+            let qrImage = this.qrImageCache;
+            
+            // 如果没有缓存或者二维码路径改变了，需要重新加载
+            if (!skipImageLoad && (!qrImage || this.data.lastQRCodePath !== qrCodePath)) {
+              qrImage = canvas.createImage();
+              await new Promise((resolve, reject) => { 
+                qrImage.onload = resolve;
+                qrImage.onerror = reject;
+                qrImage.src = qrCodePath; 
+              });
+              // 存储到实例变量（NOT DATA）
+              this.qrImageCache = qrImage;
+              this.setData({ lastQRCodePath: qrCodePath });
+            }
+            
+            // 如果有缓存的图片，直接使用
+            if (qrImage) {
+              ctx.drawImage(qrImage, cardX + 20, cardY + 20, qrSize, qrSize);
+            }
         } catch(e) {
           console.error('QR 码绘制失败', e);
         }
@@ -469,8 +552,8 @@ Page({
     ctx.fillStyle = '#000000';
     ctx.font = 'bold 22px sans-serif'; // 更大的字体，适用于 750px 宽度
     ctx.textAlign = 'center';
-    ctx.fillText('扫码查看', cardX + widgetWidth/2, cardY + qrSize + 40);
-    ctx.fillText('紧急联系人', cardX + widgetWidth/2, cardY + qrSize + 66);
+    ctx.fillText('请在机主需要帮助时', cardX + widgetWidth/2, cardY + qrSize + 50);
+    ctx.fillText('扫码查看紧急联系人', cardX + widgetWidth/2, cardY + qrSize + 80);
   },
 
   // 辅助函数：绘制警告图标 (避免真机 Emoji 乱码)
@@ -653,20 +736,20 @@ Page({
   // 选择背景
   async onSelectBg(e) {
     const index = e.currentTarget.dataset.index;
-    const bg = this.data.defaultBackgrounds[index];
+    const bgImagePath = this.data.defaultWallpapers[index];
     
     this.setData({
       selectedBgIndex: index,
-      selectedBgPath: bg.color, // 使用颜色值
+      selectedBgPath: bgImagePath, // 使用图片路径
       showDefaultBgSelector: false
     });
 
-    // 如果当前是壁纸模式，需要重新计算 Canvas 尺寸并绘制
+    // 如果当前是壁纸模式，需要重新计算 Canvas 尺寸并绘制（自适应高度）
     if (this.data.currentMode === 'wallpaper') {
       await this.onTabChange({ currentTarget: { dataset: { mode: 'wallpaper' } } });
     } else if (this.data.qrCodePath && this.data.canvas && this.data.ctx) {
       // 如果不是壁纸模式，直接绘制（不应该发生）
-      await this.drawWallpaperMode(this.data.canvas, this.data.ctx, this.data.qrCodePath, bg.color);
+      await this.drawWallpaperMode(this.data.canvas, this.data.ctx, this.data.qrCodePath, bgImagePath);
     }
   },
 
@@ -778,6 +861,214 @@ Page({
         fail: reject
       }, this);
     });
+  },
+
+  // ===== 拖拽功能 =====
+  // 触摸开始
+  onCanvasTouchStart(e) {
+    // 只在壁纸模式下启用拖拽
+    if (this.data.currentMode !== 'wallpaper') {
+      return;
+    }
+
+    const touch = e.touches[0];
+    if (!touch) return;
+    
+    // 获取 Canvas 的位置信息
+    const query = wx.createSelectorQuery().in(this);
+    query.select('#preview-canvas').boundingClientRect((rect) => {
+      if (!rect) {
+        return;
+      }
+
+      // 微信小程序使用 pageX/pageY，如果没有则使用 x/y
+      const touchX = touch.pageX || touch.x || 0;
+      const touchY = touch.pageY || touch.y || 0;
+
+      // 将屏幕坐标转换为 Canvas 坐标
+      const canvasX = (touchX - rect.left) * (this.data.canvasWidth / rect.width);
+      const canvasY = (touchY - rect.top) * (this.data.canvasHeight / rect.height);
+
+      // 检查触摸点是否在二维码 widget 区域内
+      const widgetWidth = 270;
+      const widgetHeight = 270 - 40 + 100; // qrSize + 100（与绘制逻辑一致）
+      
+      let cardX = this.data.qrWidgetX;
+      let cardY = this.data.qrWidgetY;
+      
+      // 如果没有保存的位置，使用默认位置
+      if (cardX === null || cardY === null) {
+        cardX = this.data.canvasWidth - widgetWidth - 40;
+        cardY = this.data.canvasHeight - widgetHeight - 240;
+        // 立即保存默认位置
+        this.setData({
+          qrWidgetX: cardX,
+          qrWidgetY: cardY
+        });
+      }
+
+      // 检查是否在 widget 区域内
+      const isInWidget = canvasX >= cardX && canvasX <= cardX + widgetWidth &&
+                         canvasY >= cardY && canvasY <= cardY + widgetHeight;
+      
+      console.log('触摸检测:', {
+        canvasX: canvasX.toFixed(2),
+        canvasY: canvasY.toFixed(2),
+        cardX: cardX.toFixed(2),
+        cardY: cardY.toFixed(2),
+        widgetWidth,
+        widgetHeight,
+        isInWidget,
+        qrWidgetX: this.data.qrWidgetX,
+        qrWidgetY: this.data.qrWidgetY,
+        canvasWidth: this.data.canvasWidth,
+        canvasHeight: this.data.canvasHeight
+      });
+      
+      if (isInWidget) {
+        // 开始拖拽
+        this.setData({
+          isDragging: true,
+          touchStartInQRWidget: true,
+          touchStartX: touchX,
+          touchStartY: touchY,
+          qrWidgetStartX: cardX,
+          qrWidgetStartY: cardY
+        });
+        
+        // 缓存 rect，避免后续频繁查询
+        this.canvasRectCache = rect;
+        
+        console.log('✅ 开始拖拽成功！位置:', cardX, cardY);
+      } else {
+        console.log('❌ 不在二维码区域内');
+      }
+    }).exec();
+  },
+
+  // 触摸移动（拖拽二维码）
+  onCanvasTouchMove(e) {
+    // 只在壁纸模式下处理
+    if (this.data.currentMode !== 'wallpaper') {
+      return;
+    }
+    
+    // 如果不在拖拽状态，不处理（允许页面滚动）
+    if (!this.data.isDragging || !this.data.touchStartInQRWidget) {
+      return;
+    }
+    
+    // 在拖拽状态下，阻止页面滚动（小程序事件对象没有 stopPropagation，使用 catchtouchmove 代替）
+    
+    const touch = e.touches[0];
+    if (!touch) {
+      console.log('触摸移动：无触摸点');
+      return;
+    }
+    
+    const touchX = touch.pageX || touch.x || 0;
+    const touchY = touch.pageY || touch.y || 0;
+    
+    // 使用缓存的 rect
+    let rect = this.canvasRectCache;
+    
+    if (!rect) {
+      console.log('触摸移动：rect 缓存不存在，重新查询');
+      const query = wx.createSelectorQuery().in(this);
+      query.select('#preview-canvas').boundingClientRect((r) => {
+        if (!r) {
+          console.log('触摸移动：无法获取 Canvas rect');
+          return;
+        }
+        this.canvasRectCache = r;
+        this.handleDragMove(touchX, touchY, r);
+      }).exec();
+    } else {
+      this.handleDragMove(touchX, touchY, rect);
+    }
+  },
+
+  // 处理拖拽移动
+  handleDragMove(touchX, touchY, rect) {
+    // 计算移动距离
+    const deltaX = touchX - this.data.touchStartX;
+    const deltaY = touchY - this.data.touchStartY;
+    
+    // 转换为 Canvas 坐标系的距离
+    const canvasDeltaX = deltaX * (this.data.canvasWidth / rect.width);
+    const canvasDeltaY = deltaY * (this.data.canvasHeight / rect.height);
+    
+    // 计算新位置
+    let newX = this.data.qrWidgetStartX + canvasDeltaX;
+    let newY = this.data.qrWidgetStartY + canvasDeltaY;
+    
+    // 边界检查
+    const widgetWidth = 270;
+    const widgetHeight = 270 - 40 + 100;
+    
+    newX = Math.max(0, Math.min(newX, this.data.canvasWidth - widgetWidth));
+    newY = Math.max(0, Math.min(newY, this.data.canvasHeight - widgetHeight));
+    
+    console.log('拖拽移动:', {
+      deltaX, deltaY,
+      canvasDeltaX, canvasDeltaY,
+      oldX: this.data.qrWidgetX,
+      oldY: this.data.qrWidgetY,
+      newX, newY
+    });
+    
+    // 更新位置
+    this.setData({
+      qrWidgetX: newX,
+      qrWidgetY: newY
+    });
+    
+    // 节流重绘 Canvas（避免过度重绘导致卡顿）
+    if (this.redrawTimer) {
+      clearTimeout(this.redrawTimer);
+    }
+    this.redrawTimer = setTimeout(() => {
+      this.redrawWallpaperMode();
+    }, 33); // 约 30fps，减少重绘频率以提高性能
+  },
+
+  // 触摸结束
+  onCanvasTouchEnd(e) {
+    if (this.data.isDragging && this.data.touchStartInQRWidget) {
+      // 清除定时器
+      if (this.redrawTimer) {
+        clearTimeout(this.redrawTimer);
+        this.redrawTimer = null;
+      }
+      
+      // 最终重绘一次
+      this.redrawWallpaperMode();
+      
+      // 重置状态
+      this.setData({
+        isDragging: false,
+        touchStartInQRWidget: false
+      });
+    }
+  },
+
+  // 重绘壁纸模式（用于拖拽时实时更新）
+  async redrawWallpaperMode() {
+    if (this.data.currentMode !== 'wallpaper' || !this.data.canvas || !this.data.ctx) {
+      return;
+    }
+
+    const canvas = this.data.canvas;
+    const ctx = this.data.ctx;
+    const qrCodePath = this.data.qrCodePath;
+    const selectedBgPath = this.data.selectedBgPath || '';
+
+    try {
+      // skipImageLoad = true 表示跳过图片重新加载，使用缓存，避免闪烁
+      await this.drawWallpaperMode(canvas, ctx, qrCodePath, selectedBgPath, true);
+    } catch (error) {
+      console.error('重绘失败:', error);
+    }
   }
 });
 

@@ -40,6 +40,87 @@
   height: auto;
 }
 
+/* 壁纸模式下可拖拽的容器 */
+.draggable-container {
+  user-select: none; /* 禁止选择文本 */
+  position: relative;
+  /* 不设置 touch-action: none，允许页面正常滚动 */
+}
+
+/* 壁纸模式下可拖拽的 Canvas */
+.draggable-canvas {
+  user-select: none; /* 禁止选择文本 */
+  /* 不设置 touch-action: none，允许页面正常滚动 */
+}
+
+/* 二维码区域的视觉代理覆盖层（拖拽时显示，避免 Canvas 重绘） */
+/* KEY FIX: 始终存在于 DOM 中，默认不可见但可交互（透明热点），避免销毁重建导致的闪烁 */
+.qr-widget-overlay {
+  position: absolute;
+  z-index: 100;
+  
+  /* 匹配 Canvas 绘制效果：渐变背景（白色到淡橙色） */
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFF0E5 100%);
+  border-radius: 20rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.3);
+  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 20rpx;
+  
+  /* KEY FIX: 默认状态是不可见但可交互（透明热点） */
+  opacity: 0;
+  pointer-events: auto;
+  transition: opacity 0.1s ease; /* 平滑过渡 */
+}
+
+/* 拖拽激活状态，完全可见并作为视觉代理 */
+.qr-widget-overlay.draggable-active {
+  opacity: 1;
+  /* 可选：添加轻微缩放效果，提供视觉反馈 */
+  transform: scale(1.02);
+  box-shadow: 0 8rpx 30rpx rgba(0, 0, 0, 0.4);
+}
+
+/* Widget 内容容器 */
+.widget-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* 二维码图片 */
+.widget-qr {
+  width: 230rpx; /* 匹配 qrSize (widgetWidth - 40 = 270 - 40 = 230) */
+  height: 230rpx;
+  margin-top: 20rpx;
+}
+
+/* 文字组 */
+.widget-text-group {
+  margin-top: 50rpx;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+  width: 100%;
+}
+
+/* 文字样式 */
+.widget-text-title,
+.widget-text-desc {
+  font-size: 22rpx;
+  font-weight: bold;
+  color: #000000;
+  line-height: 1.2;
+}
+
 /* === 2. 模式切换按钮组 (扁平化横排) === */
 .tab-bar {
   display: flex;
@@ -170,7 +251,6 @@
   aspect-ratio: 1;
   border-radius: 12rpx;
   border: 3rpx solid transparent;
-  margin-bottom: 12rpx;
   box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
 }
 
