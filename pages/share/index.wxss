@@ -48,7 +48,8 @@
 .preview-canvas {
   box-shadow: 0 10rpx 30rpx rgba(0,0,0,0.15);
   border-radius: 16rpx;
-  transition: all 0.3s ease;
+  /* 移除 transition，避免与 JS 尺寸计算冲突 */
+  transition: none;
   display: block;
   background-color: #FFFFFF;
   max-width: 100%;

@@ -531,7 +531,7 @@ Page({
       // 横版和竖版使用不同的缩放比例
       // 横版：进一步缩小（0.88），因为保存后还是稍大
       // 竖版：进一步缩小（0.78），因为保存后还是偏大
-      const previewScale = isLandscape ? 0.95 : 0.91;
+      const previewScale = isLandscape ? 0.95 : 0.9;
       
       // 竖版使用更大的基础尺寸（匹配 CSS 中增大的二维码）
       const baseWidgetWidth = isLandscape ? 280 : 320;      // 竖版增大
@@ -764,14 +764,19 @@ Page({
       success: async (res) => {
         const tempFilePath = res.tempFiles[0].tempFilePath;
         
-        // 重置 Widget 位置到左上角（安全区域）
+        // UX: 滚动到顶部，让用户看到画布
+        wx.pageScrollTo({
+          scrollTop: 0,
+          duration: 300
+        });
+        
+        // 重置 Widget 位置到背景图左上角（安全区域）
         // Canvas 坐标系：40px 左上角
-        // 屏幕坐标系：需要根据 canvas 的实际尺寸计算，暂时设置为 0，由 initOverlayPosition 重新计算
         this.setData({
           selectedBgPath: tempFilePath,
           selectedBgIndex: -1,
           showDefaultBgSelector: false,
-          // === FIX: Reset Widget to Top-Left ===
+          // 重置到左上角
           qrWidgetX: 40,    // Canvas Coordinate (px)
           qrWidgetY: 40,    // Canvas Coordinate (px)
           // Overlay 位置会在 initOverlayPosition 中根据 canvas 尺寸重新计算
@@ -782,12 +787,16 @@ Page({
         // 如果当前是壁纸模式，需要重新计算 Canvas 尺寸并绘制
         if (this.data.currentMode === 'wallpaper') {
           await this.onTabChange({ currentTarget: { dataset: { mode: 'wallpaper' } } });
-          // 重新初始化 overlay 位置
-          this.initOverlayPosition();
+          // 延迟确保 Canvas 尺寸更新完成（无动画后，150ms 足够）
+          setTimeout(() => {
+            this.initOverlayPosition();
+          }, 150);
         } else if (this.data.qrCodePath && this.data.canvas && this.data.ctx) {
-          // 如果不是壁纸模式，直接绘制（不应该发生）
-          await this.drawWallpaperMode(this.data.canvas, this.data.ctx, this.data.qrCodePath, tempFilePath, false, true);
-          this.initOverlayPosition();
+          // 如果不是壁纸模式，切换到壁纸模式
+          await this.onTabChange({ currentTarget: { dataset: { mode: 'wallpaper' } } });
+          setTimeout(() => {
+            this.initOverlayPosition();
+          }, 150);
         }
       },
       fail: (err) => {
@@ -808,12 +817,18 @@ Page({
     const index = e.currentTarget.dataset.index;
     const bgImagePath = this.data.defaultWallpapers[index];
     
-    // 重置 Widget 位置到左上角（安全区域）
+    // UX: 滚动到顶部，让用户看到画布
+    wx.pageScrollTo({
+      scrollTop: 0,
+      duration: 300
+    });
+    
+    // 重置 Widget 位置到背景图左上角（安全区域）
     this.setData({
       selectedBgIndex: index,
       selectedBgPath: bgImagePath, // 使用图片路径
       showDefaultBgSelector: false,
-      // === FIX: Reset Widget to Top-Left ===
+      // 重置到左上角
       qrWidgetX: 40,    // Canvas Coordinate (px)
       qrWidgetY: 40,    // Canvas Coordinate (px)
       // Overlay 位置会在 initOverlayPosition 中根据 canvas 尺寸重新计算
@@ -824,12 +839,16 @@ Page({
     // 如果当前是壁纸模式，需要重新计算 Canvas 尺寸并绘制（自适应高度）
     if (this.data.currentMode === 'wallpaper') {
       await this.onTabChange({ currentTarget: { dataset: { mode: 'wallpaper' } } });
-      // 重新初始化 overlay 位置
-      this.initOverlayPosition();
+      // 延迟确保 Canvas 尺寸更新完成（无动画后，150ms 足够）
+      setTimeout(() => {
+        this.initOverlayPosition();
+      }, 150);
     } else if (this.data.qrCodePath && this.data.canvas && this.data.ctx) {
-      // 如果不是壁纸模式，直接绘制（不应该发生）
-      await this.drawWallpaperMode(this.data.canvas, this.data.ctx, this.data.qrCodePath, bgImagePath, false, true);
-      this.initOverlayPosition();
+      // 如果不是壁纸模式，切换到壁纸模式
+      await this.onTabChange({ currentTarget: { dataset: { mode: 'wallpaper' } } });
+      setTimeout(() => {
+        this.initOverlayPosition();
+      }, 150);
     }
   },
 
@@ -1323,4 +1342,3 @@ Page({
     }
   }
 });
-
