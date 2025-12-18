@@ -13,7 +13,7 @@
       <view 
         wx:if="{{currentMode === 'wallpaper' && qrWidgetX !== null && qrWidgetY !== null}}"
         class="qr-widget-overlay"
-        style="left: {{qrWidgetOverlayLeft}}px; top: {{qrWidgetOverlayTop}}px; width: {{qrWidgetOverlayWidth}}px; height: {{qrWidgetOverlayHeight}}px; opacity: 1;"
+        style="left: {{qrWidgetOverlayLeft}}px; top: {{qrWidgetOverlayTop}}px; width: {{qrWidgetOverlayWidth}}px; height: {{qrWidgetOverlayHeight}}px; opacity: {{isSaving ? 0 : 1}};"
         catchtouchstart="onQRWidgetTouchStart"
         catchtouchmove="onQRWidgetTouchMove"
         catchtouchend="onQRWidgetTouchEnd"

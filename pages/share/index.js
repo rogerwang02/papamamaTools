@@ -15,9 +15,9 @@ Page({
     selectedBgIndex: -1,
     // 默认壁纸图片路径（从 pages/share/ 到 assets/ 的相对路径）
     defaultWallpapers: [
-      '../../assets/p1.jpg',
-      '../../assets/p2.jpg',
-      '../../assets/p3.jpg'
+      '../../assets/bg1.jpg',
+      '../../assets/bg2.jpg',
+      '../../assets/bg3.jpg',
     ],
     // 二维码 widget 位置（Canvas 坐标系）
     qrWidgetX: null, // Canvas 坐标系的 X
@@ -25,8 +25,11 @@ Page({
     // 二维码 widget 浮动层位置（屏幕坐标系）
     qrWidgetOverlayLeft: 0, // 浮动层的左边距（px）
     qrWidgetOverlayTop: 0, // 浮动层的上边距（px）
-    qrWidgetOverlayWidth: 280, // 浮动层的宽度（px）
-    qrWidgetOverlayHeight: 330, // 浮动层的高度（px）
+    qrWidgetOverlayWidth: 240, // 浮动层的宽度（px）- 超瘦身版竖版默认
+    qrWidgetOverlayHeight: 312, // 浮动层的高度（px）- 超瘦身版竖版默认
+    // Canvas 显示尺寸（用于拖拽边界计算）
+    canvasDisplayWidth: 0,
+    canvasDisplayHeight: 0,
     // 拖拽状态
     isDragging: false, // 是否正在拖拽
     touchStartX: 0, // 触摸开始时的 X 坐标（屏幕坐标）
@@ -37,7 +40,9 @@ Page({
     startCanvasY: 0, // 拖拽开始时 widget 的 Canvas Y 坐标
     // 图片路径追踪（用于判断是否需要重新加载）
     lastBgImagePath: '', // 上次加载的背景图片路径
-    lastQRCodePath: '' // 上次加载的二维码路径
+    lastQRCodePath: '', // 上次加载的二维码路径
+    // 保存状态
+    isSaving: false // 控制保存时的视觉状态，防止双重视觉效果
   },
 
   // 实例变量：缓存图片对象（不能存储在 data 中，因为 setData 无法序列化 Native Image 对象）
@@ -514,44 +519,24 @@ Page({
 
     // === 3. 绘制 Widget（合成逻辑） ===
     if (!onlyBackground) {
-      // --- 布局配置（根据横版/竖版使用不同的缩放比例） ---
+      // --- 布局配置 ---
       // 检测图片是横版还是竖版
       let isLandscape = false;
       if (bgImagePath && !bgImagePath.startsWith('#')) {
         try {
-          // 获取图片信息判断横竖版
           const imgInfo = await wx.getImageInfo({ src: bgImagePath });
           isLandscape = imgInfo.width > imgInfo.height;
         } catch(e) {
-          // 如果获取失败，默认按竖版处理
           isLandscape = false;
         }
       }
       
-      // 横版和竖版使用不同的缩放比例
-      // 横版：进一步缩小（0.88），因为保存后还是稍大
-      // 竖版：进一步缩小（0.78），因为保存后还是偏大
-      const previewScale = isLandscape ? 0.95 : 0.9;
-      
-      // 竖版使用更大的基础尺寸（匹配 CSS 中增大的二维码）
-      const baseWidgetWidth = isLandscape ? 280 : 320;      // 竖版增大
-      const baseQrImgSize = isLandscape ? 230 : 280;        // 竖版增大，匹配 CSS 320rpx
-      const basePadding = 20;           // 基础内边距
-      
-      // 高度需要根据二维码尺寸和文字区域精确计算
-      if (isLandscape) {
-        // 横版：20 (padding) + 230 (二维码) + 28 (间距) + 24*2 + 10 (两行文字，约60) + 20 (padding) ≈ 366
-        var baseWidgetHeight = 366;
-      } else {
-        // 竖版精确计算：20 (padding) + 280 (二维码) + 28 (textGap) + 26 (第一行) + 34 (lineHeight包含间距) + 20 (padding) = 408
-        var baseWidgetHeight = 408;
-      }
-      
-      // 应用预览缩放，使保存图片中的 widget 和预览一致
-      const widgetWidth = baseWidgetWidth * previewScale;
-      const qrImgSize = baseQrImgSize * previewScale;
-      const padding = basePadding * previewScale;
-      const widgetHeight = baseWidgetHeight * previewScale;
+      // === 【最终校准尺寸】 ===
+      const widgetWidth = isLandscape ? 220 : 240;
+      const qrImgSize = isLandscape ? 180 : 200;
+      const padding = 20;   // 内边距
+      const textGap = 16;   // 二维码与文字的间距
+      const widgetHeight = isLandscape ? 292 : 312;
 
       // 坐标
       let cardX = this.data.qrWidgetX;
@@ -563,52 +548,55 @@ Page({
         cardY = 40;
       }
 
-      // A. 绘制卡片背景（圆角 + 阴影）
+      // 边界检查
+      const maxX = width - widgetWidth;
+      const maxY = height - widgetHeight;
+      cardX = Math.max(0, Math.min(cardX, maxX));
+      cardY = Math.max(0, Math.min(cardY, maxY));
+
+      // A. 卡片背景
       ctx.save();
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-      ctx.shadowBlur = 20;
-      ctx.shadowOffsetY = 8;
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.25)';
+      ctx.shadowBlur = 16;
+      ctx.shadowOffsetY = 6;
 
       const gradient = ctx.createLinearGradient(cardX, cardY, cardX, cardY + widgetHeight);
       gradient.addColorStop(0, '#FFFFFF'); 
       gradient.addColorStop(1, '#FFF0E5');
       ctx.fillStyle = gradient;
 
-      const borderRadius = 20 * previewScale; // 圆角也应用缩放
-      this.drawRoundRect(ctx, cardX, cardY, widgetWidth, widgetHeight, borderRadius);
+      this.drawRoundRect(ctx, cardX, cardY, widgetWidth, widgetHeight, 20);
       ctx.fill();
-      ctx.restore(); // 恢复以移除内部元素的阴影
+      ctx.restore(); 
 
       // B. 绘制二维码
       if (qrCodePath) {
-        // 保存时强制加载二维码图片（不依赖缓存）
         const qrImage = await this.loadImage(canvas, qrCodePath);
         if (qrImage) {
-          // 在卡片内水平居中
           const qrX = cardX + (widgetWidth - qrImgSize) / 2;
-          const qrY = cardY + padding; // 顶部内边距
+          const qrY = cardY + padding; 
           ctx.drawImage(qrImage, qrX, qrY, qrImgSize, qrImgSize);
         }
       }
 
-      // C. 绘制文字
+      // C. 文字 (精确排版)
       ctx.fillStyle = '#000000';
       ctx.textAlign = 'center';
-      ctx.textBaseline = 'top'; // 从顶部向下布局更容易
+      ctx.textBaseline = 'top';
 
       const centerX = cardX + widgetWidth / 2;
-      const textGap = 28 * previewScale; // 文字间距也应用缩放
-      const lineHeight = 34 * previewScale; // 行高也应用缩放
-      const textStartY = cardY + padding + qrImgSize + textGap;
-
-      // 字体大小也应用缩放（竖版使用更大的基础字体）
-      const baseFontSize = isLandscape ? 24 : 26; // 竖版基础字体更大
-      const fontSize = baseFontSize * previewScale;
+      const fontSize = 22; // 统一字号 22px (匹配 CSS 22rpx)
       ctx.font = `bold ${fontSize}px sans-serif`;
-      
-      // 竖版需要确保文字不换行，使用单行绘制
-      ctx.fillText('请在机主需要帮助时', centerX, textStartY);
-      ctx.fillText('扫码查看紧急联系人', centerX, textStartY + lineHeight);
+
+      // 计算精确坐标
+      // 第一行文字顶部 Y
+      const text1Y = cardY + padding + qrImgSize + textGap;
+      // 第二行文字顶部 Y = 第一行Y + 字号 + 间距(8px)
+      // 间距 8px 对应 CSS 中的 gap: 6rpx (略微调整以适应 Canvas 渲染特性)
+      const text2Y = text1Y + fontSize + 8;
+
+      ctx.fillText('请在机主需要帮助时', centerX, text1Y);
+      ctx.fillText('扫码查看紧急联系人', centerX, text2Y);
     }
   },
 
@@ -908,8 +896,20 @@ Page({
       return;
     }
 
+    // 1. Start Save Mode: Hide the DOM overlay
+    this.setData({ isSaving: true });
+    
+    // Wait a brief moment for the view to update (hide overlay)
+    // This prevents the visual "clash" of two layers
+    await new Promise(resolve => setTimeout(resolve, 50));
+
     // 在保存前，将 DOM overlay 的最终位置同步回 Canvas 坐标
-    this.syncDOMToCanvasCoordinates();
+    // 使用 Promise 确保坐标同步完成后再继续
+    await new Promise((resolve) => {
+      this.syncDOMToCanvasCoordinates();
+      // 等待 setData 和 query 完成
+      setTimeout(resolve, 100);
+    });
 
     wx.showLoading({ title: '合成中...', mask: true });
 
@@ -917,7 +917,7 @@ Page({
       const canvas = this.data.canvas;
       const ctx = this.data.ctx;
 
-      // 1. 合成模式：绘制背景 + Widget（强制检查图片加载）
+      // 2. Draw Widget on Canvas (Now visible because overlay is hidden)
       await this.drawWallpaperMode(
         canvas,
         ctx,
@@ -927,14 +927,14 @@ Page({
         false  // onlyBackground = false（绘制 Widget）
       );
 
-      // 2. 保存合成后的 Canvas
+      // 3. Save
       const tempFilePath = await this.canvasToTempFilePath();
       await wx.saveImageToPhotosAlbum({ filePath: tempFilePath });
 
       wx.hideLoading();
       wx.showToast({ title: '保存成功', icon: 'success' });
 
-      // 3. 恢复为仅背景（视觉代理模式）
+      // 4. Clean Canvas (Revert to background only)
       await this.drawWallpaperMode(
         canvas,
         ctx,
@@ -959,6 +959,9 @@ Page({
           icon: 'none'
         });
       }
+    } finally {
+      // 5. End Save Mode: Show DOM overlay again
+      this.setData({ isSaving: false });
     }
   },
 
@@ -986,6 +989,11 @@ Page({
       return;
     }
 
+    // 根据 canvas 的宽高比判断是横版还是竖版
+    // Canvas 逻辑宽度通常是 750，如果高度小于宽度，可能是横版
+    const isLandscape = this.data.canvasWidth > 0 && this.data.canvasHeight > 0 && 
+                        this.data.canvasWidth > this.data.canvasHeight;
+
     const query = wx.createSelectorQuery().in(this);
     query.select('#preview-canvas').boundingClientRect((rect) => {
       if (!rect) return;
@@ -999,21 +1007,28 @@ Page({
       // 这样可以保证 overlay 在任何宽高比的 canvas 上都能保持正确的形状
       const scale = Math.min(scaleX, scaleY);
 
-      // Widget 尺寸（匹配 CSS 中增大的二维码尺寸 320rpx）
-      // 使用竖版的较大尺寸，确保预览显示正确（横版会自动缩放适配）
-      // 高度计算：20 (padding) + 280 (二维码) + 28 (textGap) + 26 (第一行) + 34 (lineHeight) + 20 (padding) = 408
-      const widgetWidth = 320;
-      const qrImgSize = 280;
-      const widgetHeight = 408; // 精确计算的高度，确保文字不出框
+      // === 【最终校准尺寸】(Ultra Slim) ===
+      // 竖版：卡片宽 240，QR 200
+      // 横版：卡片宽 220，QR 180
+      const baseWidgetWidth = isLandscape ? 220 : 240;
+      
+      // 高度精确计算: 
+      // Pad(20) + QR + Gap(16) + Text(22) + Gap(8) + Text(22) + Pad(24)
+      // 竖版 H: 20+200+16+22+8+22+24 = 312
+      // 横版 H: 20+180+16+22+8+22+24 = 292
+      const baseWidgetHeight = isLandscape ? 292 : 312;
 
-      // 将 Canvas 坐标转换为屏幕坐标（使用统一的缩放比例）
-      const overlayLeft = rect.left + this.data.qrWidgetX * scaleX;
-      const overlayTop = rect.top + this.data.qrWidgetY * scaleY;
-      // 使用统一的 scale 来保持宽高比
-      const overlayWidth = widgetWidth * scale;
-      const overlayHeight = widgetHeight * scale;
+      // === 关键修复：直接缩放，不加 rect.left ===
+      // 因为 CSS 是 absolute inside relative，left=0 就是容器左上角
+      const overlayLeft = this.data.qrWidgetX * scaleX;
+      const overlayTop = this.data.qrWidgetY * scaleY;
+      
+      const overlayWidth = baseWidgetWidth * scale;
+      const overlayHeight = baseWidgetHeight * scale;
 
       this.setData({
+        canvasDisplayWidth: rect.width,
+        canvasDisplayHeight: rect.height,
         qrWidgetOverlayLeft: overlayLeft,
         qrWidgetOverlayTop: overlayTop,
         qrWidgetOverlayWidth: overlayWidth,
@@ -1024,31 +1039,28 @@ Page({
 
   // Helper: 将 DOM overlay 的像素坐标同步回 Canvas 逻辑坐标
   syncDOMToCanvasCoordinates() {
-    const sysInfo = wx.getSystemInfoSync();
-    const windowWidth = sysInfo.windowWidth;
+    const query = wx.createSelectorQuery().in(this);
+    query.select('#preview-canvas').boundingClientRect((rect) => {
+      if (!rect) return;
 
-    // Canvas 逻辑宽度是 750，对应屏幕宽度 windowWidth
-    // rpx2px = windowWidth / 750，因此 px2rpx（或逻辑单位）= 750 / windowWidth
-    const scale = 750 / windowWidth;
+      const scaleX = rect.width / this.data.canvasWidth;
+      const scaleY = rect.height / this.data.canvasHeight;
 
-    const domLeft = this.data.qrWidgetOverlayLeft || 0;
-    const domTop = this.data.qrWidgetOverlayTop || 0;
+      // === 关键修复：直接除以缩放比例，不减 rect.left ===
+      // this.data.qrWidgetOverlayLeft 已经是相对于容器的坐标了
+      const domLeft = this.data.qrWidgetOverlayLeft || 0;
+      const domTop = this.data.qrWidgetOverlayTop || 0;
 
-    const newCanvasX = domLeft * scale;
-    const newCanvasY = domTop * scale;
+      const newCanvasX = domLeft / scaleX;
+      const newCanvasY = domTop / scaleY;
 
-    console.log('syncDOMToCanvasCoordinates:', {
-      domLeft,
-      domTop,
-      scale,
-      newCanvasX,
-      newCanvasY
-    });
+      console.log('Sync Coords (Relative):', { domLeft, scaleX, newCanvasX });
 
-    this.setData({
-      qrWidgetX: newCanvasX,
-      qrWidgetY: newCanvasY
-    });
+      this.setData({
+        qrWidgetX: newCanvasX,
+        qrWidgetY: newCanvasY
+      });
+    }).exec();
   },
 
   // ===== 拖拽功能（新的 Overlay 拖拽处理） =====
@@ -1076,28 +1088,25 @@ Page({
     const deltaX = touch.pageX - this.data.touchStartX;
     const deltaY = touch.pageY - this.data.touchStartY;
 
-    // 更新 overlay 的 CSS 位置
-    const newOverlayLeft = this.data.startOverlayLeft + deltaX;
-    const newOverlayTop = this.data.startOverlayTop + deltaY;
+    // 计算新位置（相对于拖拽开始时的位置）
+    // startOverlayLeft/Top 已经是容器相对坐标
+    let newOverlayLeft = this.data.startOverlayLeft + deltaX;
+    let newOverlayTop = this.data.startOverlayTop + deltaY;
 
-    // 边界检查（相对于 canvas-container）
-    const query = wx.createSelectorQuery().in(this);
-    query.select('#preview-canvas').boundingClientRect((rect) => {
-      if (!rect) return;
+    // === 边界检查（相对于容器，0 到 displaySize - widgetSize） ===
+    const minLeft = 0;
+    const minTop = 0;
+    const maxLeft = this.data.canvasDisplayWidth - this.data.qrWidgetOverlayWidth;
+    const maxTop = this.data.canvasDisplayHeight - this.data.qrWidgetOverlayHeight;
 
-      const minLeft = rect.left;
-      const minTop = rect.top;
-      const maxLeft = rect.right - this.data.qrWidgetOverlayWidth;
-      const maxTop = rect.bottom - this.data.qrWidgetOverlayHeight;
+    // 限制在容器范围内（已经是相对坐标，直接使用）
+    const clampedLeft = Math.max(minLeft, Math.min(maxLeft, newOverlayLeft));
+    const clampedTop = Math.max(minTop, Math.min(maxTop, newOverlayTop));
 
-      const clampedLeft = Math.max(minLeft, Math.min(maxLeft, newOverlayLeft));
-      const clampedTop = Math.max(minTop, Math.min(maxTop, newOverlayTop));
-
-      this.setData({
-        qrWidgetOverlayLeft: clampedLeft,
-        qrWidgetOverlayTop: clampedTop
-      });
-    }).exec();
+    this.setData({
+      qrWidgetOverlayLeft: clampedLeft,
+      qrWidgetOverlayTop: clampedTop
+    });
   },
 
   // 触摸结束（在 Overlay 上）
@@ -1113,17 +1122,22 @@ Page({
     query.select('#preview-canvas').boundingClientRect((rect) => {
       if (!rect) return;
 
-      // 计算缩放比例
-      const scaleX = this.data.canvasWidth / rect.width;
-      const scaleY = this.data.canvasHeight / rect.height;
+      const scaleX = rect.width / this.data.canvasWidth;
+      const scaleY = rect.height / this.data.canvasHeight;
 
-      // 将屏幕坐标转换为 Canvas 坐标
-      const canvasX = (this.data.qrWidgetOverlayLeft - rect.left) * scaleX;
-      const canvasY = (this.data.qrWidgetOverlayTop - rect.top) * scaleY;
+      // === 关键修复：直接除以缩放比例，不减 rect.left ===
+      // this.data.qrWidgetOverlayLeft 已经是相对于容器的坐标了
+      const domLeft = this.data.qrWidgetOverlayLeft || 0;
+      const domTop = this.data.qrWidgetOverlayTop || 0;
 
-      // 边界检查（Canvas 坐标系）
-      const widgetWidth = 320; // 匹配增大的尺寸
-      const widgetHeight = 408; // 精确计算的高度，确保文字不出框
+      const canvasX = domLeft / scaleX;
+      const canvasY = domTop / scaleY;
+
+      const isLandscape = this.data.canvasWidth > this.data.canvasHeight;
+      // === 【最终校准尺寸】 ===
+      const widgetWidth = isLandscape ? 220 : 240;
+      const widgetHeight = isLandscape ? 292 : 312;
+
       const clampedX = Math.max(0, Math.min(canvasX, this.data.canvasWidth - widgetWidth));
       const clampedY = Math.max(0, Math.min(canvasY, this.data.canvasHeight - widgetHeight));
 
@@ -1160,9 +1174,10 @@ Page({
       const canvasX = (touchX - rect.left) * (this.data.canvasWidth / rect.width);
       const canvasY = (touchY - rect.top) * (this.data.canvasHeight / rect.height);
 
-      // 检查触摸点是否在二维码 widget 区域内
-      const widgetWidth = 280;
-      const widgetHeight = 280 - 40 + 100; // qrSize + 100（与绘制逻辑一致）
+      // 检查触摸点是否在二维码 widget 区域内（超瘦身版尺寸）
+      const isLandscape = this.data.canvasWidth > this.data.canvasHeight;
+      const widgetWidth = isLandscape ? 220 : 240;
+      const widgetHeight = isLandscape ? 292 : 312;
       
       let cardX = this.data.qrWidgetX;
       let cardY = this.data.qrWidgetY;
@@ -1273,9 +1288,10 @@ Page({
     let newX = this.data.qrWidgetStartX + canvasDeltaX;
     let newY = this.data.qrWidgetStartY + canvasDeltaY;
     
-    // 边界检查
-    const widgetWidth = 320; // 匹配增大的尺寸
-    const widgetHeight = 408; // 精确计算的高度，确保文字不出框
+    // 边界检查（超瘦身版尺寸）
+    const isLandscape = this.data.canvasWidth > this.data.canvasHeight;
+    const widgetWidth = isLandscape ? 220 : 240;
+    const widgetHeight = isLandscape ? 292 : 312;
     
     newX = Math.max(0, Math.min(newX, this.data.canvasWidth - widgetWidth));
     newY = Math.max(0, Math.min(newY, this.data.canvasHeight - widgetHeight));
