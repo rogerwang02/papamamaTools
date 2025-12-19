@@ -1,7 +1,7 @@
 /* pages/share/index.wxss */
 .container {
   min-height: 100vh;
-  background-color: #F5F5F5;
+  background-color: #FFF0E5;
   padding: 20rpx;
   padding-bottom: 40rpx;
   padding-top: 20rpx;

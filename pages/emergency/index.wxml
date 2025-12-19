@@ -15,41 +15,71 @@
   <!-- 有数据时显示内容 -->
   <view wx:elif="{{cardData}}" class="content-wrapper">
     <!-- 身份核验区 -->
-    <view class="identity-card">
+    <view class="info-card header-card">
       <view class="avatar-area">
         <view class="avatar-placeholder">
           <text class="avatar-icon">👤</text>
         </view>
       </view>
-      <view class="identity-info">
+      <view class="user-details">
         <view class="name-row">
-          <text class="identity-name">{{cardData.name}}</text>
-          <text class="identity-badge">已实名存档</text>
+          <text class="user-name">{{cardData.name}}</text>
+          <view class="verified-badge">
+            <text>已实名</text>
+          </view>
         </view>
-        <text class="identity-detail">{{cardData.age}}岁</text>
+        <text class="user-age">{{cardData.age}}岁</text>
       </view>
     </view>
 
-    <!-- 关键医疗信息区 -->
-    <view class="medical-info-section">
-      <!-- 血型区块 -->
-      <view class="blood-type-card">
-        <view class="blood-type-icon">🩸</view>
-        <text class="blood-type-value">{{cardData.blood_type}}</text>
+    <!-- 家人寄语 -->
+    <view class="note-section" wx:if="{{true}}">
+      <text class="note-text">“ 如有不适请出示此卡，我们永远爱你。💝 ”</text>
+    </view>
+
+    <!-- 关键医疗信息区 - 网格布局（2列：血型和过敏） -->
+    <view class="grid-row">
+      <view class="info-card grid-item">
+        <view class="card-label">
+          <text class="icon">🩸</text> 血型
+        </view>
+        <text class="card-value value-highlight">{{cardData.blood_type}}</text>
       </view>
 
-      <!-- 病史/过敏区块 -->
-      <view class="conditions-card" wx:if="{{cardData.conditions}}">
-        <text class="conditions-title">⚠️ 重要病史与过敏源</text>
-        <view class="conditions-content">
-          <!-- 标签化显示 -->
-          <view class="conditions-tags" wx:if="{{conditionsTags.length > 0}}">
-            <view class="conditions-tag" wx:for="{{conditionsTags}}" wx:key="index">{{item}}</view>
-          </view>
-          <!-- 如果没有标签（旧数据兼容），显示原始文本 -->
-          <text class="conditions-text" wx:else>{{cardData.conditions}}</text>
+      <view class="info-card grid-item">
+        <view class="card-label">
+          <view class="icon icon-allergy"></view>
+          <text>过敏史</text>
         </view>
+        <text class="card-value {{allergyInfo !== '无已知过敏' ? 'text-red' : ''}}">{{allergyInfo}}</text>
       </view>
+    </view>
+
+    <!-- 常用药物展示栏 -->
+    <view class="info-card">
+      <view class="section-title">💊 正在服药</view>
+      <view class="tag-container">
+        <block wx:if="{{medicationsTags.length > 0}}">
+          <view class="tag tag-blue" wx:for="{{medicationsTags}}" wx:key="index">{{item}}</view>
+        </block>
+        <text wx:else class="empty-text">无正在服用药物</text>
+      </view>
+    </view>
+
+    <!-- 完整病史/过敏区块 -->
+    <view class="info-card" wx:if="{{cardData.conditions}}">
+      <view class="section-title">🏥 既往病史</view>
+      <view class="tag-container">
+        <block wx:if="{{conditionsTags.length > 0}}">
+          <view class="tag tag-orange" wx:for="{{conditionsTags}}" wx:key="index">{{item}}</view>
+        </block>
+        <text wx:else class="empty-text">无重大病史</text>
+      </view>
+    </view>
+
+    <!-- 最近更新时间 -->
+    <view class="update-time-section">
+      <text class="update-time-text">最后更新：{{updateTime || '未知'}}</text>
     </view>
   </view>
 
@@ -61,11 +91,10 @@
   </view>
 
   <!-- 底部固定行动栏 -->
-  <view class="bottom-action-bar" wx:if="{{cardData}}">
-    <button class="emergency-call-btn" bindtap="onMakePhoneCall">
-      <text class="emergency-call-icon">📞</text>
-      <text class="emergency-call-text">拨打紧急联系人电话</text>
+  <view class="fixed-footer" wx:if="{{cardData}}">
+    <button class="call-btn" bindtap="onMakePhoneCall">
+      <text class="phone-icon">📞</text>
+      <text>拨打紧急联系人</text>
     </button>
   </view>
 </view>
-

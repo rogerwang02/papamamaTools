@@ -8,7 +8,6 @@ Page({
     nickName: '',
     hasChanges: false,
     isUploading: false,
-    cardId: null,
     originalAvatarUrl: defaultAvatar,
     originalNickName: '',
     feedbackContent: '',
@@ -20,30 +19,29 @@ Page({
     this.fetchUserProfile();
   },
 
-  // 获取用户资料
+  // 获取用户资料（从独立的用户资料集合加载）
   async fetchUserProfile() {
     wx.showLoading({ title: '加载中' });
     try {
-      // 查询用户创建的急救卡
-      const res = await db.collection('emergency_cards')
+      // 从 user_profiles 集合加载用户资料（通过 openid 自动关联）
+      const res = await db.collection('user_profiles')
         .limit(1)
         .get();
 
       if (res.data && res.data.length > 0) {
-        const cardData = res.data[0];
-        const avatarUrl = cardData.avatarUrl || defaultAvatar;
-        const nickName = cardData.nickName || '';
+        const profileData = res.data[0];
+        const avatarUrl = profileData.avatarUrl || defaultAvatar;
+        const nickName = profileData.nickName || '';
         
         this.setData({
           avatarUrl: avatarUrl,
           nickName: nickName,
-          cardId: cardData._id,
           originalAvatarUrl: avatarUrl,
           originalNickName: nickName,
           hasChanges: false
         });
       } else {
-        // 如果没有卡片，使用默认值
+        // 如果没有用户资料，使用默认值
         this.setData({
           avatarUrl: defaultAvatar,
           nickName: '',
@@ -101,7 +99,7 @@ Page({
     });
   },
 
-  // 3. 保存逻辑
+  // 3. 保存逻辑（保存到独立的用户资料集合，通过 openid 关联）
   async onSaveProfile() {
     if (this.data.isUploading || !this.data.hasChanges) return;
 
@@ -127,28 +125,30 @@ Page({
         finalAvatarUrl = uploadRes.fileID;
       }
 
-      // 如果有 cardId，更新现有记录；否则创建新记录
-      if (this.data.cardId) {
-        // 更新数据库
-        await db.collection('emergency_cards').doc(this.data.cardId).update({
-          data: {
-            avatarUrl: finalAvatarUrl,
-            nickName: this.data.nickName
-          }
-        });
-      } else {
-        // 创建新记录保存用户资料
-        const res = await db.collection('emergency_cards').add({
+      // 查询是否已存在用户资料记录（通过 openid 自动关联）
+      const existingProfile = await db.collection('user_profiles')
+        .limit(1)
+        .get();
+
+      if (existingProfile.data && existingProfile.data.length > 0) {
+        // 更新现有用户资料
+        await db.collection('user_profiles').doc(existingProfile.data[0]._id).update({
           data: {
             avatarUrl: finalAvatarUrl,
             nickName: this.data.nickName,
-            is_active: false, // 未完成完整的医疗卡信息
-            create_time: new Date()
+            updateTime: new Date()
           }
         });
-        
-        // 保存新创建的 cardId
-        this.setData({ cardId: res._id });
+      } else {
+        // 创建新用户资料记录（openid 会自动通过 _openid 字段关联）
+        await db.collection('user_profiles').add({
+          data: {
+            avatarUrl: finalAvatarUrl,
+            nickName: this.data.nickName,
+            createTime: new Date(),
+            updateTime: new Date()
+          }
+        });
       }
 
       this.setData({ 

@@ -56,6 +56,19 @@
     </view>
 
     <view class="form-item">
+      <text class="label">常用药物</text>
+      <text class="form-tip">请输入经常在服用的药物名称</text>
+      <textarea 
+        class="textarea" 
+        placeholder="请输入常用药物名称（如：阿司匹林、降压药等）" 
+        value="{{formData.medications}}"
+        bindinput="onMedicationsInput"
+        maxlength="200"
+        auto-height
+      />
+    </view>
+
+    <view class="form-item">
       <text class="label">家属称呼 *</text>
       <input 
         class="input" 

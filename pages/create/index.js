@@ -9,6 +9,7 @@ Page({
       age: '',
       blood_type: '',
       conditions: '',
+      medications: '',
       contact_name: '',
       contact_phone: ''
     },
@@ -64,6 +65,7 @@ Page({
           'formData.age': String(cardData.age || ''),
           'formData.blood_type': cardData.blood_type || '',
           'formData.conditions': cardData.conditions || '',
+          'formData.medications': cardData.medications || '',
           'formData.contact_name': cardData.contact_name || '',
           'formData.contact_phone': cardData.contact_phone || '',
           bloodTypeIndex: bloodTypeIndex >= 0 ? bloodTypeIndex : 0
@@ -108,6 +110,12 @@ Page({
   onConditionsInput(e) {
     this.setData({
       'formData.conditions': e.detail.value
+    });
+  },
+
+  onMedicationsInput(e) {
+    this.setData({
+      'formData.medications': e.detail.value
     });
   },
 
@@ -203,12 +211,13 @@ Page({
     });
 
     try {
-      const { name, age, blood_type, conditions, contact_name, contact_phone } = this.data.formData;
+      const { name, age, blood_type, conditions, medications, contact_name, contact_phone } = this.data.formData;
       const formDataObj = {
         name: name.trim(),
         age: parseInt(age),
         blood_type: blood_type,
         conditions: conditions.trim() || '',
+        medications: medications.trim() || '',
         contact_name: contact_name.trim(),
         contact_phone: contact_phone.trim()
       };

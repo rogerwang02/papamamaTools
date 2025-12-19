@@ -96,19 +96,129 @@ Page({
     }
   },
 
-  // 创建卡片
-  onCreateCard() {
-    wx.navigateTo({
-      url: '/pages/create/index'
+  // 带权限检查的操作处理
+  async handleActionWithAuth(nextAction) {
+    wx.showLoading({ title: '验证权限...' });
+
+    try {
+      // 1. 检查用户是否已经验证过（通过检查是否有已使用的邀请码）
+      const res = await wx.cloud.callFunction({
+        name: 'verifyInviteCode',
+        data: { code: '' } // 发送空码只检查状态
+      });
+
+      wx.hideLoading();
+
+      if (res.result && res.result.success) {
+        // 已经授权 -> 继续执行
+        nextAction();
+      } else {
+        // 未授权 -> 显示邀请码输入对话框
+        this.showInviteCodeModal(nextAction);
+      }
+    } catch (e) {
+      wx.hideLoading();
+      console.error('验证权限失败:', e);
+      wx.showToast({ title: '网络错误', icon: 'none' });
+    }
+  },
+
+  // 显示邀请码输入对话框
+  showInviteCodeModal(successCallback) {
+    wx.showModal({
+      title: '内测邀请',
+      content: '',
+      editable: true, // 显示输入框
+      placeholderText: '本项目目前处于内测阶段，请输入6位邀请码开启使用。',
+      success: async (res) => {
+        if (res.confirm) {
+          // 获取用户输入的内容
+          const inputCode = res.content ? res.content.trim() : '';
+          
+          // 验证输入
+          if (!inputCode) {
+            wx.showToast({
+              title: '邀请码不能为空',
+              icon: 'none',
+              duration: 2000
+            });
+            return;
+          }
+          
+          if (inputCode.length !== 6) {
+            wx.showToast({
+              title: '邀请码应为6位字符',
+              icon: 'none',
+              duration: 2000
+            });
+            return;
+          }
+          
+          // 验证通过，提交邀请码
+          this.submitInviteCode(inputCode, successCallback);
+        }
+      }
     });
   },
 
-  // 编辑卡片
+  // 提交邀请码
+  async submitInviteCode(code, successCallback) {
+    console.log('提交邀请码:', code);
+    wx.showLoading({ title: '校验中...' });
+
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'verifyInviteCode',
+        data: { code: code }
+      });
+      
+      console.log('云函数返回结果:', res);
+
+      wx.hideLoading();
+
+      console.log('邀请码验证结果:', res.result);
+
+      if (res.result && res.result.success) {
+        const message = res.result.message || '验证成功';
+        wx.showToast({ title: message, icon: 'success' });
+        // 继续执行操作
+        setTimeout(() => {
+          successCallback();
+        }, 1500);
+      } else {
+        wx.showModal({
+          title: '验证失败',
+          content: res.result?.message || '邀请码无效',
+          showCancel: false
+        });
+      }
+    } catch (e) {
+      wx.hideLoading();
+      console.error('校验邀请码失败:', e);
+      wx.showToast({ title: '校验失败', icon: 'none' });
+    }
+  },
+
+  // 创建卡片（需要验证邀请码）
+  onCreateCard() {
+    this.handleActionWithAuth(() => {
+      // 原始逻辑：跳转到创建页面
+      wx.navigateTo({
+        url: '/pages/create/index'
+      });
+    });
+  },
+
+  // 编辑卡片（如果已有卡片，通常不需要再次验证，但为了统一体验也可以验证）
   onEditCard() {
     if (this.data.cardInfo && this.data.cardInfo._id) {
+      // 已有卡片，直接编辑（可以不验证）
       wx.navigateTo({
         url: `/pages/create/index?id=${this.data.cardInfo._id}`
       });
+    } else {
+      // 没有卡片，需要创建，所以要验证
+      this.onCreateCard();
     }
   },
 

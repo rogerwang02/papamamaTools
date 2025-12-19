@@ -1,7 +1,12 @@
 /* pages/emergency/index.wxss */
+
+/* Global Page Style */
+page {
+  background-color: #FFF0E5;
+}
+
 .container {
   min-height: 100vh;
-  background-color: #F5F5F5;
   padding-bottom: 180rpx; /* 为底部固定按钮留出空间 */
 }
 
@@ -31,19 +36,26 @@
   padding: 30rpx;
 }
 
-/* 身份核验区 */
-.identity-card {
-  background-color: #FFFFFF;
-  border-radius: 20rpx;
-  padding: 40rpx;
-  margin-bottom: 30rpx;
+/* Common Card Style */
+.info-card {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 30rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.03);
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* 1. Header Styles */
+.header-card {
   display: flex;
   align-items: center;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.06);
+  padding: 40rpx 30rpx;
 }
 
 .avatar-area {
-  margin-right: 32rpx;
+  margin-right: 30rpx;
   flex-shrink: 0;
 }
 
@@ -62,7 +74,7 @@
   color: #999;
 }
 
-.identity-info {
+.user-details {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -71,159 +83,199 @@
 .name-row {
   display: flex;
   align-items: center;
-  margin-bottom: 12rpx;
+  margin-bottom: 8rpx;
 }
 
-.identity-name {
-  font-size: 48rpx;
+.user-name {
+  font-size: 40rpx;
   font-weight: bold;
   color: #333;
   margin-right: 16rpx;
 }
 
-.identity-badge {
-  background-color: #1890FF;
-  color: #FFFFFF;
+.verified-badge {
+  background: #E3F2FD;
+  color: #1976D2;
   font-size: 20rpx;
-  padding: 6rpx 16rpx;
-  border-radius: 20rpx;
-  font-weight: 500;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  display: inline-block;
 }
 
-.identity-detail {
+.user-age {
   font-size: 28rpx;
   color: #666;
+  display: block;
 }
 
-/* 关键医疗信息区 */
-.medical-info-section {
+/* 2. Note Styles */
+.note-section {
+  margin-bottom: 24rpx;
+  padding: 0 10rpx;
+}
+
+.note-text {
+  font-size: 28rpx;
+  color: #888;
+  font-style: italic;
+  line-height: 1.5;
+  display: block;
+}
+
+/* 3. Grid Styles */
+.grid-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 24rpx;
+}
+
+.grid-item {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 30rpx;
+  justify-content: center;
+  min-height: 160rpx;
 }
 
-/* 血型卡片 */
-.blood-type-card {
-  background-color: #FFFFFF;
-  border-radius: 20rpx;
-  padding: 60rpx 40rpx;
+.card-label {
+  font-size: 26rpx;
+  color: #999;
+  margin-bottom: 16rpx;
   display: flex;
   align-items: center;
-  justify-content: center;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.06);
 }
 
-.blood-type-icon {
-  font-size: 80rpx;
-  margin-right: 24rpx;
-}
-
-.blood-type-value {
-  font-size: 96rpx;
-  font-weight: bold;
-  color: #FF3B30;
-  letter-spacing: 8rpx;
-}
-
-/* 病史/过敏卡片 */
-.conditions-card {
-  background-color: #FFF0F0;
-  border-radius: 20rpx;
-  padding: 40rpx;
-  box-shadow: 0 4rpx 20rpx rgba(255, 59, 48, 0.1);
-}
-
-.conditions-title {
-  display: block;
+.card-label .icon {
+  margin-right: 8rpx;
   font-size: 32rpx;
+}
+
+/* 橙黄色圆形警告图标 */
+.icon-allergy {
+  width: 32rpx;
+  height: 32rpx;
+  background-color: #FFA500;
+  border-radius: 50%;
+  margin-right: 8rpx;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.icon-allergy::after {
+  content: '!';
+  color: #FFF;
+  font-size: 22rpx;
   font-weight: bold;
+  line-height: 1;
+}
+
+.card-value {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.value-highlight {
+  color: #FF6B00;
+  font-size: 40rpx;
+}
+
+.text-red {
   color: #FF3B30;
+}
+
+/* 4. List/Tags Styles */
+.section-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
   margin-bottom: 24rpx;
+  display: block;
 }
 
-.conditions-content {
-  background-color: #FFFFFF;
-  border-radius: 12rpx;
-  padding: 32rpx;
-}
-
-.conditions-text {
-  font-size: 36rpx;
-  font-weight: 600;
-  color: #CC0000;
-  line-height: 1.8;
-  word-break: break-all;
-  word-wrap: break-word;
-}
-
-/* 病史标签容器 */
-.conditions-tags {
+.tag-container {
   display: flex;
   flex-wrap: wrap;
   gap: 16rpx;
 }
 
-.conditions-tag {
-  display: inline-block;
-  background-color: #FFF0F0;
-  color: #CC0000;
-  font-size: 28rpx;
+.tag {
+  padding: 12rpx 24rpx;
+  border-radius: 30rpx;
+  font-size: 26rpx;
   font-weight: 500;
-  padding: 8rpx 16rpx;
-  border-radius: 8rpx;
+}
+
+.tag-blue {
+  background: #E8F5E9;
+  color: #2E7D32;
+}
+
+.tag-orange {
+  background: #FFF3E0;
+  color: #EF6C00;
+}
+
+.empty-text {
+  color: #CCC;
+  font-size: 26rpx;
+}
+
+/* 最近更新时间 */
+.update-time-section {
+  text-align: center;
+  padding: 20rpx 0;
+  margin-top: 10rpx;
+}
+
+.update-time-text {
+  font-size: 24rpx;
+  color: #999;
   line-height: 1.5;
 }
 
-/* 底部固定行动栏 */
-.bottom-action-bar {
+/* Footer */
+.fixed-footer {
   position: fixed;
   bottom: 0;
   left: 0;
-  right: 0;
-  background-color: #FFFFFF;
-  padding: 24rpx 0;
-  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
-  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.08);
-  z-index: 100;
+  width: 100%;
+  background: #fff;
+  padding: 20rpx 40rpx;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.05);
   box-sizing: border-box;
 }
 
-.emergency-call-btn {
-  width: 100% !important;
-  height: 88rpx;
-  background-color: #FF3B30;
-  color: #FFFFFF;
-  font-size: 32rpx;
-  font-weight: bold;
-  border-radius: 44rpx;
+.call-btn {
+  background: linear-gradient(135deg, #FF3B30, #FF6B00);
+  color: #fff;
+  border-radius: 50rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8rpx 24rpx rgba(255, 59, 48, 0.4);
-  padding: 0 40rpx;
-  box-sizing: border-box;
-}
-
-.emergency-call-btn::after {
+  font-size: 34rpx;
+  font-weight: bold;
+  height: 90rpx;
+  box-shadow: 0 8rpx 20rpx rgba(255, 59, 48, 0.3);
+  width: 100%;
   border: none;
 }
 
-.emergency-call-icon {
-  font-size: 40rpx;
-  margin-right: 10rpx;
-  flex-shrink: 0;
-  line-height: 1;
+.call-btn::after {
+  border: none;
 }
 
-.emergency-call-text {
-  font-size: 32rpx;
-  white-space: nowrap;
-  flex-shrink: 0;
-  line-height: 1;
+.phone-icon {
+  margin-right: 16rpx;
+  font-size: 36rpx;
 }
 
 /* 错误状态 */
-/* 加载中状态 */
 .loading-container {
   display: flex;
   flex-direction: column;
@@ -288,9 +340,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  border: none;
 }
 
 .back-btn::after {
   border: none;
 }
-
