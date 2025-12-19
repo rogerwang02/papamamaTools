@@ -10,7 +10,9 @@ Page({
     isUploading: false,
     cardId: null,
     originalAvatarUrl: defaultAvatar,
-    originalNickName: ''
+    originalNickName: '',
+    feedbackContent: '',
+    isFeedbackEmpty: true
   },
 
   onLoad(options) {
@@ -103,22 +105,6 @@ Page({
   async onSaveProfile() {
     if (this.data.isUploading || !this.data.hasChanges) return;
 
-    // 检查是否有数据需要保存
-    if (!this.data.cardId) {
-      wx.showModal({
-        title: '提示',
-        content: '您还没有创建急救卡，是否现在去创建？',
-        success: (res) => {
-          if (res.confirm) {
-            wx.navigateTo({
-              url: '/pages/create/index'
-            });
-          }
-        }
-      });
-      return;
-    }
-
     wx.showLoading({ title: '保存中...' });
     this.setData({ isUploading: true });
 
@@ -141,13 +127,29 @@ Page({
         finalAvatarUrl = uploadRes.fileID;
       }
 
-      // 更新数据库
-      await db.collection('emergency_cards').doc(this.data.cardId).update({
-        data: {
-          avatarUrl: finalAvatarUrl,
-          nickName: this.data.nickName
-        }
-      });
+      // 如果有 cardId，更新现有记录；否则创建新记录
+      if (this.data.cardId) {
+        // 更新数据库
+        await db.collection('emergency_cards').doc(this.data.cardId).update({
+          data: {
+            avatarUrl: finalAvatarUrl,
+            nickName: this.data.nickName
+          }
+        });
+      } else {
+        // 创建新记录保存用户资料
+        const res = await db.collection('emergency_cards').add({
+          data: {
+            avatarUrl: finalAvatarUrl,
+            nickName: this.data.nickName,
+            is_active: false, // 未完成完整的医疗卡信息
+            create_time: new Date()
+          }
+        });
+        
+        // 保存新创建的 cardId
+        this.setData({ cardId: res._id });
+      }
 
       this.setData({ 
         avatarUrl: finalAvatarUrl,
@@ -198,13 +200,93 @@ Page({
         showCancel: false,
         confirmText: '知道了'
       });
-    } else if (item === 'contact') {
+    }
+  },
+
+  // 反馈输入处理
+  onFeedbackInput(e) {
+    const value = e.detail.value || '';
+    this.setData({ 
+      feedbackContent: value,
+      isFeedbackEmpty: !value.trim()
+    });
+  },
+
+  // 提交反馈
+  async onSubmitFeedback() {
+    const content = this.data.feedbackContent.trim();
+
+    if (!content) return;
+
+    // 1. 验证：检查用户是否已设置昵称
+    // 我们假设"已登录"意味着有昵称（不是默认的"微信用户"）
+    if (!this.data.nickName || this.data.nickName.trim() === '') {
       wx.showModal({
-        title: '联系客服',
-        content: '如有问题或建议，请联系客服：\n\n客服电话：400-XXX-XXXX\n工作时间：9:00-18:00',
+        title: '提示',
+        content: '为了方便客服联系您，请先在上方完善您的头像和昵称信息。',
+        confirmText: '知道了',
         showCancel: false,
-        confirmText: '知道了'
+        success: () => {
+          // 滚动到顶部或高亮输入（可选）
+          wx.pageScrollTo({ scrollTop: 0, duration: 300 });
+        }
       });
+      return;
+    }
+
+    wx.showLoading({ title: '提交中...' });
+
+    try {
+      // 2. 调用云函数
+      const res = await wx.cloud.callFunction({
+        name: 'submitFeedback',
+        data: {
+          content: content,
+          userInfo: {
+            nickName: this.data.nickName,
+            avatarUrl: this.data.avatarUrl
+          },
+          deviceInfo: wx.getSystemInfoSync()
+        }
+      });
+
+      wx.hideLoading();
+
+      if (res.result && res.result.success) {
+        wx.showToast({ 
+          title: '反馈成功', 
+          icon: 'success',
+          duration: 2000
+        });
+        
+        // 清空输入
+        this.setData({ 
+          feedbackContent: '',
+          isFeedbackEmpty: true
+        });
+      } else {
+        throw new Error(res.result?.errMsg || '提交失败');
+      }
+    } catch (err) {
+      console.error('提交反馈失败:', err);
+      wx.hideLoading();
+      
+      // 检查是否是集合不存在的错误
+      const errMsg = err.message || err.toString() || '';
+      if (errMsg.includes('collection not exists') || errMsg.includes('DATABASE_COLLECTION_NOT_EXIST')) {
+        wx.showModal({
+          title: '提示',
+          content: '数据库集合尚未创建，请在云开发控制台的数据库中创建名为 "feedbacks" 的集合。',
+          showCancel: false,
+          confirmText: '知道了'
+        });
+      } else {
+        wx.showToast({ 
+          title: '提交失败，请重试', 
+          icon: 'none',
+          duration: 2000
+        });
+      }
     }
   }
 });
