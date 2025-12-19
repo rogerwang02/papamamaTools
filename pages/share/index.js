@@ -572,7 +572,15 @@ Page({
       gradient.addColorStop(1, '#FFF0E5');
       ctx.fillStyle = gradient;
 
-      this.drawRoundRect(ctx, cardX, cardY, widgetWidth, widgetHeight, 20);
+      // 计算圆角值以匹配 CSS 的 40rpx
+      // CSS: border-radius: 40rpx，widget 宽度在 CSS 中约为 240rpx
+      // CSS 圆角比例: 40rpx / 240rpx = 16.67%
+      // 为了在 Canvas 中保持相同的视觉比例，圆角应该为 widgetWidth 的 16.67%
+      // Canvas widgetWidth 240px，圆角 = 240 * 0.1667 ≈ 40px
+      // 横版 widgetWidth 220px，圆角 = 220 * 0.1667 ≈ 37px
+      // 使用较大的值以确保圆角足够圆
+      const borderRadius = isLandscape ? 37 : 40; // 匹配 CSS 的 40rpx 比例
+      this.drawRoundRect(ctx, cardX, cardY, widgetWidth, widgetHeight, borderRadius);
       ctx.fill();
       ctx.restore(); 
 
@@ -962,13 +970,28 @@ Page({
       console.error('保存失败:', error);
       wx.hideLoading();
       
-      if (error.errMsg && error.errMsg.includes('auth deny')) {
+      // FIX: Handle Auth Deny by guiding user to settings
+      const errMsg = error.errMsg || '';
+      if (errMsg.includes('auth deny') || errMsg.includes('authorize:fail')) {
         wx.showModal({
-          title: '提示',
-          content: '需要授权访问相册才能保存图片',
-          showCancel: false
+          title: '权限提示',
+          content: '保存图片需要您的相册授权，请在设置中开启',
+          confirmText: '去设置',
+          showCancel: true,
+          success: (res) => {
+            if (res.confirm) {
+              wx.openSetting({
+                success: (settingRes) => {
+                  if (settingRes.authSetting['scope.writePhotosAlbum']) {
+                    wx.showToast({ title: '授权成功，请重试', icon: 'none' });
+                  }
+                }
+              });
+            }
+          }
         });
-      } else {
+      } else if (!errMsg.includes('cancel')) {
+        // Generic error (ignore user cancellation)
         wx.showToast({
           title: '保存失败',
           icon: 'none'
@@ -987,15 +1010,13 @@ Page({
       return;
     }
 
-    // 1. Start Save Mode: Hide the DOM overlay
+    // 1. Start Save Mode: Hide DOM
     this.setData({ isSaving: true });
     
-    // Wait a brief moment for the view to update (hide overlay)
-    // This prevents the visual "clash" of two layers
+    // Wait for view update
     await new Promise(resolve => setTimeout(resolve, 50));
-
-    // 在保存前，将 DOM overlay 的最终位置同步回 Canvas 坐标
-    // 使用 Promise 确保坐标同步完成后再继续
+    
+    // Sync positions
     await new Promise((resolve) => {
       this.syncDOMToCanvasCoordinates();
       // 等待 setData 和 query 完成
@@ -1008,50 +1029,75 @@ Page({
       const canvas = this.data.canvas;
       const ctx = this.data.ctx;
 
-      // 2. Draw Widget on Canvas (Now visible because overlay is hidden)
+      // 2. Draw Widget on Canvas
       await this.drawWallpaperMode(
         canvas,
         ctx,
         this.data.qrCodePath,
         this.data.selectedBgPath || this.data.defaultWallpapers[0] || '',
-        false, // skipImageLoad = false（强制检查）
-        false  // onlyBackground = false（绘制 Widget）
+        false, 
+        false  // Draw Widget = TRUE
       );
 
       // 3. Save
       const tempFilePath = await this.canvasToTempFilePath();
       await wx.saveImageToPhotosAlbum({ filePath: tempFilePath });
 
-      wx.hideLoading();
       wx.showToast({ title: '保存成功', icon: 'success' });
 
-      // 4. Clean Canvas (Revert to background only)
-      await this.drawWallpaperMode(
-        canvas,
-        ctx,
-        this.data.qrCodePath,
-        this.data.selectedBgPath || this.data.defaultWallpapers[0] || '',
-        true, // skipImageLoad = true（使用缓存）
-        true  // onlyBackground = true（只绘制背景）
-      );
+      // (Note: Cleanup logic removed from here)
+
     } catch (error) {
       console.error('保存失败:', error);
-      wx.hideLoading();
-
-      if (error.errMsg && error.errMsg.includes('auth deny')) {
+      
+      // FIX: Handle Auth Deny by guiding user to settings
+      const errMsg = error.errMsg || '';
+      if (errMsg.includes('auth deny') || errMsg.includes('authorize:fail')) {
         wx.showModal({
-          title: '提示',
-          content: '需要授权访问相册才能保存图片',
-          showCancel: false
+          title: '权限提示',
+          content: '保存图片需要您的相册授权，请在设置中开启',
+          confirmText: '去设置',
+          showCancel: true,
+          success: (res) => {
+            if (res.confirm) {
+              wx.openSetting({
+                success: (settingRes) => {
+                  if (settingRes.authSetting['scope.writePhotosAlbum']) {
+                    wx.showToast({ title: '授权成功，请重试', icon: 'none' });
+                  }
+                }
+              });
+            }
+          }
         });
-      } else {
-        wx.showToast({
-          title: '保存失败',
-          icon: 'none'
+      } else if (!errMsg.includes('cancel')) {
+        // Generic error (ignore user cancellation)
+        wx.showToast({ 
+          title: '保存失败', 
+          icon: 'none' 
         });
       }
     } finally {
-      // 5. End Save Mode: Show DOM overlay again
+      wx.hideLoading();
+
+      // === FIX: ALWAYS Cleanup Canvas (Success or Fail) ===
+      try {
+        const canvas = this.data.canvas;
+        const ctx = this.data.ctx;
+        // Revert to "Background Only"
+        await this.drawWallpaperMode(
+          canvas,
+          ctx,
+          this.data.qrCodePath,
+          this.data.selectedBgPath || this.data.defaultWallpapers[0] || '',
+          true, // Use cache
+          true  // Only Background = TRUE
+        );
+      } catch (e) {
+        console.error('Cleanup failed:', e);
+      }
+
+      // 4. End Save Mode: Show DOM overlay
       this.setData({ isSaving: false });
     }
   },
