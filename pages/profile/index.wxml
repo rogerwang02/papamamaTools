@@ -1,12 +1,31 @@
 <!--pages/profile/index.wxml-->
 <view class="container">
   <view class="profile-header">
-    <view class="avatar-wrapper">
-      <open-data type="userAvatarUrl" class="avatar"></open-data>
-    </view>
+    <button 
+      class="avatar-wrapper" 
+      open-type="chooseAvatar" 
+      bind:chooseavatar="onChooseAvatar"
+      disabled="{{isUploading}}"
+    >
+      <image class="avatar" src="{{avatarUrl}}" mode="aspectFill"></image>
+    </button>
+    
     <view class="user-info">
-      <open-data type="userNickName" class="nickname"></open-data>
+      <input 
+        type="nickname" 
+        class="nickname-input" 
+        placeholder="点击输入昵称" 
+        value="{{nickName}}" 
+        bindchange="onNicknameChange" 
+        placeholder-class="placeholder-text"
+      />
     </view>
+  </view>
+
+  <view class="action-section">
+    <button class="save-btn" bindtap="onSaveProfile" disabled="{{!hasChanges || isUploading}}">
+      {{isUploading ? '保存中...' : '保存个人资料'}}
+    </button>
   </view>
 
   <view class="menu-section">

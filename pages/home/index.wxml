@@ -2,7 +2,7 @@
 <view class="container">
   <!-- 顶部欢迎语 -->
   <view class="header">
-    <text class="welcome-title">早安，守护者</text>
+    <text class="welcome-title">您好，守护者</text>
     <text class="welcome-subtitle">今天也要关注家人的健康哦</text>
   </view>
 
@@ -29,10 +29,17 @@
     <view wx:else class="card-container">
       <!-- 卡片头部 -->
       <view class="card-header">
-        <text class="card-header-title">🚑 急救卡预览</text>
-        <view class="card-status">
-          <view class="status-dot"></view>
-          <text class="status-text">已激活</text>
+        <view class="header-left">
+          <text class="card-header-title">🚑 急救卡预览</text>
+        </view>
+        <view class="header-right">
+          <view class="card-status">
+            <view class="status-dot"></view>
+            <text class="status-text">已激活</text>
+          </view>
+          <view class="delete-icon-btn" bindtap="onDeleteCard">
+            <text class="delete-icon">🗑️</text>
+          </view>
         </view>
       </view>
 
@@ -54,20 +61,26 @@
         </view>
       </view>
 
-      <!-- 底部按钮区 -->
-      <view class="card-actions">
-        <button class="card-btn edit-btn" bindtap="onEditCard">编辑信息</button>
-        <button class="card-btn qr-btn" bindtap="onShowQRCode">展示二维码</button>
-      </view>
-
-      <!-- 删除按钮 -->
-      <view class="card-delete">
-        <button class="delete-btn" bindtap="onDeleteCard">删除此卡</button>
-      </view>
-
-      <!-- 模拟扫描二维码按钮 -->
-      <view class="card-scan">
-        <button class="scan-btn" bindtap="onSimulateScan">模拟扫描二维码</button>
+      <!-- 操作按钮网格 -->
+      <view class="card-actions-grid">
+        <view class="action-item" bindtap="onEditCard">
+          <view class="action-icon-circle edit-icon">
+            <text class="action-icon">📝</text>
+          </view>
+          <text class="action-text">编辑信息</text>
+        </view>
+        <view class="action-item" bindtap="onPreviewCard">
+          <view class="action-icon-circle preview-icon">
+            <text class="action-icon">👁️</text>
+          </view>
+          <text class="action-text">预览卡片</text>
+        </view>
+        <view class="action-item" bindtap="onShowQRCode">
+          <view class="action-icon-circle qr-icon">
+            <text class="action-icon">📱</text>
+          </view>
+          <text class="action-text">生成二维码</text>
+        </view>
       </view>
     </view>
   </view>

@@ -14,11 +14,20 @@ Page({
   },
 
   onLoad(options) {
-    // 页面加载
+    // 页面加载时检查用户身份
+    this.checkUserIdentity();
   },
 
   onShow() {
-    // 每次显示页面时刷新数据
+    // 每次显示页面时检查身份（如果用户删除了卡片，需要重新检查）
+    // 注意：如果已经跳转到分享页面，这里不会执行
+    this.checkUserIdentity();
+  },
+
+  // 检查用户身份（不再跳转，只加载数据）
+  async checkUserIdentity() {
+    // 直接加载卡片数据，如果有卡片会显示卡片信息，如果没有会显示创建按钮
+    // 不再进行自动跳转，让用户可以选择查看或编辑
     this.loadCardData();
   },
 
@@ -176,8 +185,8 @@ Page({
     });
   },
 
-  // 模拟扫描二维码
-  onSimulateScan() {
+  // 预览卡片
+  onPreviewCard() {
     if (this.data.cardInfo && this.data.cardInfo._id) {
       wx.navigateTo({
         url: `/pages/emergency/index?id=${this.data.cardInfo._id}`

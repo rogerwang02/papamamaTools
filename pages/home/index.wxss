@@ -124,10 +124,20 @@
   border-bottom: 1rpx solid #F0F0F0;
 }
 
+.header-left {
+  flex: 1;
+}
+
 .card-header-title {
   font-size: 32rpx;
   font-weight: 600;
   color: #333;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
 }
 
 .card-status {
@@ -147,6 +157,27 @@
   font-size: 24rpx;
   color: #52C41A;
   font-weight: 500;
+}
+
+.delete-icon-btn {
+  padding: 8rpx;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44rpx;
+  min-height: 44rpx;
+}
+
+.delete-icon-btn:active {
+  opacity: 1;
+  transform: scale(0.95);
+}
+
+.delete-icon {
+  font-size: 36rpx;
+  line-height: 1;
 }
 
 /* 卡片内容 */
@@ -201,101 +232,67 @@
   word-break: break-all;
 }
 
-.card-actions {
+/* 操作按钮网格 */
+.card-actions-grid {
   display: flex;
-  gap: 20rpx;
-  padding: 0 40rpx 40rpx;
+  justify-content: space-between;
+  padding: 30rpx 20rpx 30rpx;
+  border-top: 1rpx solid #F5F5F5;
+  margin-top: 0;
 }
 
-.card-btn {
+.action-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   flex: 1;
-  height: 88rpx;
-  border-radius: 44rpx;
-  font-size: 30rpx;
-  font-weight: 600;
+  padding: 10rpx;
+  transition: all 0.2s ease;
+}
+
+/* 图标圆形按钮 */
+.action-icon-circle {
+  width: 90rpx;
+  height: 90rpx;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-bottom: 12rpx;
+  box-shadow: 0 4rpx 10rpx rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
 }
 
-.card-btn::after {
-  border: none;
+.action-icon {
+  font-size: 40rpx;
+  line-height: 1;
 }
 
-.edit-btn {
-  background-color: transparent;
-  border: 2rpx solid #E0E0E0;
-  color: #666;
+.edit-icon {
+  background: #E3F2FD;
 }
 
-.qr-btn {
-  background: linear-gradient(135deg, #FF6B00 0%, #FF8C00 100%);
-  color: #FFFFFF;
-  box-shadow: 0 8rpx 24rpx rgba(255, 107, 0, 0.3);
-  border: none;
+.preview-icon {
+  background: #FFF3E0;
 }
 
-/* 删除按钮区域 */
-.card-delete {
-  padding: 0 40rpx 40rpx;
-  border-top: 1rpx solid #F0F0F0;
-  padding-top: 30rpx;
-  margin-top: 0;
+.qr-icon {
+  background: #E8F5E9;
 }
 
-.delete-btn {
-  width: 100%;
-  height: 80rpx;
-  background-color: transparent;
-  color: #999;
-  font-size: 28rpx;
-  border: 1rpx solid #E0E0E0;
-  border-radius: 40rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.action-text {
+  font-size: 26rpx;
+  color: #333;
+  font-weight: 500;
+  line-height: 1.4;
 }
 
-.delete-btn::after {
-  border: none;
+/* 点击反馈 */
+.action-item:active .action-icon-circle {
+  transform: scale(0.95);
+  opacity: 0.8;
 }
 
-.delete-btn:active {
-  background-color: #FFF0F0;
-  border-color: #FF3B30;
-  color: #FF3B30;
-}
-
-/* 模拟扫描二维码按钮区域 */
-.card-scan {
-  padding: 0 40rpx 40rpx;
-  border-top: 1rpx solid #F0F0F0;
-  padding-top: 30rpx;
-  margin-top: 0;
-}
-
-.scan-btn {
-  width: 100%;
-  height: 80rpx;
-  background-color: transparent;
-  color: #FF6B00;
-  font-size: 28rpx;
-  border: 1rpx solid #FF6B00;
-  border-radius: 40rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.scan-btn::after {
-  border: none;
-}
-
-.scan-btn:active {
-  background-color: #FFF0E5;
-  border-color: #FF8C00;
-  color: #FF8C00;
-}
 
 /* 健康提醒区域 */
 .reminder-section {
