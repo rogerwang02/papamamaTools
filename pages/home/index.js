@@ -1,15 +1,20 @@
 // pages/home/index.js
 const db = wx.cloud.database();
+const QQMapWX = require('../../libs/qqmap-wx-jssdk.min');
+
+// TODO: 必须替换为您在腾讯位置服务申请的真实 Key
+// 获取地址：https://lbs.qq.com/
+const MAP_KEY = 'F3MBZ-CEA67-BCHXJ-HYM4U-XVMQF-Y2FIG';
 
 Page({
   data: {
     loading: true,
     cardInfo: null,
-    reminders: [
-      { icon: '💊', text: '记得按时吃药' },
-      { icon: '🌡️', text: '天气转凉注意保暖' },
-      { icon: '🥗', text: '保持均衡饮食' },
-      { icon: '🚶', text: '适度运动有益健康' }
+    habits: [
+      { id: 1, text: '按时吃药了没？', icon: '💊', done: false },
+      { id: 2, text: '测量血压了没？', icon: '🩺', done: false },
+      { id: 3, text: '适量运动了没？', icon: '🚶', done: false },
+      { id: 4, text: '多喝温水了没？', icon: '💧', done: false }
     ]
   },
 
@@ -43,12 +48,12 @@ Page({
       .replace(/[，,]+/g, ',')         // 将多个逗号合并为一个
       .replace(/^\s*,\s*|\s*,\s*$/g, '')  // 去除首尾逗号和空格
       .trim();
-    
+
     // 限制最多显示10个字符，超出部分用省略号
     if (formatted.length > 10) {
       formatted = formatted.substring(0, 10) + '...';
     }
-    
+
     return formatted;
   },
 
@@ -134,7 +139,7 @@ Page({
         if (res.confirm) {
           // 获取用户输入的内容
           const inputCode = res.content ? res.content.trim() : '';
-          
+
           // 验证输入
           if (!inputCode) {
             wx.showToast({
@@ -144,7 +149,7 @@ Page({
             });
             return;
           }
-          
+
           if (inputCode.length !== 6) {
             wx.showToast({
               title: '邀请码应为6位字符',
@@ -153,7 +158,7 @@ Page({
             });
             return;
           }
-          
+
           // 验证通过，提交邀请码
           this.submitInviteCode(inputCode, successCallback);
         }
@@ -171,7 +176,7 @@ Page({
         name: 'verifyInviteCode',
         data: { code: code }
       });
-      
+
       console.log('云函数返回结果:', res);
 
       wx.hideLoading();
@@ -306,6 +311,169 @@ Page({
         title: '卡片信息异常',
         icon: 'none'
       });
+    }
+  },
+
+  // 1. SOS 呼救
+  onSOSCall() {
+    // 优先使用卡片中的紧急联系人电话，否则使用120
+    const emergencyPhone = '120';
+
+    wx.makePhoneCall({
+      phoneNumber: emergencyPhone,
+      success: () => {
+        console.log('Calling SOS:', emergencyPhone);
+      },
+      fail: (err) => {
+        console.error('拨打电话失败:', err);
+        wx.showToast({
+          title: '拨打电话失败',
+          icon: 'none'
+        });
+      }
+    });
+  },
+
+  // 2. 查找附近医院（使用腾讯地图SDK）
+  onFindHospital() {
+    // 检查Key是否配置
+    if (!MAP_KEY || MAP_KEY === 'REPLACE_ME_WITH_YOUR_KEY') {
+      wx.showModal({
+        title: '配置缺失',
+        content: '请先在代码中配置腾讯地图 Key',
+        showCancel: false
+      });
+      return;
+    }
+
+    const qqmapsdk = new QQMapWX({ key: MAP_KEY });
+    wx.showLoading({ title: '搜索附近医院...' });
+    const that = this;
+
+    // 1. 获取位置
+    wx.getLocation({
+      type: 'gcj02',
+      success: function (res) {
+        const latitude = res.latitude;
+        const longitude = res.longitude;
+
+        // 2. 使用SDK搜索医院
+        qqmapsdk.search({
+          keyword: '医院', // 搜索关键词
+          location: {
+            latitude: latitude,
+            longitude: longitude
+          },
+          page_size: 6, // 显示前6个结果
+          success: function (searchRes) {
+            wx.hideLoading();
+
+            if (searchRes.data && searchRes.data.length > 0) {
+              const hospitals = searchRes.data;
+
+              // 格式化名称用于ActionSheet（例如："协和医院 (500m)"）
+              const itemList = hospitals.map(item => {
+                let dist = item._distance < 1000 
+                  ? `${item._distance}m` 
+                  : `${(item._distance / 1000).toFixed(1)}km`;
+                return `${item.title} (${dist})`;
+              });
+
+              // 3. 显示搜索结果列表
+              wx.showActionSheet({
+                itemList: itemList,
+                success: function (tapRes) {
+                  const selected = hospitals[tapRes.tapIndex];
+
+                  // 4. 导航到选中的医院
+                  wx.openLocation({
+                    latitude: selected.location.lat,
+                    longitude: selected.location.lng,
+                    name: selected.title,
+                    address: selected.address,
+                    scale: 16
+                  });
+                }
+              });
+            } else {
+              wx.showToast({
+                title: '附近未找到医院',
+                icon: 'none'
+              });
+            }
+          },
+          fail: function (err) {
+            wx.hideLoading();
+            console.error('搜索失败:', err);
+            wx.showToast({
+              title: '搜索失败，请检查Key配置',
+              icon: 'none'
+            });
+          }
+        });
+      },
+      fail: function (err) {
+        wx.hideLoading();
+        // 处理权限拒绝
+        if (err.errMsg && err.errMsg.indexOf('auth') !== -1) {
+          wx.showModal({
+            title: '权限提示',
+            content: '需要获取位置信息以查找附近医院',
+            confirmText: '去设置',
+            cancelText: '取消',
+            success: (res) => {
+              if (res.confirm) {
+                wx.openSetting({
+                  success: (settingRes) => {
+                    if (settingRes.authSetting['scope.userLocation']) {
+                      // 用户授权了位置权限，重新尝试
+                      that.onFindHospital();
+                    }
+                  }
+                });
+              }
+            }
+          });
+        } else {
+          wx.showToast({
+            title: '定位失败',
+            icon: 'none'
+          });
+        }
+      }
+    });
+  },
+
+  // 3. 显示使用指南
+  onShowGuide() {
+    wx.showModal({
+      title: '使用指南',
+      content: '1. 点击"编辑信息"完善您的急救卡\n2. 点击"生成二维码"，创建自己的桌面壁纸或打印用的急救卡\n3. 遇到紧急情况点击"一键呼救"\n4. 每日完成健康打卡，关注家人健康',
+      showCancel: false,
+      confirmText: '知道了'
+    });
+  },
+
+  // 5. 切换健康打卡状态
+  onToggleHabit(e) {
+    const id = e.currentTarget.dataset.id;
+    const habits = this.data.habits.map(item => {
+      if (item.id === id) {
+        // 修改点：把 { ...item } 换成 Object.assign，解决 babel 报错
+        return Object.assign({}, item, { done: !item.done });
+      }
+      return item;
+    });
+
+    this.setData({ habits });
+
+    // 触觉反馈 (加个 try-catch 防止不支持震动的手机报错)
+    try {
+      wx.vibrateShort({
+        type: 'light'
+      });
+    } catch (err) {
+      console.log('Vibration not supported');
     }
   }
 });

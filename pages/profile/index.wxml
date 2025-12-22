@@ -41,7 +41,7 @@
     <view class="feedback-box">
       <textarea 
         class="feedback-input" 
-        placeholder="请输入您的建议或遇到的问题（必填）..." 
+        placeholder="请输入您的建议或遇到的问题..." 
         placeholder-class="placeholder"
         value="{{feedbackContent}}"
         bindinput="onFeedbackInput"

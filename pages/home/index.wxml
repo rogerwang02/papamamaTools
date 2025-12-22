@@ -85,17 +85,48 @@
     </view>
   </view>
 
-  <!-- 健康提醒区域 -->
-  <view class="reminder-section" wx:if="{{!loading}}">
-    <view class="reminder-header">
-      <text class="reminder-title">健康提醒</text>
-    </view>
-    <view class="reminder-list">
-      <view class="reminder-item" wx:for="{{reminders}}" wx:key="index">
-        <text class="reminder-icon">{{item.icon}}</text>
-        <text class="reminder-text">{{item.text}}</text>
+  <!-- 工具箱区域 -->
+  <view class="utility-section" wx:if="{{!loading}}">
+    <view class="section-title">贴心工具箱</view>
+    <view class="utility-grid">
+      <view class="utility-item" bindtap="onSOSCall">
+        <view class="utility-icon-bg bg-red">
+          <text class="utility-icon">🆘</text>
+        </view>
+        <text class="utility-label">一键呼救</text>
+      </view>
+      <view class="utility-item" bindtap="onFindHospital">
+        <view class="utility-icon-bg bg-blue">
+          <text class="utility-icon">🏥</text>
+        </view>
+        <text class="utility-label">附近医院</text>
+      </view>
+      <view class="utility-item" bindtap="onShowGuide">
+        <view class="utility-icon-bg bg-green">
+          <text class="utility-icon">📖</text>
+        </view>
+        <text class="utility-label">使用指南</text>
       </view>
     </view>
   </view>
+
+  <!-- 健康打卡区域 -->
+  <view class="habit-section" wx:if="{{!loading}}">
+    <view class="section-title">今日健康打卡</view>
+    <view class="habit-list">
+      <block wx:for="{{habits}}" wx:key="id">
+        <view class="habit-item {{item.done ? 'habit-done' : ''}}" bindtap="onToggleHabit" data-id="{{item.id}}">
+          <view class="habit-icon">{{item.icon}}</view>
+          <text class="habit-text">{{item.text}}</text>
+          <view class="habit-checkbox">
+            <text wx:if="{{item.done}}">✅</text>
+            <view wx:else class="checkbox-circle"></view>
+          </view>
+        </view>
+      </block>
+    </view>
+  </view>
+
+  <view class="footer-space"></view>
 </view>
 

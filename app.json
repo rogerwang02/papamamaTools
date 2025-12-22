@@ -42,6 +42,14 @@
   "style": "v2",
   "sitemapLocation": "sitemap.json",
   "cloud": true,
-  "lazyCodeLoading": "requiredComponents"
+  "lazyCodeLoading": "requiredComponents",
+  "permission": {
+    "scope.userLocation": {
+      "desc": "我们需要获取您的位置以查找附近的医院"
+    }
+  },
+  "requiredPrivateInfos": [
+    "getLocation"
+  ]
 }
 
