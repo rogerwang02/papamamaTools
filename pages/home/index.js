@@ -257,7 +257,7 @@ Page({
       content: '删除后需要重新创建卡片，确定要删除吗？',
       confirmText: '删除',
       cancelText: '取消',
-      confirmColor: '#FF3B30',
+        confirmColor: '#FF3B30',
       success: async (res) => {
         if (res.confirm) {
           // 用户确认删除

@@ -7,6 +7,17 @@ const CLOUD_BASE_ID = 'cloud://cloud1-0gum144f4caaf976.636c-cloud1-0gum144f4caaf
 // Note: We'll construct the full ID dynamically: base + / + filename
 const REMOTE_BGS = ['bg1.jpg', 'bg2.jpg', 'bg3.jpg'];
 
+// === 屏安签文 ===
+const safetyQuotes = [
+  "点亮屏幕，许你岁岁屏安。",
+  "无论去往哪里，都要平安归来。",
+  "您的健康，是我们最大的福气。",
+  "别怕麻烦，电话这头，我随时都在。",
+  "在这座城市，请照顾好独一无二的自己。",
+  "愿你的坚强，都有软肋可依。",
+  "慢慢长大，世界等你探索。"
+];
+
 Page({
   data: {
     cardId: '',
@@ -46,7 +57,9 @@ Page({
     lastBgImagePath: '', // 上次加载的背景图片路径
     lastQRCodePath: '', // 上次加载的二维码路径
     // 保存状态
-    isSaving: false // 控制保存时的视觉状态，防止双重视觉效果
+    isSaving: false, // 控制保存时的视觉状态，防止双重视觉效果
+    // 屏安签文
+    selectedQuote: '' // 随机选中的签文
   },
 
   // 实例变量：缓存图片对象（不能存储在 data 中，因为 setData 无法序列化 Native Image 对象）
@@ -177,6 +190,10 @@ Page({
     });
 
     try {
+      // 随机选择屏安签文
+      const randomQuote = safetyQuotes[Math.floor(Math.random() * safetyQuotes.length)];
+      this.setData({ selectedQuote: randomQuote });
+
       const res = await wx.cloud.callFunction({
         name: 'createQRCode',
         data: {
@@ -613,6 +630,39 @@ Page({
       ctx.fillText('请在机主需要帮助时', centerX, text1Y);
       ctx.fillText('扫码查看紧急联系人', centerX, text2Y);
     }
+
+    // D. 绘制屏安签文（在壁纸最下方，无论是否绘制Widget）
+    if (this.data.selectedQuote && !onlyBackground) {
+      const quoteFontSize = 16; // 签文字体大小
+      const quoteColor = '#666666'; // 深灰色，也可以使用主色调 #FF6B00
+      const maxQuoteWidth = width - 40; // 左右各留20px边距
+      const bottomMargin = 30; // 距离底部30px
+      
+      ctx.save();
+      ctx.fillStyle = quoteColor;
+      ctx.font = `${quoteFontSize}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top'; // 使用top对齐，从指定Y坐标向下绘制
+      
+      // 先计算文本需要的高度（估算）
+      const estimatedLines = Math.ceil(this.data.selectedQuote.length / 12); // 每行约12个字符
+      const lineHeight = quoteFontSize + 4;
+      const totalTextHeight = estimatedLines * lineHeight;
+      
+      // 从底部向上计算起始Y坐标
+      const quoteStartY = height - bottomMargin - totalTextHeight;
+      
+      // 使用 drawMultilineText 处理长文本自动换行
+      this.drawMultilineText(
+        ctx,
+        this.data.selectedQuote,
+        width / 2, // 居中X坐标
+        quoteStartY,
+        maxQuoteWidth,
+        lineHeight
+      );
+      ctx.restore();
+    }
   },
 
 
@@ -735,7 +785,7 @@ Page({
   drawECGLine(ctx, x, y, w) {
     ctx.save();
     ctx.beginPath();
-    ctx.strokeStyle = '#FF6B00'; // 橙红色线条
+      ctx.strokeStyle = '#FF6B00'; // 橙红色线条
     ctx.lineWidth = 2;
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
