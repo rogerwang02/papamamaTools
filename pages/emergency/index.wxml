@@ -34,7 +34,7 @@
 
     <!-- 家人寄语 -->
     <view class="note-section" wx:if="{{true}}">
-      <text class="note-text">“ 如有不适请出示此卡，我们永远爱你。💝 ”</text>
+      <text class="note-text">“ 如有不适请出示此卡，请好好爱自己。💝 ”</text>
     </view>
 
     <!-- 关键医疗信息区 - 网格布局（2列：血型和过敏） -->
@@ -48,8 +48,7 @@
 
       <view class="info-card grid-item">
         <view class="card-label">
-          <view class="icon icon-allergy"></view>
-          <text>过敏史</text>
+          <view class="icon icon-allergy"></view> 过敏史
         </view>
         <text class="card-value {{allergyInfo !== '无已知过敏' ? 'text-red' : ''}}">{{allergyInfo}}</text>
       </view>

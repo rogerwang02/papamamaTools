@@ -2,7 +2,7 @@
 
 /* Global Page Style */
 page {
-  background-color: #FFF0E5;
+  background-color: #F7F8FA;
 }
 
 .container {
@@ -150,11 +150,11 @@ page {
   font-size: 32rpx;
 }
 
-/* 橙黄色圆形警告图标 */
+/* 黄色圆形警告图标 */
 .icon-allergy {
   width: 32rpx;
   height: 32rpx;
-  background-color: #FFA500;
+  background-color: #FFB800;
   border-radius: 50%;
   margin-right: 8rpx;
   position: relative;
@@ -168,9 +168,10 @@ page {
 .icon-allergy::after {
   content: '!';
   color: #FFF;
-  font-size: 22rpx;
+  font-size: 20rpx;
   font-weight: bold;
   line-height: 1;
+  font-family: Arial, sans-serif;
 }
 
 .card-value {
