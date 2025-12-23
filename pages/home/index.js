@@ -1,11 +1,6 @@
 // pages/home/index.js
 const db = wx.cloud.database();
-const QQMapWX = require('../../libs/qqmap-wx-jssdk.min');
 const app = getApp();
-
-// TODO: 必须替换为您在腾讯位置服务申请的真实 Key
-// 获取地址：https://lbs.qq.com/
-const MAP_KEY = 'F3MBZ-CEA67-BCHXJ-HYM4U-XVMQF-Y2FIG';
 
 Page({
   data: {
@@ -413,116 +408,6 @@ Page({
           });
         }
       });
-    });
-  },
-
-  // 2. 查找附近医院（使用腾讯地图SDK）
-  onFindHospital() {
-    // 检查Key是否配置
-    if (!MAP_KEY || MAP_KEY === 'REPLACE_ME_WITH_YOUR_KEY') {
-      wx.showModal({
-        title: '配置缺失',
-        content: '请先在代码中配置腾讯地图 Key',
-        showCancel: false
-      });
-      return;
-    }
-
-    const qqmapsdk = new QQMapWX({ key: MAP_KEY });
-    wx.showLoading({ title: '搜索附近医院...' });
-    const that = this;
-
-    // 1. 获取位置
-    wx.getLocation({
-      type: 'gcj02',
-      success: function (res) {
-        const latitude = res.latitude;
-        const longitude = res.longitude;
-
-        // 2. 使用SDK搜索医院
-        qqmapsdk.search({
-          keyword: '医院', // 搜索关键词
-          location: {
-            latitude: latitude,
-            longitude: longitude
-          },
-          page_size: 6, // 显示前6个结果
-          success: function (searchRes) {
-            wx.hideLoading();
-
-            if (searchRes.data && searchRes.data.length > 0) {
-              const hospitals = searchRes.data;
-
-              // 格式化名称用于ActionSheet（例如："协和医院 (500m)"）
-              const itemList = hospitals.map(item => {
-                let dist = item._distance < 1000 
-                  ? `${item._distance}m` 
-                  : `${(item._distance / 1000).toFixed(1)}km`;
-                return `${item.title} (${dist})`;
-              });
-
-              // 3. 显示搜索结果列表
-              wx.showActionSheet({
-                itemList: itemList,
-                success: function (tapRes) {
-                  const selected = hospitals[tapRes.tapIndex];
-
-                  // 4. 导航到选中的医院
-                  wx.openLocation({
-                    latitude: selected.location.lat,
-                    longitude: selected.location.lng,
-                    name: selected.title,
-                    address: selected.address,
-                    scale: 16
-                  });
-                }
-              });
-            } else {
-              wx.showToast({
-                title: '附近未找到医院',
-                icon: 'none'
-              });
-            }
-          },
-          fail: function (err) {
-            wx.hideLoading();
-            console.error('搜索失败:', err);
-            wx.showToast({
-              title: '搜索失败，请检查Key配置',
-              icon: 'none'
-            });
-          }
-        });
-      },
-      fail: function (err) {
-        wx.hideLoading();
-        // 处理权限拒绝
-        if (err.errMsg && err.errMsg.indexOf('auth') !== -1) {
-          wx.showModal({
-            title: '权限提示',
-            content: '需要获取位置信息以查找附近医院',
-            confirmText: '去设置',
-            cancelText: '取消',
-            success: (res) => {
-              if (res.confirm) {
-                wx.openSetting({
-                  success: (settingRes) => {
-                    if (settingRes.authSetting['scope.userLocation']) {
-                      // 用户授权了位置权限，重新尝试
-                      that.onFindHospital();
-                    }
-                  }
-                });
-              }
-            }
-          });
-        } else {
-          wx.showToast({
-            title: '定位失败',
-            icon: 'none'
-          });
-        }
-      }
     });
   },
 
