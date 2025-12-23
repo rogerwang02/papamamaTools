@@ -243,6 +243,7 @@ Page({
         name: 'submitFeedback',
         data: {
           content: content,
+          contact: this.data.nickName || '', // 使用昵称作为联系方式
           userInfo: {
             nickName: this.data.nickName,
             avatarUrl: this.data.avatarUrl
@@ -254,19 +255,21 @@ Page({
       wx.hideLoading();
 
       if (res.result && res.result.success) {
-        wx.showToast({ 
-          title: '反馈成功', 
-          icon: 'success',
-          duration: 2000
-        });
-        
-        // 清空输入
-        this.setData({ 
-          feedbackContent: '',
-          isFeedbackEmpty: true
+        wx.showModal({
+          title: '感谢您的声音',
+          content: '我们已收到反馈，并将尽快优化！管理员已收到实时通知。',
+          showCancel: false,
+          confirmText: '好的',
+          success: () => {
+            // 清空输入
+            this.setData({ 
+              feedbackContent: '',
+              isFeedbackEmpty: true
+            });
+          }
         });
       } else {
-        throw new Error(res.result?.errMsg || '提交失败');
+        throw new Error(res.result?.msg || res.result?.error || res.result?.errMsg || '提交失败');
       }
     } catch (err) {
       console.error('提交反馈失败:', err);
