@@ -1,6 +1,7 @@
 // pages/home/index.js
 const db = wx.cloud.database();
 const QQMapWX = require('../../libs/qqmap-wx-jssdk.min');
+const app = getApp();
 
 // TODO: 必须替换为您在腾讯位置服务申请的真实 Key
 // 获取地址：https://lbs.qq.com/
@@ -21,18 +22,72 @@ Page({
     bmiHeight: '',
     bmiWeight: '',
     // 医保凭证提示模态框
-    showMedicalCardModal: false
+    showMedicalCardModal: false,
+    // 健康指引功能开关（从全局变量同步）
+    showMedicalGuide: false
   },
 
   onLoad(options) {
     // 页面加载时检查用户身份
     this.checkUserIdentity();
+    
+    // 如果全局变量还是默认值（可能配置还没拉取完成），主动查询一次配置
+    if (!app.globalData.enableMedicalGuide) {
+      this.fetchMedicalGuideConfig();
+    } else {
+      // 如果已经有值，直接同步
+      this.syncMedicalGuideConfig();
+    }
+    
+    // 延迟多次同步配置状态，确保 fetchConfig 有足够时间完成（针对慢网络）
+    setTimeout(() => {
+      this.syncMedicalGuideConfig();
+    }, 300);
+    
+    setTimeout(() => {
+      this.syncMedicalGuideConfig();
+    }, 800);
   },
 
   onShow() {
     // 每次显示页面时检查身份（如果用户删除了卡片，需要重新检查）
     // 注意：如果已经跳转到分享页面，这里不会执行
     this.checkUserIdentity();
+    
+    // 同步健康指引功能开关状态
+    this.syncMedicalGuideConfig();
+  },
+
+  // 主动查询健康指引配置（页面级查询，不依赖 app.js 的异步加载）
+  fetchMedicalGuideConfig() {
+    const db = wx.cloud.database();
+    db.collection('app_config').where({
+      key: 'audit_switch'
+    }).get().then(res => {
+      if (res.data.length > 0) {
+        const enabled = res.data[0].enable_medical_guide === true;
+        // 更新全局变量
+        app.globalData.enableMedicalGuide = enabled;
+        // 同步到页面数据
+        this.setData({
+          showMedicalGuide: enabled
+        });
+        console.log('✅ 页面主动拉取配置成功，功能开关:', enabled);
+      } else {
+        console.log('⚠️ 未找到配置，使用默认关闭状态');
+      }
+    }).catch(err => {
+      console.error('页面拉取配置失败，使用默认关闭状态', err);
+    });
+  },
+
+  // 同步健康指引功能开关状态（提取为独立方法，便于复用）
+  syncMedicalGuideConfig() {
+    if (app.globalData.enableMedicalGuide !== this.data.showMedicalGuide) {
+      this.setData({
+        showMedicalGuide: app.globalData.enableMedicalGuide
+      });
+    }
   },
 
   // 检查用户身份（不再跳转，只加载数据）
@@ -109,10 +164,22 @@ Page({
 
   // 带权限检查的操作处理
   async handleActionWithAuth(nextAction) {
+    // 1. 先检查本地缓存是否有验证记录
+    const cacheKey = 'inviteCodeVerified';
+    const cachedAuth = wx.getStorageSync(cacheKey);
+    
+    if (cachedAuth && cachedAuth.verified === true) {
+      // 本地缓存有验证记录，直接执行操作
+      console.log('✅ 使用本地缓存验证状态，直接执行操作');
+      nextAction();
+      return;
+    }
+
+    // 2. 本地没有缓存，调用云函数验证
     wx.showLoading({ title: '验证权限...' });
 
     try {
-      // 1. 检查用户是否已经验证过（通过检查是否有已使用的邀请码）
+      // 检查用户是否已经验证过（通过检查是否有已使用的邀请码）
       const res = await wx.cloud.callFunction({
         name: 'verifyInviteCode',
         data: { code: '' } // 发送空码只检查状态
@@ -121,7 +188,9 @@ Page({
       wx.hideLoading();
 
       if (res.result && res.result.success) {
-        // 已经授权 -> 继续执行
+        // 已经授权 -> 保存到本地缓存，然后继续执行
+        wx.setStorageSync(cacheKey, { verified: true, timestamp: Date.now() });
+        console.log('✅ 验证成功，已保存到本地缓存');
         nextAction();
       } else {
         // 未授权 -> 显示邀请码输入对话框
@@ -190,6 +259,11 @@ Page({
       console.log('邀请码验证结果:', res.result);
 
       if (res.result && res.result.success) {
+        // 验证成功，保存到本地缓存
+        const cacheKey = 'inviteCodeVerified';
+        wx.setStorageSync(cacheKey, { verified: true, timestamp: Date.now() });
+        console.log('✅ 邀请码验证成功，已保存到本地缓存');
+        
         const message = res.result.message || '验证成功';
         wx.showToast({ title: message, icon: 'success' });
         // 继续执行操作
@@ -494,6 +568,12 @@ Page({
 
   // 3. 智能导诊 - 跳转到智能导诊页面（需要验证邀请码）
   onOpenTriage() {
+    // 双重保险：点击时再次确认开关
+    if (!app.globalData.enableMedicalGuide) {
+      console.log('健康指引功能未启用');
+      return;
+    }
+    
     this.handleActionWithAuth(() => {
       wx.navigateTo({
         url: '/pages/triage/index'

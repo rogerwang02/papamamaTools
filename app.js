@@ -14,9 +14,33 @@ App({
         traceUser: true,
       });
     }
+    
+    // 启动时获取云端配置
+    this.fetchConfig();
   },
+  
+  // 拉取云端配置
+  fetchConfig() {
+    const db = wx.cloud.database();
+    db.collection('app_config').where({
+      key: 'audit_switch'
+    }).get().then(res => {
+      if (res.data.length > 0) {
+        // 更新全局变量
+        this.globalData.enableMedicalGuide = res.data[0].enable_medical_guide === true;
+        console.log('✅ 配置拉取成功，功能开关:', this.globalData.enableMedicalGuide);
+      } else {
+        console.log('⚠️ 未找到配置，使用默认关闭状态');
+      }
+    }).catch(err => {
+      console.error('配置拉取失败，使用默认关闭状态', err);
+      // 失败时保持默认值 false
+    });
+  },
+  
   globalData: {
     userInfo: null,
+    enableMedicalGuide: false, // 🔴 默认为关闭，审核安全第一
     firstAidData: [
       {
         id: 'cpr',

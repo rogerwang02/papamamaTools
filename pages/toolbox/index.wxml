@@ -34,11 +34,11 @@
       <text class="tool-name">急救常识</text>
     </view>
 
-    <view class="tool-item" bindtap="onOpenTriage">
+    <view class="tool-item" bindtap="onOpenTriage" wx:if="{{showMedicalGuide}}">
       <view class="icon-box bg-indigo">
-        <text class="tool-icon">🤖</text>
+        <text class="tool-icon">📋</text>
       </view>
-      <text class="tool-name">智能导诊</text>
+      <text class="tool-name">科室建议</text>
     </view>
   </view>
 </view>
