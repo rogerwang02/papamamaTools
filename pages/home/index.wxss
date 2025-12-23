@@ -322,26 +322,27 @@
   flex-direction: column;
   align-items: center;
   margin-bottom: 30rpx;
-  padding: 0 10rpx;
+  padding: 0 5rpx;
+  box-sizing: border-box;
 }
 
 .utility-icon-bg {
-  width: 100rpx;
-  height: 100rpx;
-  border-radius: 30rpx;
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 24rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 16rpx;
+  margin-bottom: 12rpx;
   box-shadow: 0 4rpx 10rpx rgba(0, 0, 0, 0.05);
 }
 
 .utility-icon {
-  font-size: 48rpx;
+  font-size: 38rpx;
 }
 
 .utility-label {
-  font-size: 26rpx;
+  font-size: 24rpx;
   color: #555;
   text-align: center;
 }
@@ -361,6 +362,18 @@
 
 .bg-green {
   background: #E8F5E9;
+}
+
+.bg-purple {
+  background: #F3E5F5;
+}
+
+.bg-cyan {
+  background: #E0F7FA;
+}
+
+.bg-gray {
+  background: #F5F5F5;
 }
 
 /* 健康打卡区域 */
@@ -421,5 +434,217 @@
 
 .footer-space {
   height: 60rpx;
+}
+
+/* BMI计算器模态框样式 */
+.bmi-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.bmi-modal-content {
+  width: 85%;
+  max-width: 600rpx;
+  background-color: #fff;
+  border-radius: 24rpx;
+  overflow: hidden;
+  transform: scale(0.9);
+  transition: transform 0.3s;
+}
+
+.bmi-modal.show .bmi-modal-content {
+  transform: scale(1);
+}
+
+.bmi-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 40rpx 30rpx 20rpx;
+  border-bottom: 2rpx solid #F0F0F0;
+}
+
+.bmi-modal-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.bmi-modal-close {
+  font-size: 48rpx;
+  color: #999;
+  line-height: 1;
+  padding: 0 10rpx;
+}
+
+.bmi-modal-body {
+  padding: 40rpx 30rpx;
+}
+
+.bmi-input-item {
+  margin-bottom: 30rpx;
+}
+
+.bmi-input-item:last-child {
+  margin-bottom: 0;
+}
+
+.bmi-input-label {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16rpx;
+}
+
+.bmi-input {
+  width: 100%;
+  height: 88rpx;
+  background-color: #F8F8F8;
+  border-radius: 12rpx;
+  padding: 0 24rpx;
+  font-size: 32rpx;
+  color: #333;
+  box-sizing: border-box;
+}
+
+.bmi-input-placeholder {
+  color: #999;
+}
+
+.bmi-modal-footer {
+  display: flex;
+  border-top: 2rpx solid #F0F0F0;
+  padding: 20rpx 30rpx 30rpx;
+}
+
+.bmi-modal-btn {
+  flex: 1;
+  height: 80rpx;
+  border-radius: 12rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 10rpx;
+  border: none;
+}
+
+.bmi-modal-btn::after {
+  border: none;
+}
+
+.cancel-btn {
+  background-color: #F5F5F5;
+  color: #666;
+}
+
+.confirm-btn {
+  background: linear-gradient(135deg, #FF6B00 0%, #FF8C00 100%);
+  color: #fff;
+}
+
+/* 医保凭证提示模态框样式 */
+.medical-card-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.medical-card-modal-content {
+  width: 85%;
+  max-width: 600rpx;
+  background-color: #fff;
+  border-radius: 24rpx;
+  overflow: hidden;
+}
+
+.medical-card-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 40rpx 30rpx 20rpx;
+  border-bottom: 2rpx solid #F0F0F0;
+}
+
+.medical-card-modal-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.medical-card-modal-close {
+  font-size: 48rpx;
+  color: #999;
+  line-height: 1;
+  padding: 0 10rpx;
+}
+
+.medical-card-modal-body {
+  padding: 30rpx;
+  text-align: center;
+}
+
+.medical-card-modal-tip {
+  display: block;
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 30rpx;
+  line-height: 1.6;
+}
+
+.medical-card-guide-image {
+  width: 100%;
+  border-radius: 12rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+}
+
+.medical-card-modal-footer {
+  display: flex;
+  border-top: 2rpx solid #F0F0F0;
+  padding: 20rpx 30rpx 30rpx;
+}
+
+.medical-card-modal-btn {
+  flex: 1;
+  height: 80rpx;
+  border-radius: 12rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 10rpx;
+  border: none;
+}
+
+.medical-card-modal-btn::after {
+  border: none;
+}
+
+.medical-card-modal-btn.cancel-btn {
+  background-color: #F5F5F5;
+  color: #666;
+}
+
+.medical-card-modal-btn.confirm-btn {
+  background: linear-gradient(135deg, #FF6B00 0%, #FF8C00 100%);
+  color: #fff;
 }
 

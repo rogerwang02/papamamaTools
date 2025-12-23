@@ -95,17 +95,29 @@
         </view>
         <text class="utility-label">一键呼救</text>
       </view>
-      <view class="utility-item" bindtap="onFindHospital">
-        <view class="utility-icon-bg bg-blue">
-          <text class="utility-icon">🏥</text>
+      <view class="utility-item" bindtap="onOpenMedicalCard">
+        <view class="utility-icon-bg bg-cyan">
+          <text class="utility-icon">💳</text>
         </view>
-        <text class="utility-label">附近医院</text>
+        <text class="utility-label">电子医保卡</text>
       </view>
-      <view class="utility-item" bindtap="onShowGuide">
-        <view class="utility-icon-bg bg-green">
-          <text class="utility-icon">📖</text>
+      <view class="utility-item" bindtap="onCalculateBMI">
+        <view class="utility-icon-bg bg-blue">
+          <text class="utility-icon">⚖️</text>
         </view>
-        <text class="utility-label">使用指南</text>
+        <text class="utility-label">BMI计算器</text>
+      </view>
+      <view class="utility-item" bindtap="onShowFirstAid">
+        <view class="utility-icon-bg bg-purple">
+          <text class="utility-icon">⛑️</text>
+        </view>
+        <text class="utility-label">急救常识</text>
+      </view>
+      <view class="utility-item" bindtap="onGoToToolbox">
+        <view class="utility-icon-bg bg-gray">
+          <text class="utility-icon">⋯</text>
+        </view>
+        <text class="utility-label">更多工具</text>
       </view>
     </view>
   </view>
@@ -128,5 +140,67 @@
   </view>
 
   <view class="footer-space"></view>
+</view>
+
+<!-- 医保凭证提示模态框 -->
+<view wx:if="{{showMedicalCardModal}}" class="medical-card-modal">
+  <view class="medical-card-modal-content">
+    <view class="medical-card-modal-header">
+      <text class="medical-card-modal-title">提示</text>
+      <text class="medical-card-modal-close" bindtap="onCloseMedicalCardModal">×</text>
+    </view>
+    <view class="medical-card-modal-body">
+      <text class="medical-card-modal-tip">即将打开腾讯健康小程序，点击左上角医保码</text>
+      <image 
+        class="medical-card-guide-image" 
+        src="/assets/medical-card-guide.jpg" 
+        mode="widthFix"
+      ></image>
+    </view>
+    <view class="medical-card-modal-footer">
+      <button class="medical-card-modal-btn cancel-btn" bindtap="onCloseMedicalCardModal">取消</button>
+      <button class="medical-card-modal-btn confirm-btn" bindtap="onConfirmOpenMedicalCard">确定</button>
+    </view>
+  </view>
+</view>
+
+<!-- BMI计算器输入模态框 -->
+<view wx:if="{{showBMIModal}}" class="bmi-modal show">
+  <view class="bmi-modal-content">
+    <view class="bmi-modal-header">
+      <text class="bmi-modal-title">BMI计算器</text>
+      <text class="bmi-modal-close" bindtap="onCloseBMIModal">×</text>
+    </view>
+    <view class="bmi-modal-body">
+      <view class="bmi-input-item">
+        <text class="bmi-input-label">身高（厘米）</text>
+        <input 
+          class="bmi-input" 
+          type="digit" 
+          placeholder="请输入身高，例如：165" 
+          value="{{bmiHeight}}"
+          bindinput="onBMIHeightInput"
+          placeholder-class="bmi-input-placeholder"
+          maxlength="3"
+        />
+      </view>
+      <view class="bmi-input-item">
+        <text class="bmi-input-label">体重（公斤）</text>
+        <input 
+          class="bmi-input" 
+          type="digit" 
+          placeholder="请输入体重，例如：65" 
+          value="{{bmiWeight}}"
+          bindinput="onBMIWeightInput"
+          placeholder-class="bmi-input-placeholder"
+          maxlength="3"
+        />
+      </view>
+    </view>
+    <view class="bmi-modal-footer">
+      <button class="bmi-modal-btn cancel-btn" bindtap="onCloseBMIModal">取消</button>
+      <button class="bmi-modal-btn confirm-btn" bindtap="onBMIConfirm">计算</button>
+    </view>
+  </view>
 </view>
 
