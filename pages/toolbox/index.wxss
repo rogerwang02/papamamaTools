@@ -94,6 +94,10 @@ page {
   background: #F5F5F5;
 }
 
+.bg-indigo {
+  background: #E8EAF6;
+}
+
 /* 医保凭证提示模态框样式 */
 .medical-card-modal {
   position: fixed;

@@ -488,13 +488,10 @@ Page({
     });
   },
 
-  // 3. 健康计算器 (BMI) - 显示输入模态框
-  onCalculateBMI() {
-    // 重置输入值
-    this.setData({
-      showBMIModal: true,
-      bmiHeight: '',
-      bmiWeight: ''
+  // 3. 智能导诊 - 跳转到智能导诊页面
+  onOpenTriage() {
+    wx.navigateTo({
+      url: '/pages/triage/index'
     });
   },
 

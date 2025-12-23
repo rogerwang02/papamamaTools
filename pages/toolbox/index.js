@@ -174,5 +174,12 @@ Page({
     wx.navigateTo({
       url: '/pages/guide/list/index'
     });
+  },
+
+  // 5. 智能导诊
+  onOpenTriage() {
+    wx.navigateTo({
+      url: '/pages/triage/index'
+    });
   }
 });

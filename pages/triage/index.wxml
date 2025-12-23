@@ -1,0 +1,53 @@
+<!--pages/triage/index.wxml-->
+<view class="container">
+  <view class="header">
+    <text class="title">🤖 智能导诊</text>
+    <text class="subtitle">描述您的身体不适，AI帮您推荐科室</text>
+  </view>
+
+  <view class="input-box">
+    <textarea 
+      class="symptom-input" 
+      placeholder="请详细描述您的症状，例如：左下腹刺痛，持续了两天，早上起床头晕，有点恶心;" 
+      bindinput="onInput"
+      value="{{inputText}}"
+      maxlength="200"
+    ></textarea>
+    <view class="word-count">{{inputText.length}}/200</view>
+  </view>
+
+  <button class="analyze-btn" bindtap="onAnalyze" loading="{{loading}}" disabled="{{!canAnalyze || loading}}">
+    开始分析
+  </button>
+
+  <view class="result-card" wx:if="{{result}}">
+    <view class="result-header {{result.urgency === '立即拨打120' ? 'bg-red' : (result.urgency === '无关' ? 'bg-gray' : 'bg-blue')}}">
+      <text class="dept-name">{{result.department}}</text>
+      <text class="urgency-tag" wx:if="{{result.urgency !== '无关'}}">{{result.urgency}}</text>
+      <text class="urgency-tag" wx:else>🚫</text>
+    </view>
+    
+    <view class="result-body">
+      <block wx:if="{{result.urgency !== '无关'}}">
+        <view class="result-item">
+          <text class="label">🩺 推荐理由：</text>
+          <text class="content">{{result.reason}}</text>
+        </view>
+        <view class="result-item">
+          <text class="label">💡 就诊贴士：</text>
+          <text class="content">{{result.tips}}</text>
+        </view>
+      </block>
+      <block wx:else>
+        <view class="result-item non-medical-item">
+          <text class="content non-medical-reason">{{result.reason}}</text>
+          <text class="content non-medical-tip">我是医疗助手，只能回答健康相关的问题哦。</text>
+        </view>
+      </block>
+    </view>
+    <view class="disclaimer" wx:if="{{result.urgency !== '无关'}}">
+      *AI建议仅供参考，不能替代医生诊断。急症请直接就医。
+    </view>
+  </view>
+</view>
+

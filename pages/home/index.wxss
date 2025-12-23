@@ -180,24 +180,25 @@
   line-height: 1;
 }
 
-/* 卡片内容 */
+/* 卡片内容 - 压缩内边距 */
 .card-content {
-  padding: 40rpx;
+  padding: 30rpx 40rpx 20rpx; /* 上左右保持，下方减少 */
 }
 
-/* 超大号姓名 */
+/* 姓名 - 稍微调小并大幅减少下方留白 */
 .card-name {
-  font-size: 64rpx;
+  font-size: 52rpx; /* 原64rpx -> 52rpx，更精致 */
   font-weight: bold;
   color: #333;
-  margin-bottom: 40rpx;
+  margin-bottom: 20rpx; /* 原40rpx -> 20rpx，减少空隙 */
   line-height: 1.2;
 }
 
-/* 关键信息网格（两列） */
+/* 关键信息网格 - 保持但微调 */
 .card-info-grid {
   display: flex;
   gap: 30rpx;
+  margin-bottom: 10rpx; /* 底部稍微留一点空隙即可 */
 }
 
 .card-info-col {
@@ -209,18 +210,19 @@
 .card-info-label {
   font-size: 24rpx;
   color: #999;
-  margin-bottom: 12rpx;
+  margin-bottom: 8rpx; /* 标签和内容挨紧一点 */
 }
 
 .card-info-value {
-  font-size: 32rpx;
+  font-size: 30rpx; /* 原32rpx -> 30rpx */
   font-weight: bold;
   color: #333;
   line-height: 1.4;
+  min-height: 42rpx; /* 保持最小高度防止塌陷 */
 }
 
 .card-info-value.blood-type {
-  font-size: 36rpx;
+  font-size: 34rpx; /* 原36rpx -> 34rpx */
   color: #FF3B30;
 }
 
@@ -232,13 +234,13 @@
   word-break: break-all;
 }
 
-/* 操作按钮网格 */
+/* 操作按钮网格 - 压缩上下空间 */
 .card-actions-grid {
   display: flex;
   justify-content: space-between;
-  padding: 30rpx 20rpx 30rpx;
+  padding: 24rpx 30rpx 30rpx; /* 压缩内边距 */
   border-top: 1rpx solid #F5F5F5;
-  margin-top: 0;
+  margin-top: 20rpx; /* 减少与上方内容的距离 */
 }
 
 .action-item {
@@ -246,25 +248,25 @@
   flex-direction: column;
   align-items: center;
   flex: 1;
-  padding: 10rpx;
+  /* padding: 10rpx; 删除这个多余的padding */
   transition: all 0.2s ease;
 }
 
-/* 图标圆形按钮 */
+/* 图标圆形按钮 - 稍微缩小 */
 .action-icon-circle {
-  width: 90rpx;
-  height: 90rpx;
+  width: 80rpx; /* 原90rpx -> 80rpx */
+  height: 80rpx;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 12rpx;
-  box-shadow: 0 4rpx 10rpx rgba(0, 0, 0, 0.08);
+  margin-bottom: 10rpx;
+  box-shadow: 0 4rpx 10rpx rgba(0, 0, 0, 0.05);
   transition: all 0.2s ease;
 }
 
 .action-icon {
-  font-size: 40rpx;
+  font-size: 36rpx; /* 原40rpx -> 36rpx */
   line-height: 1;
 }
 
@@ -281,8 +283,8 @@
 }
 
 .action-text {
-  font-size: 26rpx;
-  color: #333;
+  font-size: 24rpx; /* 原26rpx -> 24rpx */
+  color: #555;
   font-weight: 500;
   line-height: 1.4;
 }
@@ -374,6 +376,10 @@
 
 .bg-gray {
   background: #F5F5F5;
+}
+
+.bg-indigo {
+  background: #E8EAF6;
 }
 
 /* 健康打卡区域 */

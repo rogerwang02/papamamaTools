@@ -1,0 +1,195 @@
+page { 
+  background: #F7F8FA; 
+  padding: 30rpx; 
+  box-sizing: border-box; 
+}
+
+.container {
+  min-height: 100vh;
+}
+
+.header { 
+  margin-bottom: 40rpx; 
+}
+
+.title { 
+  font-size: 44rpx; 
+  font-weight: bold; 
+  color: #333; 
+  display: block; 
+  margin-bottom: 10rpx; 
+}
+
+.subtitle { 
+  font-size: 28rpx; 
+  color: #999; 
+}
+
+.input-box { 
+  background: #fff; 
+  border-radius: 20rpx; 
+  padding: 30rpx; 
+  margin-bottom: 40rpx; 
+  position: relative; 
+}
+
+.symptom-input { 
+  width: 100%; 
+  height: 200rpx; 
+  font-size: 30rpx; 
+  color: #333; 
+  line-height: 1.5; 
+}
+
+.word-count { 
+  position: absolute; 
+  bottom: 20rpx; 
+  right: 30rpx; 
+  font-size: 24rpx; 
+  color: #ccc; 
+}
+
+.analyze-btn { 
+  background: linear-gradient(135deg, #4A90E2, #007AFF); 
+  color: #fff; 
+  border-radius: 50rpx; 
+  font-weight: bold; 
+  font-size: 32rpx;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 20rpx rgba(0,122,255,0.3);
+  border: none;
+  padding: 0;
+}
+
+.analyze-btn::after {
+  border: none;
+}
+
+.analyze-btn[disabled] { 
+  background: #E0E0E0; 
+  color: #999; 
+  box-shadow: none; 
+}
+
+.result-card { 
+  background: #fff; 
+  border-radius: 24rpx; 
+  overflow: hidden; 
+  margin-top: 50rpx; 
+  animation: slideUp 0.3s ease; 
+  box-shadow: 0 10rpx 30rpx rgba(0,0,0,0.05); 
+}
+
+.result-header { 
+  padding: 40rpx 30rpx; 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+}
+
+.bg-blue { 
+  background: #E3F2FD; 
+}
+
+.bg-blue .dept-name,
+.bg-blue .urgency-tag {
+  color: #1565C0;
+}
+
+.bg-red { 
+  background: #FFEBEE; 
+}
+
+.bg-red .dept-name,
+.bg-red .urgency-tag {
+  color: #D32F2F;
+}
+
+.bg-gray { 
+  background: #F5F5F5; 
+}
+
+.bg-gray .dept-name,
+.bg-gray .urgency-tag {
+  color: #666;
+}
+
+.dept-name { 
+  font-size: 40rpx; 
+  font-weight: bold; 
+}
+
+.urgency-tag { 
+  font-size: 24rpx; 
+  padding: 6rpx 16rpx; 
+  border-radius: 20rpx; 
+  background: rgba(255,255,255,0.5); 
+  font-weight: bold; 
+}
+
+.result-body { 
+  padding: 30rpx; 
+}
+
+.result-item { 
+  margin-bottom: 24rpx; 
+}
+
+.result-item:last-child {
+  margin-bottom: 0;
+}
+
+.label { 
+  font-weight: bold; 
+  color: #333; 
+  margin-bottom: 8rpx; 
+  display: block; 
+  font-size: 28rpx;
+}
+
+.content { 
+  color: #666; 
+  font-size: 28rpx; 
+  line-height: 1.6; 
+  display: block;
+}
+
+.non-medical-item {
+  text-align: center;
+  padding: 40rpx 0;
+}
+
+.non-medical-reason {
+  color: #666;
+  margin-bottom: 20rpx;
+}
+
+.non-medical-tip {
+  font-size: 26rpx;
+  color: #999;
+  display: block;
+  margin-top: 20rpx;
+}
+
+.disclaimer { 
+  font-size: 22rpx; 
+  color: #bbb; 
+  text-align: center; 
+  margin-top: 20rpx; 
+  padding: 20rpx; 
+}
+
+@keyframes slideUp { 
+  from { 
+    opacity: 0; 
+    transform: translateY(20rpx); 
+  } 
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  } 
+}
+

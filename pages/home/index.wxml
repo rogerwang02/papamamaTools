@@ -101,11 +101,11 @@
         </view>
         <text class="utility-label">电子医保卡</text>
       </view>
-      <view class="utility-item" bindtap="onCalculateBMI">
-        <view class="utility-icon-bg bg-blue">
-          <text class="utility-icon">⚖️</text>
+      <view class="utility-item" bindtap="onOpenTriage">
+        <view class="utility-icon-bg bg-indigo">
+          <text class="utility-icon">🤖</text>
         </view>
-        <text class="utility-label">BMI计算器</text>
+        <text class="utility-label">智能导诊</text>
       </view>
       <view class="utility-item" bindtap="onShowFirstAid">
         <view class="utility-icon-bg bg-purple">

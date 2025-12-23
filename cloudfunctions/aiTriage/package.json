@@ -1,0 +1,11 @@
+{
+  "name": "aiTriage",
+  "version": "1.0.0",
+  "description": "AI智能导诊服务",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3",
+    "axios": "^1.6.0"
+  }
+}
+
