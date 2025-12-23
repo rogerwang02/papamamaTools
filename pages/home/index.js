@@ -320,23 +320,25 @@ Page({
     }
   },
 
-  // 1. SOS 呼救
+  // 1. SOS 呼救（需要验证邀请码）
   onSOSCall() {
-    // 优先使用卡片中的紧急联系人电话，否则使用120
-    const emergencyPhone = '120';
+    this.handleActionWithAuth(() => {
+      // 优先使用卡片中的紧急联系人电话，否则使用120
+      const emergencyPhone = '120';
 
-    wx.makePhoneCall({
-      phoneNumber: emergencyPhone,
-      success: () => {
-        console.log('Calling SOS:', emergencyPhone);
-      },
-      fail: (err) => {
-        console.error('拨打电话失败:', err);
-        wx.showToast({
-          title: '拨打电话失败',
-          icon: 'none'
-        });
-      }
+      wx.makePhoneCall({
+        phoneNumber: emergencyPhone,
+        success: () => {
+          console.log('Calling SOS:', emergencyPhone);
+        },
+        fail: (err) => {
+          console.error('拨打电话失败:', err);
+          wx.showToast({
+            title: '拨打电话失败',
+            icon: 'none'
+          });
+        }
+      });
     });
   },
 
@@ -450,10 +452,12 @@ Page({
     });
   },
 
-  // 2. 打开医保电子凭证 - 显示提示模态框
+  // 2. 打开医保电子凭证 - 显示提示模态框（需要验证邀请码）
   onOpenMedicalCard() {
-    this.setData({
-      showMedicalCardModal: true
+    this.handleActionWithAuth(() => {
+      this.setData({
+        showMedicalCardModal: true
+      });
     });
   },
 
@@ -488,10 +492,12 @@ Page({
     });
   },
 
-  // 3. 智能导诊 - 跳转到智能导诊页面
+  // 3. 智能导诊 - 跳转到智能导诊页面（需要验证邀请码）
   onOpenTriage() {
-    wx.navigateTo({
-      url: '/pages/triage/index'
+    this.handleActionWithAuth(() => {
+      wx.navigateTo({
+        url: '/pages/triage/index'
+      });
     });
   },
 
@@ -583,10 +589,12 @@ Page({
     });
   },
 
-  // 4. 急救常识 - 跳转到急救指南列表页
+  // 4. 急救常识 - 跳转到急救指南列表页（需要验证邀请码）
   onShowFirstAid() {
-    wx.navigateTo({
-      url: '/pages/guide/list/index'
+    this.handleActionWithAuth(() => {
+      wx.navigateTo({
+        url: '/pages/guide/list/index'
+      });
     });
   },
 
@@ -600,10 +608,12 @@ Page({
     });
   },
 
-  // 6. 跳转到工具箱页面
+  // 6. 跳转到工具箱页面（需要验证邀请码）
   onGoToToolbox() {
-    wx.switchTab({
-      url: '/pages/toolbox/index'
+    this.handleActionWithAuth(() => {
+      wx.switchTab({
+        url: '/pages/toolbox/index'
+      });
     });
   },
 
