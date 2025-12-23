@@ -19,7 +19,9 @@ Page({
     showQRModal: false,
     qrCodeFileID: '',
     isGeneratingQR: false,
-    currentCardId: ''
+    currentCardId: '',
+    isAgreed: false, // 隐私协议同意状态，默认为 false
+    showPrivacyModal: false // 隐私协议弹窗显示状态
   },
 
   onLoad(options) {
@@ -196,9 +198,44 @@ Page({
     return true;
   },
 
+  // 切换隐私协议复选框状态
+  toggleAgree() {
+    this.setData({ isAgreed: !this.data.isAgreed });
+  },
+
+  // 显示隐私协议弹窗
+  showPrivacyModal(e) {
+    console.log('隐私协议链接被点击', e);
+    this.setData({
+      showPrivacyModal: true
+    });
+  },
+
+  // 关闭隐私协议弹窗
+  onClosePrivacyModal() {
+    this.setData({
+      showPrivacyModal: false
+    });
+  },
+
+  // 阻止事件冒泡
+  stopPropagation() {
+    // 空函数，用于阻止事件冒泡
+  },
+
   // 提交表单
   async onSubmit() {
     if (this.data.isSubmitting) {
+      return;
+    }
+
+    // 🛡️ 隐私协议验证：必须勾选才能提交
+    if (!this.data.isAgreed) {
+      wx.showToast({
+        title: '请先勾选隐私协议',
+        icon: 'none',
+        duration: 2000
+      });
       return;
     }
 

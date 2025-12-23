@@ -92,9 +92,57 @@
     </view>
   </view>
 
+  <!-- 隐私协议复选框 -->
+  <view class="privacy-row">
+    <view class="checkbox-container" bindtap="toggleAgree">
+      <view class="checkbox {{isAgreed ? 'checked' : ''}}">
+        <text wx:if="{{isAgreed}}" class="check-icon">✓</text>
+      </view>
+      <text class="privacy-label">我已阅读并同意</text>
+    </view>
+    <view class="privacy-link" catchtap="showPrivacyModal">《隐私保护及服务条款》</view>
+  </view>
+
   <button class="submit-btn" bindtap="onSubmit" disabled="{{isSubmitting || isGeneratingQR}}">
     {{isGeneratingQR ? '生成中...' : (isSubmitting ? '保存中...' : (editId ? '保存修改' : '生成安心卡'))}}
   </button>
+</view>
+
+<!-- 隐私协议弹窗 -->
+<view wx:if="{{showPrivacyModal}}" class="privacy-modal">
+  <view class="privacy-modal-content" catchtap="stopPropagation">
+    <view class="privacy-modal-header">
+      <text class="privacy-modal-title">隐私保护及服务条款</text>
+      <text class="privacy-modal-close" bindtap="onClosePrivacyModal">×</text>
+    </view>
+    <view class="privacy-modal-body">
+      <view class="privacy-content">
+        <view class="privacy-item">
+          <text class="privacy-item-title">1.【传输与存储安全】</text>
+          <text class="privacy-item-text">您的数据全程采用 HTTPS 银行级加密传输，并存储于腾讯云安全服务器。我们承诺严格控制权限，仅供急救场景展示。</text>
+        </view>
+        <view class="privacy-item">
+          <text class="privacy-item-title">2.【数据销毁】</text>
+          <text class="privacy-item-text">您拥有完全控制权。删除急救卡后，云端数据将立即被物理销毁，不留备份。</text>
+        </view>
+        <view class="privacy-item">
+          <text class="privacy-item-title">3.【防诈骗提醒】</text>
+          <text class="privacy-item-text">请妥善保管您的安心卡。若您的紧急联系人接到"亲人出事"或"急需汇款"的电话，请务必先通过视频、警方或医院官方渠道核实身份，切勿轻信转账。本程序无法鉴别扫码者身份，对诈骗行为不承担责任。</text>
+        </view>
+        <view class="privacy-item">
+          <text class="privacy-item-title">4.【免责申明】</text>
+          <text class="privacy-item-text">本程序为个人开发者免费提供的辅助工具，非专业医疗设备。因网络故障或不可抗力导致的信息无法读取，开发者不承担法律责任。</text>
+        </view>
+        <view class="privacy-item">
+          <text class="privacy-item-title">5.【双重保障】</text>
+          <text class="privacy-item-text">强烈建议您同时随身携带纸质急救卡，以应对极端情况。</text>
+        </view>
+      </view>
+    </view>
+    <view class="privacy-modal-footer">
+      <button class="privacy-modal-btn" bindtap="onClosePrivacyModal">确认</button>
+    </view>
+  </view>
 </view>
 
 <!-- 二维码展示模态框 -->

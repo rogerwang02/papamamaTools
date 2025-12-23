@@ -125,6 +125,174 @@
   border: none;
 }
 
+/* 隐私协议区域 */
+.privacy-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 30rpx 0 20rpx;
+  font-size: 26rpx;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox {
+  width: 34rpx;
+  height: 34rpx;
+  border: 2rpx solid #ccc;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10rpx;
+  transition: all 0.2s;
+}
+
+.checkbox.checked {
+  background-color: #FF6B00;
+  border-color: #FF6B00;
+}
+
+.check-icon {
+  color: #fff;
+  font-size: 22rpx;
+  font-weight: bold;
+}
+
+.privacy-label {
+  color: #666;
+}
+
+.privacy-link {
+  color: #576b95;
+  margin-left: 8rpx;
+  padding: 12rpx 8rpx;
+  /* 增加点击区域，确保可以点击 */
+  display: inline-block;
+  /* 添加下划线，明确这是可点击的链接 */
+  text-decoration: underline;
+  /* 确保可以点击 */
+  position: relative;
+  z-index: 10;
+  /* 明确指定最小尺寸，确保点击区域足够大 */
+  min-height: 44rpx;
+  line-height: 1.5;
+  /* 确保元素可以接收点击事件 */
+  pointer-events: auto;
+}
+
+/* 隐私协议弹窗样式 */
+.privacy-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.privacy-modal-content {
+  width: 85%;
+  max-width: 680rpx;
+  max-height: 80vh;
+  background-color: #fff;
+  border-radius: 24rpx;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.privacy-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 40rpx 30rpx 20rpx;
+  border-bottom: 2rpx solid #F0F0F0;
+  flex-shrink: 0;
+}
+
+.privacy-modal-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.privacy-modal-close {
+  font-size: 48rpx;
+  color: #999;
+  line-height: 1;
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.privacy-modal-body {
+  padding: 30rpx;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.privacy-content {
+  display: flex;
+  flex-direction: column;
+  gap: 30rpx;
+}
+
+.privacy-item {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.privacy-item-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #FF6B00;
+  line-height: 1.5;
+}
+
+.privacy-item-text {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.8;
+  text-align: justify;
+}
+
+.privacy-modal-footer {
+  padding: 20rpx 30rpx 40rpx;
+  flex-shrink: 0;
+  border-top: 2rpx solid #F0F0F0;
+}
+
+.privacy-modal-btn {
+  width: 100%;
+  height: 88rpx;
+  border-radius: 44rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: linear-gradient(135deg, #FF6B00 0%, #FF8C00 100%);
+  color: #fff;
+  box-shadow: 0 6rpx 20rpx rgba(255, 107, 0, 0.3);
+}
+
+.privacy-modal-btn::after {
+  border: none;
+}
+
 /* 二维码模态框样式 */
 .qr-modal {
   position: fixed;
