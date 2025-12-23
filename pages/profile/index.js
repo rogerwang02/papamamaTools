@@ -195,10 +195,11 @@ Page({
     
     if (item === 'about') {
       wx.showModal({
-        title: '关于我们',
-        content: '屏安 (Ping An)\n\n一款专为老年人设计的健康急救小程序，帮助家人制作紧急联系卡，关键时刻能救命。',
+        title: '关于"屏安"', // 标题也可以微调一下
+        // 使用模板字符串(``)可以让排版更直观，但在 wx.showModal 里还是建议用 \n
+        content: '愿屏幕微光，照亮平安归途。\n\n致力于为每个家庭打造专属的“数字护身符”。让关键时刻的急救信息，成为守护家人的最后一道防线。\n\n因为爱，要有备无患。',
         showCancel: false,
-        confirmText: '知道了'
+        confirmText: '愿平安' // 按钮文字也可以更有温度
       });
     }
   },

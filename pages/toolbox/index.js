@@ -169,14 +169,10 @@ Page({
     });
   },
 
-  // 4. 急救常识
+  // 4. 急救常识 - 跳转到急救指南列表页
   onShowFirstAid() {
-    wx.showModal({
-      title: '老年急救小口诀',
-      content: '1. 脑卒中(中风)：FAST口诀——看脸是否歪、查手能否抬、听语是否清。\n\n2. 心梗胸痛：立即停止活动，舌下含服硝酸甘油，拨打120。\n\n3. 跌倒：不要急于扶起，先确认意识和有无骨折，再寻求帮助。',
-      showCancel: false,
-      confirmText: '记住了',
-      confirmColor: '#FF6B00'
+    wx.navigateTo({
+      url: '/pages/guide/list/index'
     });
   }
 });

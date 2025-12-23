@@ -1,0 +1,61 @@
+<!--pages/guide/detail/index.wxml-->
+<view class="container">
+  <view class="video-wrapper" wx:if="{{info.videoUrl}}">
+    <video 
+      class="video-player" 
+      src="{{videoSrc}}" 
+      controls 
+      show-center-play-btn 
+      title="{{info.title}}"
+    ></video>
+  </view>
+  <view class="no-video" wx:else>
+    <text>暂无演示视频，请阅读下方文字指南</text>
+  </view>
+
+  <view class="source-note" wx:if="{{info.videoUrl}}">
+    <text>视频来源：B站UP主'静思百草园'</text>
+    <text>（仅作公益科普展示，如有侵权请联系删除）</text>
+  </view>
+
+  <view class="content-body">
+    <view class="detail-header">
+      <text class="detail-icon">{{info.icon}}</text>
+      <text class="detail-title">{{info.title}}</text>
+    </view>
+    
+    <view class="section">
+      <view class="section-title-row">
+        <text class="dot bg-orange"></text>
+        <text class="section-title">如何判断</text>
+      </view>
+      <view class="step-list">
+        <view class="step-item" wx:for="{{info.judge}}" wx:key="*this">
+          <text class="step-num">{{index + 1}}</text>
+          <text class="step-text">{{item}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title-row">
+        <text class="dot bg-green"></text>
+        <text class="section-title">急救步骤</text>
+      </view>
+      <view class="step-list">
+        <view class="step-item" wx:for="{{info.action}}" wx:key="*this">
+          <text class="step-num action-num">{{index + 1}}</text>
+          <text class="step-text">{{item}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="footer-action">
+      <button class="more-btn" bindtap="onOpenMoreInfo">
+        📺 观看更多急救知识视频
+      </button>
+      <text class="tip-text">点击复制链接，请在浏览器或B站打开</text>
+    </view>
+  </view>
+</view>
+

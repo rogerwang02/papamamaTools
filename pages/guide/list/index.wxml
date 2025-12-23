@@ -1,0 +1,21 @@
+<!--pages/guide/list/index.wxml-->
+<view class="container">
+  <view class="header-area">
+    <text class="page-title">急救指南</text>
+    <text class="page-desc">关键时刻的救命知识库</text>
+  </view>
+  <view class="guide-list">
+    <block wx:for="{{list}}" wx:key="id">
+      <view class="guide-card" bindtap="toDetail" data-id="{{item.id}}" style="background-color: {{item.color}};">
+        <view class="card-left">
+          <text class="card-title">{{item.title}}</text>
+          <text class="card-intro">{{item.intro}}</text>
+        </view>
+        <view class="card-right">
+          <text class="card-icon">{{item.icon}}</text>
+        </view>
+      </view>
+    </block>
+  </view>
+</view>
+

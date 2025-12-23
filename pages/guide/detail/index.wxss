@@ -1,0 +1,175 @@
+/* pages/guide/detail/index.wxss */
+.container {
+  padding-bottom: 60rpx;
+  background-color: #F7F8FA;
+  min-height: 100vh;
+}
+
+.video-wrapper {
+  width: 100%;
+  height: 420rpx;
+  background: #000;
+}
+
+.video-player {
+  width: 100%;
+  height: 100%;
+}
+
+.no-video {
+  width: 100%;
+  height: 300rpx;
+  background: #F5F5F5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-size: 28rpx;
+}
+
+/* 视频来源说明 */
+.source-note {
+  padding: 30rpx 30rpx;
+  background-color: #F9F9F9;
+  font-size: 22rpx;
+  color: #999;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.4;
+}
+
+.content-body {
+  padding: 40rpx;
+  background: #fff;
+  border-radius: 40rpx 40rpx 0 0;
+  margin-top: -20rpx;
+  position: relative;
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 60rpx;
+  border-bottom: 1rpx solid #eee;
+  padding-bottom: 30rpx;
+}
+
+.detail-icon {
+  font-size: 60rpx;
+  margin-right: 20rpx;
+}
+
+.detail-title {
+  font-size: 44rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.section {
+  margin-bottom: 60rpx;
+}
+
+.section-title-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  margin-right: 16rpx;
+}
+
+.bg-orange {
+  background: #FF9800;
+}
+
+.bg-green {
+  background: #4CAF50;
+}
+
+.section-title {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.step-list {
+  padding-left: 0;
+}
+
+.step-item {
+  display: flex;
+  margin-bottom: 24rpx;
+  line-height: 1.6;
+}
+
+.step-num {
+  background: #F5F5F5;
+  color: #999;
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 40rpx;
+  font-size: 24rpx;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+  margin-top: 6rpx;
+}
+
+.action-num {
+  background: #E8F5E9;
+  color: #4CAF50;
+  font-weight: bold;
+}
+
+.step-text {
+  font-size: 30rpx;
+  color: #444;
+  flex: 1;
+}
+
+/* 底部操作按钮 */
+.footer-action {
+  margin-top: 60rpx;
+  margin-bottom: 40rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.more-btn {
+  background: #E3F2FD;
+  color: #1976D2;
+  font-size: 30rpx;
+  font-weight: bold;
+  border-radius: 50rpx;
+  padding: 20rpx 40rpx;
+  border: 2rpx solid #BBDEFB;
+  box-shadow: 0 4rpx 10rpx rgba(25, 118, 210, 0.1);
+  width: auto;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+}
+
+.more-btn::after {
+  border: none;
+}
+
+.more-btn:active {
+  background: #BBDEFB;
+}
+
+.tip-text {
+  font-size: 22rpx;
+  color: #999;
+  margin-top: 16rpx;
+}
+

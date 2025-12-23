@@ -5,7 +5,9 @@
     "pages/profile/index",
     "pages/create/index",
     "pages/emergency/index",
-    "pages/share/index"
+    "pages/share/index",
+    "pages/guide/list/index",
+    "pages/guide/detail/index"
   ],
   "window": {
     "navigationBarTitleText": "屏安",
