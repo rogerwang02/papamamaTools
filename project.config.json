@@ -1,5 +1,5 @@
 {
-  "description": "屏安 (Ping An) - 紧急联系卡小程序",
+  "description": "屏安守护 (Ping An Guardian) - 紧急联系卡小程序",
   "packOptions": {
     "ignore": [],
     "include": []
@@ -50,7 +50,7 @@
   "compileType": "miniprogram",
   "libVersion": "2.33.0",
   "appid": "wxe817a6968d1b39f6",
-  "projectname": "SeniorGuard",
+  "projectname": "屏安守护",
   "cloudfunctionRoot": "cloudfunctions/",
   "isGameTourist": false,
   "condition": {

@@ -11,7 +11,7 @@
     "pages/triage/index"
   ],
   "window": {
-    "navigationBarTitleText": "屏安",
+    "navigationBarTitleText": "屏安守护",
     "navigationBarBackgroundColor": "#FF6B00",
     "navigationBarTextStyle": "white",
     "backgroundColor": "#F5F5F5"
