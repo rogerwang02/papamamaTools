@@ -282,16 +282,10 @@ Page({
 
   // 返回首页
   onGoBack() {
-    // 🟢 FIX: Use switchTab for TabBar pages
+    // 🧹 干净跳转：不带参数，直接切回 Tab 页
+    // 由于首页会在 onShow 里自动调用 getUserCard，所以数据会自动刷新为"我的数据"
     wx.switchTab({
-      url: '/pages/home/index',
-      fail: (err) => {
-        console.warn('SwitchTab failed, trying reLaunch:', err);
-        // Fallback if switchTab fails
-        wx.reLaunch({ 
-          url: '/pages/home/index' 
-        });
-      }
+      url: '/pages/home/index'
     });
   }
 });

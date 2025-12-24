@@ -113,22 +113,23 @@ Page({
     return formatted;
   },
 
-  // 加载卡片数据
+  // 加载卡片数据（使用云函数，确保只获取当前用户的数据）
   async loadCardData() {
     // 显示导航栏 Loading
     wx.showNavigationBarLoading();
 
     try {
-      // 查询用户创建的急救卡
-      // 云开发自带权限控制，默认只能查到自己创建的数据，直接 .get() 即可
-      const res = await db.collection('emergency_cards')
-        .limit(1)
-        .get();
-
-      // 处理查询结果
-      if (res.data && res.data.length > 0) {
-        // 如果有数据，处理病史信息（将所有标点符号和换行统一为逗号）
-        const cardData = res.data[0];
+      // ☁️ 调用云函数：只拿我自己的数据
+      const res = await wx.cloud.callFunction({
+        name: 'getUserCard'
+      });
+      
+      console.log('My Card Data:', res.result);
+      
+      if (res.result && res.result.success && res.result.data && res.result.data.length > 0) {
+        // 找到了我的卡片
+        const cardData = res.result.data[0];
+        // 处理病史信息（将所有标点符号和换行统一为逗号）
         if (cardData.conditions) {
           cardData.conditions = this.formatConditions(cardData.conditions);
         }
@@ -138,7 +139,7 @@ Page({
           loading: false
         });
       } else {
-        // 如果没有数据，设置为 null
+        // 没找到我的卡片（我是新用户，或者我没创建过）
         this.setData({
           cardInfo: null,
           loading: false
