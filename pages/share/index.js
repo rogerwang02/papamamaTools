@@ -59,7 +59,9 @@ Page({
     // 保存状态
     isSaving: false, // 控制保存时的视觉状态，防止双重视觉效果
     // 屏安签文
-    selectedQuote: '' // 随机选中的签文
+    selectedQuote: '', // 随机选中的签文
+    // 是否已显示壁纸模式提示框
+    hasShownWallpaperTip: false
   },
 
   // 实例变量：缓存图片对象（不能存储在 data 中，因为 setData 无法序列化 Native Image 对象）
@@ -68,6 +70,25 @@ Page({
   // 节流定时器和缓存
   redrawTimer: null, // Canvas 重绘的定时器（用于节流）
   canvasRectCache: null, // 缓存的 Canvas 位置信息
+
+  // 辅助函数：计算二维码Widget右下角默认位置
+  getDefaultQRWidgetPosition() {
+    const canvasW = this.data.canvasWidth || 750;
+    const canvasH = this.data.canvasHeight || 1250;
+    const margin = 40; // 边距
+    
+    // 判断是横版还是竖版（根据canvas宽高比）
+    const isLandscape = canvasW > canvasH;
+    const widgetWidth = isLandscape ? 220 : 240;
+    const widgetHeight = isLandscape ? 292 : 312;
+    
+    return {
+      x: canvasW - widgetWidth - margin,
+      y: canvasH - widgetHeight - margin,
+      widgetWidth,
+      widgetHeight
+    };
+  },
 
   // 更新Canvas尺寸（根据模式）
   updateCanvasSize(mode) {
@@ -267,11 +288,16 @@ Page({
       let bgImage = this.data.selectedBgPath;
       if (!bgImage || bgImage.startsWith('#')) {
         // 如果没有选择背景或者是颜色值，使用默认第一张图片
-        bgImage = this.data.defaultWallpapers[0];
-        this.setData({
-          selectedBgPath: bgImage,
-          selectedBgIndex: 0
-        });
+        bgImage = this.data.defaultWallpapers && this.data.defaultWallpapers.length > 0 
+          ? this.data.defaultWallpapers[0] 
+          : '';
+        // 只有当有默认壁纸时才设置，避免设置为 undefined
+        if (bgImage) {
+          this.setData({
+            selectedBgPath: bgImage,
+            selectedBgIndex: 0
+          });
+        }
       }
       
       if (bgImage && !bgImage.startsWith('#')) {
@@ -304,26 +330,41 @@ Page({
 
       this.applyCanvasSize(mode, cssW, cssH, logW, logH);
       
-      // === FIX: 切换到壁纸模式时，如果二维码位置未初始化，默认位置设置为左上角 ===
+      // === FIX: 切换到壁纸模式时，如果二维码位置未初始化，默认位置设置为右下角 ===
       if (mode === 'wallpaper') {
         if (this.data.qrWidgetX === null || this.data.qrWidgetY === null) {
-          // 默认位置：左上角（安全区域）
-          const defaultX = 40;
-          const defaultY = 40;
+          // 默认位置：右下角（安全区域）
+          const defaultPos = this.getDefaultQRWidgetPosition();
           
           // 计算屏幕像素位置（用于 overlay）
           const sysInfo = wx.getSystemInfoSync();
           const rpx2px = (rpx) => (sysInfo.windowWidth / 750) * rpx;
-          const overlayLeftPx = 40 * rpx2px(1); // 近似值，实际会在 initOverlayPosition 中重新计算
-          const overlayTopPx = 40 * rpx2px(1);
+          const overlayLeftPx = defaultPos.x * rpx2px(1); // 近似值，实际会在 initOverlayPosition 中重新计算
+          const overlayTopPx = defaultPos.y * rpx2px(1);
           
           this.setData({
-            qrWidgetX: defaultX,
-            qrWidgetY: defaultY,
+            qrWidgetX: defaultPos.x,
+            qrWidgetY: defaultPos.y,
             // 临时设置 overlay 位置，会在 initOverlayPosition 中根据实际 canvas 尺寸重新计算
             qrWidgetOverlayLeft: overlayLeftPx,
             qrWidgetOverlayTop: overlayTopPx
           });
+        }
+        
+        // 第一次进入壁纸模式时显示提示框
+        if (!this.data.hasShownWallpaperTip) {
+          setTimeout(() => {
+            wx.showModal({
+              title: '提示',
+              content: '请移动二维码至合适位置后保存壁纸',
+              showCancel: false,
+              confirmText: '我知道了',
+              confirmColor: '#FF6B00'
+            });
+            this.setData({
+              hasShownWallpaperTip: true
+            });
+          }, 500); // 延迟500ms，确保页面渲染完成
         }
       }
     }
@@ -566,10 +607,11 @@ Page({
       let cardX = this.data.qrWidgetX;
       let cardY = this.data.qrWidgetY;
       
-      // 安全回退
+      // 安全回退：使用右下角默认位置
       if (cardX === null || cardY === null) {
-        cardX = 40;
-        cardY = 40;
+        const defaultPos = this.getDefaultQRWidgetPosition();
+        cardX = defaultPos.x;
+        cardY = defaultPos.y;
       }
 
       // 边界检查
@@ -841,7 +883,7 @@ Page({
             fileID: fileID
           });
 
-          if (res.statusCode === 200) {
+          if (res.statusCode === 200 && res.tempFilePath) {
             const savedFilePath = `${wx.env.USER_DATA_PATH}/${fileName}`;
             fs.saveFileSync(res.tempFilePath, savedFilePath);
             
@@ -849,15 +891,16 @@ Page({
             wx.setStorageSync(cacheKey, localPath);
             console.log(`Cloud Downloaded & Cached: ${fileName}`);
           } else {
-            // Fallback (though rare with cloud.downloadFile)
-            console.error('Cloud download failed status:', res.statusCode);
-            // If cloud download fails, we can't really fallback to http without permission
-            // but we can try to use the tempFilePath directly if valid
-            localPath = res.tempFilePath; 
+            // Download failed - skip this file
+            console.warn(`⚠️ 背景图下载失败: ${fileName}, status: ${res.statusCode || 'UNKNOWN'}`);
+            console.warn('💡 提示：请检查云开发控制台 -> 存储 -> 权限设置，确保文件为"所有用户可读"');
+            localPath = null; // Explicitly set to null, don't add to finalPaths
           }
         } catch (err) {
-          console.error(`Failed to download ${fileName}`, err);
-          // If totally failed, no fallback image available effectively
+          console.error(`❌ 背景图加载失败: ${fileName}`, err);
+          console.warn('💡 提示：请检查云开发控制台 -> 存储 -> 权限设置，确保文件为"所有用户可读"');
+          // If download fails, skip this file (don't add undefined to finalPaths)
+          localPath = null;
         }
       }
       
@@ -899,11 +942,11 @@ Page({
           await this.onTabChange({ currentTarget: { dataset: { mode: 'wallpaper' } } });
           // 延时100毫秒后再重置二维码浮层位置，防止二维码部分被边界遮住
           setTimeout(() => {
-            // 重置 Widget 位置到背景图左上角（安全区域）
-            // Canvas 坐标系：40px 左上角
+            // 重置 Widget 位置到右下角（安全区域）
+            const defaultPos = this.getDefaultQRWidgetPosition();
             this.setData({
-              qrWidgetX: 40,    // Canvas Coordinate (px)
-              qrWidgetY: 40,    // Canvas Coordinate (px)
+              qrWidgetX: defaultPos.x,    // Canvas Coordinate (px)
+              qrWidgetY: defaultPos.y,    // Canvas Coordinate (px)
               // Overlay 位置会在 initOverlayPosition 中根据 canvas 尺寸重新计算
               qrWidgetOverlayLeft: 0,
               qrWidgetOverlayTop: 0
@@ -915,10 +958,11 @@ Page({
           await this.onTabChange({ currentTarget: { dataset: { mode: 'wallpaper' } } });
           // 延时100毫秒后再重置二维码浮层位置，防止二维码部分被边界遮住
           setTimeout(() => {
-            // 重置 Widget 位置到背景图左上角（安全区域）
+            // 重置 Widget 位置到右下角（安全区域）
+            const defaultPos = this.getDefaultQRWidgetPosition();
             this.setData({
-              qrWidgetX: 40,
-              qrWidgetY: 40,
+              qrWidgetX: defaultPos.x,
+              qrWidgetY: defaultPos.y,
               qrWidgetOverlayLeft: 0,
               qrWidgetOverlayTop: 0
             });
@@ -942,7 +986,15 @@ Page({
   // 选择背景
   async onSelectBg(e) {
     const index = e.currentTarget.dataset.index;
-    const bgImagePath = this.data.defaultWallpapers[index];
+    const bgImagePath = this.data.defaultWallpapers && this.data.defaultWallpapers[index] 
+      ? this.data.defaultWallpapers[index] 
+      : '';
+    
+    // 如果路径无效，不更新（避免设置为 undefined）
+    if (!bgImagePath) {
+      console.warn('⚠️ 背景图片路径无效，index:', index);
+      return;
+    }
     
     // UX: 滚动到顶部，让用户看到画布
     wx.pageScrollTo({
@@ -962,10 +1014,11 @@ Page({
       await this.onTabChange({ currentTarget: { dataset: { mode: 'wallpaper' } } });
       // 延时100毫秒后再重置二维码浮层位置，防止二维码部分被边界遮住
       setTimeout(() => {
-        // 重置 Widget 位置到背景图左上角（安全区域）
+        // 重置 Widget 位置到右下角（安全区域）
+        const defaultPos = this.getDefaultQRWidgetPosition();
         this.setData({
-          qrWidgetX: 40,    // Canvas Coordinate (px)
-          qrWidgetY: 40,    // Canvas Coordinate (px)
+          qrWidgetX: defaultPos.x,    // Canvas Coordinate (px)
+          qrWidgetY: defaultPos.y,    // Canvas Coordinate (px)
           // Overlay 位置会在 initOverlayPosition 中根据 canvas 尺寸重新计算
           qrWidgetOverlayLeft: 0,
           qrWidgetOverlayTop: 0
@@ -977,10 +1030,11 @@ Page({
       await this.onTabChange({ currentTarget: { dataset: { mode: 'wallpaper' } } });
       // 延时100毫秒后再重置二维码浮层位置，防止二维码部分被边界遮住
       setTimeout(() => {
-        // 重置 Widget 位置到背景图左上角（安全区域）
+        // 重置 Widget 位置到右下角（安全区域）
+        const defaultPos = this.getDefaultQRWidgetPosition();
         this.setData({
-          qrWidgetX: 40,
-          qrWidgetY: 40,
+          qrWidgetX: defaultPos.x,
+          qrWidgetY: defaultPos.y,
           qrWidgetOverlayLeft: 0,
           qrWidgetOverlayTop: 0
         });
@@ -1369,10 +1423,11 @@ Page({
       let cardX = this.data.qrWidgetX;
       let cardY = this.data.qrWidgetY;
       
-      // 如果没有保存的位置，使用默认位置
+      // 如果没有保存的位置，使用右下角默认位置
       if (cardX === null || cardY === null) {
-        cardX = this.data.canvasWidth - widgetWidth - 40;
-        cardY = this.data.canvasHeight - widgetHeight - 240;
+        const defaultPos = this.getDefaultQRWidgetPosition();
+        cardX = defaultPos.x;
+        cardY = defaultPos.y;
         // 立即保存默认位置
         this.setData({
           qrWidgetX: cardX,

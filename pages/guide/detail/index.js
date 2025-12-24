@@ -59,11 +59,32 @@ Page({
       console.log('🎉 命中本地缓存，离线播放:', localPath);
       this.setData({ videoSrc: localPath });
     } catch (e) {
-      // 2. 本地没有？别等下载！直接播云端链接（实现秒开）
+      // 2. 如果是 cloud:// 格式，需要转换为临时 HTTP URL（安卓兼容性）
+      let videoUrl = cloudUrl;
+      if (cloudUrl && cloudUrl.startsWith('cloud://')) {
+        try {
+          console.log('🔄 转换 cloud:// 格式为临时 URL...');
+          const tempFileRes = await wx.cloud.getTempFileURL({
+            fileList: [cloudUrl]
+          });
+          if (tempFileRes.fileList && tempFileRes.fileList.length > 0 && tempFileRes.fileList[0].tempFileURL) {
+            videoUrl = tempFileRes.fileList[0].tempFileURL;
+            console.log('✅ 转换成功，使用临时 URL 播放');
+          } else {
+            console.warn('⚠️ 转换失败，尝试直接使用 cloud:// URL');
+          }
+        } catch (err) {
+          console.error('❌ 获取视频临时URL失败:', err);
+          // 如果转换失败，尝试直接使用 cloud://（某些情况下可能可以工作）
+          videoUrl = cloudUrl;
+        }
+      }
+      
+      // 3. 设置视频源并开始播放
       console.log('🚀 启用云端流式播放 (边下边播)');
-      this.setData({ videoSrc: cloudUrl });
+      this.setData({ videoSrc: videoUrl });
 
-      // 3. 后台悄悄下载，为"下次"做好准备
+      // 4. 后台悄悄下载，为"下次"做好准备
       this.downloadAndCache(cloudUrl, localPath);
     }
   },

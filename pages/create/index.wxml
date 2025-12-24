@@ -2,15 +2,15 @@
 <view class="container">
   <view class="header">
     <text class="title">{{editId ? '编辑卡片信息' : '创建紧急联系卡'}}</text>
-    <text class="subtitle">{{editId ? '修改卡片信息，确保信息准确无误' : '为老人填写基本信息，关键时刻能救命'}}</text>
+    <text class="subtitle">{{editId ? '修改卡片信息，确保信息准确无误' : '为需要帮助者填写基本信息，关键时刻能救命'}}</text>
   </view>
 
   <view class="form-container">
     <view class="form-item">
-      <text class="label">老人姓名 *</text>
+      <text class="label">姓名 *</text>
       <input 
         class="input" 
-        placeholder="请输入老人姓名" 
+        placeholder="请输入姓名" 
         value="{{formData.name}}"
         bindinput="onNameInput"
         maxlength="20"
@@ -28,7 +28,7 @@
       />
     </view>
 
-    <view class="form-item">
+    <view class="form-item blood-type-item">
       <text class="label">血型 *</text>
       <picker 
         mode="selector" 
@@ -121,21 +121,30 @@
           <text class="privacy-item-title">1.【传输与存储安全】</text>
           <text class="privacy-item-text">您的数据全程采用 HTTPS 银行级加密传输，并存储于腾讯云安全服务器。我们承诺严格控制权限，仅供急救场景展示。</text>
         </view>
+        
         <view class="privacy-item">
-          <text class="privacy-item-title">2.【数据销毁】</text>
+          <text class="privacy-item-title">2.【数据准确性与免责】(重要)</text>
+          <text class="privacy-item-text">本程序仅作为信息记录工具，不对用户自行填写内容的真实性、准确性负责。请务必确保您录入的血型、病史、药物过敏等信息准确无误。因信息填写错误导致的任何医疗后果，开发者不承担法律责任。</text>
+        </view>
+
+        <view class="privacy-item">
+          <text class="privacy-item-title">3.【隐私公开风险告知】</text>
+          <text class="privacy-item-text">生成“屏安”壁纸即意味着您同意将上述急救信息展示在手机锁屏界面。这意味着任何人（包括捡到手机的陌生人）均可看到。请您根据自身情况，谨慎选择展示的信息详略程度。</text>
+        </view>
+
+        <view class="privacy-item">
+          <text class="privacy-item-title">4.【防诈骗提醒】</text>
+          <text class="privacy-item-text">请妥善保管您的设备。若您的紧急联系人接到"亲人出事"或"急需汇款"的电话，请务必先通过视频、警方或医院官方渠道核实身份，切勿轻信转账。本程序无法鉴别扫码者身份，对诈骗行为不承担责任。</text>
+        </view>
+
+        <view class="privacy-item">
+          <text class="privacy-item-title">5.【服务性质申明】</text>
+          <text class="privacy-item-text">本程序为个人开发者提供的免费辅助工具，非专业医疗设备。因网络故障、系统兼容性或不可抗力导致的信息无法读取，开发者不承担连带责任。</text>
+        </view>
+        
+        <view class="privacy-item">
+          <text class="privacy-item-title">6.【数据销毁】</text>
           <text class="privacy-item-text">您拥有完全控制权。删除急救卡后，云端数据将立即被物理销毁，不留备份。</text>
-        </view>
-        <view class="privacy-item">
-          <text class="privacy-item-title">3.【防诈骗提醒】</text>
-          <text class="privacy-item-text">请妥善保管您的安心卡。若您的紧急联系人接到"亲人出事"或"急需汇款"的电话，请务必先通过视频、警方或医院官方渠道核实身份，切勿轻信转账。本程序无法鉴别扫码者身份，对诈骗行为不承担责任。</text>
-        </view>
-        <view class="privacy-item">
-          <text class="privacy-item-title">4.【免责申明】</text>
-          <text class="privacy-item-text">本程序为个人开发者免费提供的辅助工具，非专业医疗设备。因网络故障或不可抗力导致的信息无法读取，开发者不承担法律责任。</text>
-        </view>
-        <view class="privacy-item">
-          <text class="privacy-item-title">5.【双重保障】</text>
-          <text class="privacy-item-text">强烈建议您同时随身携带纸质急救卡，以应对极端情况。</text>
         </view>
       </view>
     </view>

@@ -68,6 +68,7 @@
   align-items: center;
   font-size: 32rpx;
   color: #333;
+  box-sizing: border-box;
 }
 
 .picker.placeholder {

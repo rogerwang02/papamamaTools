@@ -68,9 +68,9 @@ page {
 }
 
 .tool-name {
-  font-size: 28rpx;
+  font-size: 30rpx;      /* 增大字号，方便点击阅读 (原28rpx -> 30rpx) */
   color: #333;
-  font-weight: 500;
+  font-weight: bold;     /* 加粗 */
 }
 
 /* Colors */
@@ -142,22 +142,30 @@ page {
 }
 
 .medical-card-modal-body {
-  padding: 30rpx;
+  padding: 40rpx 30rpx;
   text-align: center;
 }
 
 .medical-card-modal-tip {
-  display: block;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
   font-size: 28rpx;
   color: #666;
-  margin-bottom: 30rpx;
-  line-height: 1.6;
+  line-height: 1.8;
+  gap: 4rpx;
 }
 
-.medical-card-guide-image {
-  width: 100%;
-  border-radius: 12rpx;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+.medical-card-modal-tip text {
+  line-height: 1.8;
+}
+
+.medical-card-modal-tip .highlight-text {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #FF6B00;
+  margin: 0 4rpx;
 }
 
 .medical-card-modal-footer {

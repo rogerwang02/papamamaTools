@@ -12,31 +12,35 @@ const WXPUSHER_TOKEN = 'AT_mMaCFqpn21I3dyKEkumYICZC8SWxo7MN';
 const ADMIN_UID = 'UID_CxmHiVhZeplMONj9yIF4MgC3ZRCM'; 
 
 exports.main = async (event, context) => {
-  const { content, contact } = event;
+  const { content, contact, userInfo } = event;
   const wxContext = cloud.getWXContext();
 
   if (!content) return { success: false, msg: '内容为空' };
 
   try {
+    // 获取用户昵称
+    const nickName = (userInfo && userInfo.nickName) || contact || '未设置昵称';
+    
     // 1. 存数据库
     const dbRes = await db.collection('feedbacks').add({
       data: {
         openid: wxContext.OPENID,
         content,
         contact,
+        nickName: nickName, // 保存昵称到数据库
         createTime: db.serverDate()
       }
     });
 
-    // 2. 构造消息
-    const htmlMsg = `新反馈: ${content}`;
+    // 2. 构造消息（包含用户昵称）
+    const htmlMsg = `新反馈\n\n用户: ${nickName}\n内容: ${content}`;
     console.log('正在向 WxPusher 发送请求...'); // 日志打点
 
     // 3. 发送请求并获取"完整响应"
     const response = await axios.post('https://wxpusher.zjiecode.com/api/send/message', {
       appToken: WXPUSHER_TOKEN,
       content: htmlMsg,
-      summary: '新反馈通知',
+      summary: `新反馈 - ${nickName}`,
       contentType: 2,
       uids: [ADMIN_UID]
     });

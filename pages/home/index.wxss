@@ -208,9 +208,10 @@
 }
 
 .card-info-label {
-  font-size: 24rpx;
-  color: #999;
-  margin-bottom: 8rpx; /* 标签和内容挨紧一点 */
+  font-size: 30rpx;      /* 增大字号 (原24rpx -> 30rpx) */
+  font-weight: bold;     /* 加粗 */
+  color: #666;           /* 保持深灰色，对比度够 */
+  margin-bottom: 10rpx;
 }
 
 .card-info-value {
@@ -283,10 +284,11 @@
 }
 
 .action-text {
-  font-size: 24rpx; /* 原26rpx -> 24rpx */
-  color: #555;
-  font-weight: 500;
+  font-size: 28rpx;      /* 增大字号 (原24rpx -> 28rpx) */
+  color: #333;           /* 加深颜色 */
+  font-weight: 600;      /* 半粗体，比图标稍微细一点点但要清晰 */
   line-height: 1.4;
+  margin-top: 12rpx;
 }
 
 /* 点击反馈 */
@@ -344,9 +346,11 @@
 }
 
 .utility-label {
-  font-size: 24rpx;
-  color: #555;
+  font-size: 30rpx;      /* 增大字号，方便点击阅读 (原24rpx -> 30rpx) */
+  font-weight: bold;     /* 加粗 */
+  color: #333;
   text-align: center;
+  margin-top: 16rpx;
 }
 
 /* 工具箱颜色 */
@@ -603,22 +607,30 @@
 }
 
 .medical-card-modal-body {
-  padding: 30rpx;
+  padding: 40rpx 30rpx;
   text-align: center;
 }
 
 .medical-card-modal-tip {
-  display: block;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
   font-size: 28rpx;
   color: #666;
-  margin-bottom: 30rpx;
-  line-height: 1.6;
+  line-height: 1.8;
+  gap: 4rpx;
 }
 
-.medical-card-guide-image {
-  width: 100%;
-  border-radius: 12rpx;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+.medical-card-modal-tip text {
+  line-height: 1.8;
+}
+
+.medical-card-modal-tip .highlight-text {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #FF6B00;
+  margin: 0 4rpx;
 }
 
 .medical-card-modal-footer {

@@ -51,12 +51,12 @@
       <text class="medical-card-modal-close" bindtap="onCloseMedicalCardModal">×</text>
     </view>
     <view class="medical-card-modal-body">
-      <text class="medical-card-modal-tip">即将打开腾讯健康小程序，点击左上角医保码</text>
-      <image 
-        class="medical-card-guide-image" 
-        src="/assets/medical-card-guide.jpg" 
-        mode="widthFix"
-      ></image>
+      <view class="medical-card-modal-tip">
+        <text>即将打开</text>
+        <text class="highlight-text">腾讯健康</text>
+        <text>小程序，点击左上角</text>
+        <text class="highlight-text">医保码</text>
+      </view>
     </view>
     <view class="medical-card-modal-footer">
       <button class="medical-card-modal-btn cancel-btn" bindtap="onCloseMedicalCardModal">取消</button>

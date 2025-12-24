@@ -13,7 +13,7 @@ Page({
       contact_name: '',
       contact_phone: ''
     },
-    bloodTypes: ['A型', 'B型', 'AB型', 'O型', 'RH阴性'],
+    bloodTypes: ['A型', 'B型', 'AB型', 'O型', 'RH阴性', '不清楚'],
     bloodTypeIndex: 0,
     isSubmitting: false,
     showQRModal: false,
@@ -139,7 +139,7 @@ Page({
     
     if (!name || name.trim() === '') {
       wx.showToast({
-        title: '请输入老人姓名',
+        title: '请输入姓名',
         icon: 'none'
       });
       return false;
@@ -223,6 +223,23 @@ Page({
     // 空函数，用于阻止事件冒泡
   },
 
+  // 获取用户头像URL
+  async getUserAvatar() {
+    try {
+      const res = await db.collection('user_profiles')
+        .limit(1)
+        .get();
+      
+      if (res.data && res.data.length > 0 && res.data[0].avatarUrl) {
+        return res.data[0].avatarUrl;
+      }
+      return null;
+    } catch (error) {
+      console.error('获取用户头像失败:', error);
+      return null;
+    }
+  },
+
   // 提交表单
   async onSubmit() {
     if (this.data.isSubmitting) {
@@ -249,6 +266,10 @@ Page({
 
     try {
       const { name, age, blood_type, conditions, medications, contact_name, contact_phone } = this.data.formData;
+      
+      // 获取用户头像URL
+      const avatarUrl = await this.getUserAvatar();
+      
       const formDataObj = {
         name: name.trim(),
         age: parseInt(age),
@@ -258,6 +279,11 @@ Page({
         contact_name: contact_name.trim(),
         contact_phone: contact_phone.trim()
       };
+      
+      // 如果获取到头像，添加到数据中
+      if (avatarUrl) {
+        formDataObj.avatar = avatarUrl;
+      }
 
       // 判断是新建还是编辑模式
       if (this.data.editId) {

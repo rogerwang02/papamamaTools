@@ -59,6 +59,13 @@ page {
   flex-shrink: 0;
 }
 
+.avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  background-color: #F0F0F0;
+}
+
 .avatar-placeholder {
   width: 120rpx;
   height: 120rpx;
@@ -102,11 +109,6 @@ page {
   display: inline-block;
 }
 
-.user-age {
-  font-size: 28rpx;
-  color: #666;
-  display: block;
-}
 
 /* 2. Note Styles */
 .note-section {
@@ -123,23 +125,32 @@ page {
 }
 
 /* 3. Grid Styles */
+.card-grid {
+  display: flex;
+  flex-direction: column;
+}
+
 .grid-row {
   display: flex;
   justify-content: space-between;
-  gap: 24rpx;
+  margin-bottom: 24rpx;
 }
 
-.grid-item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: 160rpx;
+.info-card.half {
+  width: 48%;
+  box-sizing: border-box;
+}
+
+.info-card.full {
+  width: 100%;
+  margin-bottom: 24rpx;
+  box-sizing: border-box;
 }
 
 .card-label {
-  font-size: 26rpx;
-  color: #999;
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #666;
   margin-bottom: 16rpx;
   display: flex;
   align-items: center;
@@ -147,7 +158,7 @@ page {
 
 .card-label .icon {
   margin-right: 8rpx;
-  font-size: 32rpx;
+  font-size: 36rpx;
 }
 
 /* 黄色圆形警告图标 */
@@ -176,54 +187,35 @@ page {
 
 .card-value {
   font-size: 34rpx;
-  font-weight: bold;
+  font-weight: 600;
   color: #333;
 }
 
-.value-highlight {
-  color: #FF6B00;
+.card-value.highlight {
+  color: #FF8C00; /* Theme Orange for Key Data */
   font-size: 40rpx;
 }
 
-.text-red {
-  color: #FF3B30;
-}
-
-/* 4. List/Tags Styles */
-.section-title {
-  font-size: 30rpx;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 24rpx;
-  display: block;
-}
-
-.tag-container {
+/* 4. Tags Styles - Unified Orange Theme */
+.tags-container {
   display: flex;
   flex-wrap: wrap;
   gap: 16rpx;
 }
 
-.tag {
+.clean-tag {
+  /* Subtle Orange Background - Professional & Consistent */
+  background-color: #FFF7E6; 
+  color: #FF8C00;
+  font-size: 28rpx;
   padding: 12rpx 24rpx;
-  border-radius: 30rpx;
-  font-size: 26rpx;
+  border-radius: 12rpx;
   font-weight: 500;
 }
 
-.tag-blue {
-  background: #E8F5E9;
-  color: #2E7D32;
-}
-
-.tag-orange {
-  background: #FFF3E0;
-  color: #EF6C00;
-}
-
 .empty-text {
-  color: #CCC;
-  font-size: 26rpx;
+  color: #ccc;
+  font-size: 28rpx;
 }
 
 /* 最近更新时间 */

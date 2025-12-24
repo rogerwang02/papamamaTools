@@ -114,8 +114,30 @@ Page({
           console.log('格式化时间失败:', e);
         }
         
+        // 处理头像 URL：如果是 cloud:// 格式，需要转换为临时 HTTP URL
+        let avatarUrl = res.data.avatar || null;
+        if (avatarUrl && avatarUrl.startsWith('cloud://')) {
+          try {
+            const tempFileRes = await wx.cloud.getTempFileURL({
+              fileList: [avatarUrl]
+            });
+            if (tempFileRes.fileList && tempFileRes.fileList.length > 0 && tempFileRes.fileList[0].tempFileURL) {
+              avatarUrl = tempFileRes.fileList[0].tempFileURL;
+            }
+          } catch (err) {
+            console.error('获取头像临时URL失败:', err);
+            avatarUrl = null; // 获取失败则设为 null，显示占位符
+          }
+        }
+        
+        // 将头像 URL 添加到数据中
+        const cardData = {
+          ...res.data,
+          avatar: avatarUrl
+        };
+        
         this.setData({
-          cardData: res.data,
+          cardData: cardData,
           conditionsTags: conditionsTags,
           allergyInfo: allergyInfo,
           medications: res.data.medications || '无',

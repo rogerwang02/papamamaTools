@@ -224,7 +224,7 @@ Page({
     if (!this.data.nickName || this.data.nickName.trim() === '') {
       wx.showModal({
         title: '提示',
-        content: '为了方便客服联系您，请先在上方完善您的头像和昵称信息。',
+        content: '为了更好的对反馈内容进行梳理，请先在上方完善您的头像和昵称信息。',
         confirmText: '知道了',
         showCancel: false,
         success: () => {
