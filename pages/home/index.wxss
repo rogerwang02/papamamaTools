@@ -60,49 +60,103 @@
   color: #999;
 }
 
-/* 空状态卡片 - 渐变引导卡片 */
-.empty-card {
-  background: linear-gradient(135deg, #FF8C33 0%, #FF6B00 100%);
+/* 创建卡片按钮 - 高CTA按钮样式 */
+.create-card-btn {
+  background: linear-gradient(135deg, #FF8C00 0%, #FF6600 100%);
   border-radius: 24rpx;
-  padding: 50rpx 40rpx;
+  padding: 40rpx 40rpx;
+  margin: 0 0 40rpx 0;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  box-shadow: 0 12rpx 40rpx rgba(255, 107, 0, 0.25);
+  color: #fff;
+  /* 强烈的阴影使其"浮起" */
+  box-shadow: 0 10rpx 20rpx rgba(255, 102, 0, 0.3);
   position: relative;
   overflow: hidden;
+  /* 呼吸动画 */
+  animation: breathe 3s infinite ease-in-out;
 }
 
-.empty-card-left {
-  margin-right: 32rpx;
-  flex-shrink: 0;
+/* 按下反馈状态 */
+.btn-hover {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
+
+/* 左侧内容 */
+.btn-left {
+  display: flex;
+  align-items: center;
+  flex: 1;
 }
 
 .empty-icon {
-  font-size: 120rpx;
+  font-size: 100rpx;
   display: block;
+  margin-right: 24rpx;
   filter: drop-shadow(0 4rpx 8rpx rgba(0, 0, 0, 0.1));
 }
 
-.empty-card-right {
-  flex: 1;
+.text-content {
   display: flex;
   flex-direction: column;
 }
 
-.empty-title {
-  display: block;
-  font-size: 40rpx;
+.main-title {
+  font-size: 36rpx;
   font-weight: bold;
   color: #FFFFFF;
-  margin-bottom: 16rpx;
+  margin-bottom: 8rpx;
   line-height: 1.4;
 }
 
-.empty-desc {
+.sub-title {
   display: block;
   font-size: 26rpx;
-  color: rgba(255, 255, 255, 0.9);
+  color: #FFFFFF;
+  opacity: 0.9;
   line-height: 1.5;
+}
+
+/* 右侧箭头（点击提示） */
+.btn-right {
+  flex-shrink: 0;
+  margin-left: 24rpx;
+}
+
+.arrow-circle {
+  width: 72rpx;
+  height: 72rpx;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+
+.arrow {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 4rpx;
+}
+
+/* 呼吸动画关键帧 */
+@keyframes breathe {
+  0% { 
+    transform: scale(1); 
+    box-shadow: 0 10rpx 20rpx rgba(255, 102, 0, 0.3); 
+  }
+  50% { 
+    transform: scale(1.02); 
+    box-shadow: 0 15rpx 30rpx rgba(255, 102, 0, 0.4); 
+  }
+  100% { 
+    transform: scale(1); 
+    box-shadow: 0 10rpx 20rpx rgba(255, 102, 0, 0.3); 
+  }
 }
 
 /* 已创建卡片容器 - 医疗风格 */
