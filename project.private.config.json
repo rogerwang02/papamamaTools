@@ -1,7 +1,19 @@
 {
   "libVersion": "2.33.0",
   "projectname": "PapamamaTools",
-  "condition": {},
+  "condition": {
+    "miniprogram": {
+      "list": [
+        {
+          "name": "pages/emergency/index",
+          "pathName": "pages/emergency/index",
+          "query": "scene=a2352464694b93d00907293820501efe",
+          "scene": null,
+          "launchMode": "default"
+        }
+      ]
+    }
+  },
   "setting": {
     "urlCheck": false,
     "coverView": true,

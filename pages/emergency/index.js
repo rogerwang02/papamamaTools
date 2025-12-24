@@ -67,11 +67,26 @@ Page({
   },
 
   onLoad(options) {
-    const id = options.id;
+    let id = options.id;
     
+    // 🟢 FIX: Handle QR Code "scene" parameter
+    if (options.scene) {
+      // WeChat encodes the scene, so we must decode it
+      const scene = decodeURIComponent(options.scene);
+      console.log('Scanned Scene:', scene);
+      // Assuming scene IS the cardId (e.g., scene="card_123")
+      id = scene;
+    }
+    
+    console.log('Final Card ID:', id);
     if (!id) {
-      this.setData({
-        loading: false
+      console.error('No valid ID found in options:', options);
+      this.setData({ 
+        loading: false 
+      });
+      wx.showToast({ 
+        title: '二维码无效', 
+        icon: 'none' 
       });
       return;
     }
@@ -154,10 +169,25 @@ Page({
         });
       }
     } catch (error) {
-      console.error('获取数据失败:', error);
+      console.error('❌ Data Fetch Error:', error); // Log full error object
+      
+      let errorMsg = '信息获取失败';
+      
+      // Check for Permission Denied error (Common in Cloud DB)
+      if (error.errCode === -502001) {
+        errorMsg = '权限不足：请检查数据库权限设置';
+        console.error('⚠️ DB Permission Error! Set permissions to "All users readable"');
+      }
+      
       this.setData({
         cardData: null,
         loading: false
+      });
+      
+      wx.showToast({ 
+        title: errorMsg, 
+        icon: 'none', 
+        duration: 3000 
       });
     }
   },
@@ -252,11 +282,14 @@ Page({
 
   // 返回首页
   onGoBack() {
-    wx.navigateBack({
-      delta: 1,
-      fail: () => {
-        wx.redirectTo({
-          url: '/pages/home/index'
+    // 🟢 FIX: Use switchTab for TabBar pages
+    wx.switchTab({
+      url: '/pages/home/index',
+      fail: (err) => {
+        console.warn('SwitchTab failed, trying reLaunch:', err);
+        // Fallback if switchTab fails
+        wx.reLaunch({ 
+          url: '/pages/home/index' 
         });
       }
     });
