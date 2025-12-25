@@ -84,6 +84,12 @@
   opacity: 0.9;
 }
 
+/* 胶囊按钮按下效果 */
+.create-card-btn:active .cta-capsule {
+  transform: scale(0.95);
+  background-color: #f0f0f0;
+}
+
 /* 左侧内容 */
 .btn-left {
   display: flex;
@@ -125,22 +131,19 @@
   margin-left: 24rpx;
 }
 
-.arrow-circle {
-  width: 72rpx;
-  height: 72rpx;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
+.cta-capsule {
+  background-color: #ffffff;
+  color: #FF6600;
+  padding: 12rpx 24rpx;
+  border-radius: 30rpx;
+  font-size: 26rpx;
+  font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(4px);
-}
-
-.arrow {
-  font-size: 36rpx;
-  font-weight: bold;
-  color: #fff;
-  margin-bottom: 4rpx;
+  box-shadow: 0 4rpx 10rpx rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
+  white-space: nowrap;
 }
 
 /* 呼吸动画关键帧 */
@@ -498,6 +501,34 @@
 
 .footer-space {
   height: 60rpx;
+}
+
+/* Admin Panel Styles */
+.admin-panel {
+  margin: 40rpx 20rpx;
+  padding: 30rpx;
+  background-color: #f0f0f0;
+  border: 2rpx dashed #999;
+  border-radius: 16rpx;
+}
+
+.admin-title {
+  font-size: 24rpx;
+  color: #666;
+  margin-bottom: 20rpx;
+  text-align: center;
+}
+
+.admin-btn {
+  font-size: 28rpx;
+  width: 100%;
+}
+
+.admin-hint {
+  font-size: 20rpx;
+  color: #999;
+  text-align: center;
+  margin-top: 16rpx;
 }
 
 /* BMI计算器模态框样式 */

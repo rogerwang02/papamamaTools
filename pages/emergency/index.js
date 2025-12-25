@@ -98,7 +98,7 @@ Page({
     this.loadCardData(id);
   },
 
-  // 加载卡片数据
+  // 加载卡片数据（使用安全云函数，绕过数据库权限限制）
   async loadCardData(id) {
     // 确保 loading 状态为 true（在加载开始时显示 loading）
     this.setData({
@@ -107,76 +107,84 @@ Page({
     });
 
     try {
-      const res = await db.collection('emergency_cards').doc(id).get();
-      
-      if (res.data && res.data.is_active) {
-        // 处理病史数据，转换为标签数组
-        const conditionsTags = this.parseConditionsToTags(res.data.conditions);
-        // 提取过敏信息
-        const allergyInfo = this.extractAllergy(res.data.conditions);
-        // 处理常用药物数据，转换为标签数组
-        const medicationsTags = res.data.medications ? this.parseConditionsToTags(res.data.medications) : [];
-        
-        // 格式化更新时间
-        let updateTime = '';
-        try {
-          if (res.data.update_time) {
-            updateTime = this.formatDate(res.data.update_time);
-          } else if (res.data.create_time) {
-            updateTime = this.formatDate(res.data.create_time);
-          }
-        } catch (e) {
-          console.log('格式化时间失败:', e);
-        }
-        
-        // 处理头像 URL：如果是 cloud:// 格式，需要转换为临时 HTTP URL
-        let avatarUrl = res.data.avatar || null;
-        if (avatarUrl && avatarUrl.startsWith('cloud://')) {
-          try {
-            const tempFileRes = await wx.cloud.getTempFileURL({
-              fileList: [avatarUrl]
-            });
-            if (tempFileRes.fileList && tempFileRes.fileList.length > 0 && tempFileRes.fileList[0].tempFileURL) {
-              avatarUrl = tempFileRes.fileList[0].tempFileURL;
-            }
-          } catch (err) {
-            console.error('获取头像临时URL失败:', err);
-            avatarUrl = null; // 获取失败则设为 null，显示占位符
-          }
-        }
-        
-        // 将头像 URL 添加到数据中
-        const cardData = {
-          ...res.data,
-          avatar: avatarUrl
-        };
-        
-        this.setData({
-          cardData: cardData,
-          conditionsTags: conditionsTags,
-          allergyInfo: allergyInfo,
-          medications: res.data.medications || '无',
-          medicationsTags: medicationsTags,
-          updateTime: updateTime,
-          loading: false
-        });
-        // 加载对应的二维码
-        this.loadQRCode(id);
-      } else {
-        this.setData({
-          cardData: null,
-          loading: false
-        });
+      // 🔄 CHANGE: Call the Secure Cloud Function instead of Direct DB Access
+      // This bypasses the "Private" database permission settings because Cloud Functions have admin rights.
+      const res = await wx.cloud.callFunction({
+        name: 'getCardDetail',
+        data: { cardId: id }
+      });
+
+      // Check the custom response code from our cloud function
+      if (res.result.code !== 0 || !res.result.data) {
+        throw new Error(res.result.msg || '信息获取失败或已失效');
       }
+
+      const cardDataRaw = res.result.data;
+      
+      // 处理病史数据，转换为标签数组
+      const conditionsTags = this.parseConditionsToTags(cardDataRaw.conditions);
+      // 提取过敏信息
+      const allergyInfo = this.extractAllergy(cardDataRaw.conditions);
+      // 处理常用药物数据，转换为标签数组
+      const medicationsTags = cardDataRaw.medications ? this.parseConditionsToTags(cardDataRaw.medications) : [];
+      
+      // 格式化更新时间
+      let updateTime = '';
+      try {
+        if (cardDataRaw.update_time) {
+          updateTime = this.formatDate(cardDataRaw.update_time);
+        } else if (cardDataRaw.create_time) {
+          updateTime = this.formatDate(cardDataRaw.create_time);
+        }
+      } catch (e) {
+        console.log('格式化时间失败:', e);
+      }
+      
+      // 处理头像 URL：如果是 cloud:// 格式，需要转换为临时 HTTP URL
+      let avatarUrl = cardDataRaw.avatar || null;
+      if (avatarUrl && avatarUrl.startsWith('cloud://')) {
+        try {
+          const tempFileRes = await wx.cloud.getTempFileURL({
+            fileList: [avatarUrl]
+          });
+          if (tempFileRes.fileList && tempFileRes.fileList.length > 0 && tempFileRes.fileList[0].tempFileURL) {
+            avatarUrl = tempFileRes.fileList[0].tempFileURL;
+          }
+        } catch (err) {
+          console.error('获取头像临时URL失败:', err);
+          avatarUrl = null; // 获取失败则设为 null，显示占位符
+        }
+      }
+      
+      // 将头像 URL 添加到数据中
+      const cardData = {
+        ...cardDataRaw,
+        avatar: avatarUrl
+      };
+      
+      this.setData({
+        cardData: cardData,
+        conditionsTags: conditionsTags,
+        allergyInfo: allergyInfo,
+        medications: cardDataRaw.medications || '无',
+        medicationsTags: medicationsTags,
+        updateTime: updateTime,
+        loading: false
+      });
+      // 加载对应的二维码
+      this.loadQRCode(id);
     } catch (error) {
       console.error('❌ Data Fetch Error:', error); // Log full error object
       
       let errorMsg = '信息获取失败';
       
-      // Check for Permission Denied error (Common in Cloud DB)
-      if (error.errCode === -502001) {
-        errorMsg = '权限不足：请检查数据库权限设置';
-        console.error('⚠️ DB Permission Error! Set permissions to "All users readable"');
+      // Handle different error scenarios
+      if (error.message && error.message.includes('失效')) {
+        errorMsg = '信息获取失败或已失效';
+      } else if (error.message && error.message.includes('未找到')) {
+        errorMsg = '未找到该急救卡';
+      } else if (error.errMsg && error.errMsg.includes('not found')) {
+        errorMsg = '未找到该急救卡';
       }
       
       this.setData({

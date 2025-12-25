@@ -56,7 +56,13 @@
       <view class="safety-tip">
         <text class="tip-text">温馨提示：此二维码仅包含紧急联系方式，不含身份证等敏感隐私，请放心扫码。</text>
       </view>
-      <button class="save-btn print-btn" bindtap="onSavePrintImage">保存打印图片</button>
+      <view class="footer-action-bar">
+        <button class="save-btn main-btn print-btn" bindtap="onSavePrintImage">保存打印图片</button>
+        <view class="nfc-btn side-btn" bindtap="copyNfcLink">
+          <text class="nfc-icon">🔗</text>
+          <text class="nfc-text">NFC</text>
+        </view>
+      </view>
     </view>
 
     <!-- 壁纸版操作区 -->
@@ -85,7 +91,9 @@
         </view>
       </view>
 
-      <button class="save-btn wallpaper-btn" bindtap="onSaveWallpaperImage">保存壁纸图片</button>
+      <view class="footer-action-bar">
+        <button class="save-btn main-btn wallpaper-btn" bindtap="onSaveWallpaperImage">保存壁纸图片</button>
+      </view>
     </view>
   </view>
 </view>

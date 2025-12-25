@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>紧急医疗信息 | 屏安守护</title>
+    <script src="https://static.cloudbase.net/cloudbase-js-sdk/latest/cloudbase.full.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background-color: #F7F8FA;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        /* 顶部安全栏 */
+        .safety-bar {
+            background-color: #FEF0F0;
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .safety-icon {
+            font-size: 16px;
+            margin-right: 6px;
+        }
+
+        .safety-text {
+            font-size: 12px;
+            color: #D32F2F;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        /* 内容区域 */
+        .content-wrapper {
+            padding: 15px;
+            max-width: 750px;
+            margin: 0 auto;
+        }
+
+        /* Common Card Style */
+        .info-card {
+            background: #FFFFFF;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        /* 1. Header Styles */
+        .header-card {
+            display: flex;
+            align-items: center;
+            padding: 20px 15px;
+        }
+
+        .user-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .name-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .user-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* 2. Note Styles */
+        .note-section {
+            margin-bottom: 12px;
+            padding: 0 5px;
+        }
+
+        .note-text {
+            font-size: 14px;
+            color: #888;
+            font-style: italic;
+            line-height: 1.5;
+            display: block;
+        }
+
+        /* 3. Grid Styles */
+        .card-grid {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .grid-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            gap: 4%;
+        }
+
+        .info-card.half {
+            width: 48%;
+            box-sizing: border-box;
+        }
+
+        .info-card.full {
+            width: 100%;
+            margin-bottom: 12px;
+            box-sizing: border-box;
+        }
+
+        .card-label {
+            font-size: 15px;
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-label .icon {
+            margin-right: 4px;
+            font-size: 18px;
+        }
+
+        /* 黄色圆形警告图标 */
+        .icon-allergy {
+            width: 16px;
+            height: 16px;
+            background-color: #FFB800;
+            border-radius: 50%;
+            margin-right: 4px;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            vertical-align: middle;
+            flex-shrink: 0;
+        }
+
+        .icon-allergy::after {
+            content: '!';
+            color: #FFF;
+            font-size: 10px;
+            font-weight: bold;
+            line-height: 1;
+            font-family: Arial, sans-serif;
+        }
+
+        .card-value {
+            font-size: 17px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .card-value.highlight {
+            color: #FF8C00;
+            font-size: 20px;
+        }
+
+        /* 4. Tags Styles - Unified Orange Theme */
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .clean-tag {
+            background-color: #FFF7E6;
+            color: #FF8C00;
+            font-size: 14px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .empty-text {
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        /* 最近更新时间 */
+        .update-time-section {
+            text-align: center;
+            padding: 10px 0;
+            margin-top: 5px;
+        }
+
+        .update-time-text {
+            font-size: 12px;
+            color: #999;
+            line-height: 1.5;
+        }
+
+        /* Footer */
+        .fixed-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #fff;
+            padding: 10px 20px;
+            padding-bottom: calc(10px + env(safe-area-inset-bottom));
+            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.05);
+            box-sizing: border-box;
+        }
+
+        .call-btn {
+            background: linear-gradient(135deg, #FF3B30, #FF6B00);
+            color: #fff;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+            height: 44px;
+            box-shadow: 0 4px 10px rgba(255, 59, 48, 0.3);
+            width: 100%;
+            border: none;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .phone-icon {
+            margin-right: 8px;
+            font-size: 18px;
+        }
+
+        /* Conversion Button (Secondary) */
+        .conversion-area {
+            margin-top: 12px;
+            /* padding-top: 12px; */
+            border-top: 1px solid #F0F0F0;
+        }
+
+        .convert-btn {
+            display: block;
+            width: 100%;
+            text-align: center;
+            padding: 12px;
+            margin-top: 0;
+            background-color: transparent;
+            border: 2px solid #E0E0E0;
+            border-radius: 25px;
+            color: #666;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+
+        .convert-btn:active {
+            background-color: #f0f0f0;
+            border-color: #ccc;
+        }
+
+        /* Helper Text */
+        .convert-hint {
+            font-size: 11px;
+            color: #999;
+            text-align: center;
+            margin-top: 8px;
+            margin-bottom: 0;
+        }
+
+        /* 二维码浮层容器（右下角） */
+        .qr-float-layer {
+            position: fixed;
+            bottom: 110px;
+            right: 20px; /* 展开状态：浮层右侧距离屏幕右边界20px */
+            z-index: 999;
+            display: flex;
+            align-items: flex-start; /* 上边缘对齐 */
+            transition: transform 0.3s ease-in-out;
+        }
+
+        /* 收起状态：整个容器向右移动，浮层完全移出屏幕，按钮右侧贴紧屏幕右边界 */
+        /* 浮层宽度 = 140px(max-width) + 32px(padding) = 172px，移动距离就是浮层宽度 */
+        .qr-float-layer.collapsed {
+            transform: translateX(165px);
+            /* 移动172px，让浮层完全移出，按钮贴着右边界 */
+        }
+
+        /* 展开/收起按钮 - 在浮层左侧，上边缘对齐 */
+        .qr-toggle-btn {
+            width: 36px;
+            height: 36px;
+            background: #FFFFFF;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s;
+            flex-shrink: 0;
+            margin-right: 0; /* 按钮右侧紧贴浮层左侧 */
+        }
+
+        .qr-float-content {
+            background: #FFFFFF;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 140px;
+            margin-left: 0; /* 浮层左侧紧贴按钮右侧 */
+        }
+
+        .qr-toggle-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* 二维码图标 - 使用SVG绘制 */
+        .qr-icon {
+            width: 20px;
+            height: 20px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23333'%3E%3Cpath d='M3 3h7v7H3z'/%3E%3Cpath d='M14 3h7v7h-7z'/%3E%3Cpath d='M3 14h7v7H3z'/%3E%3Crect x='14' y='14' width='3' height='3'/%3E%3Crect x='18' y='14' width='3' height='3'/%3E%3Crect x='14' y='18' width='3' height='3'/%3E%3Cpath d='M11 8h2v8h-2z'/%3E%3Cpath d='M8 11h8v2H8z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+        }
+
+        .qr-text-line {
+            font-size: 12px;
+            color: #333;
+            line-height: 1.2;
+            text-align: center;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .qr-text-line:first-child {
+            color: #FF8C00;
+            font-weight: 600;
+        }
+
+        .mp-qrcode {
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            margin-top: 4px;
+            display: block;
+        }
+
+        /* 错误状态 */
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 100px 40px;
+            text-align: center;
+            min-height: 60vh;
+        }
+
+        .loading-icon {
+            font-size: 60px;
+            display: block;
+            margin-bottom: 20px;
+            animation: rotate 2s linear infinite;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .error-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 100px 40px;
+            text-align: center;
+            min-height: 60vh;
+        }
+
+        .error-icon {
+            font-size: 100px;
+            margin-bottom: 40px;
+        }
+
+        .error-text {
+            font-size: 36px;
+            color: #666;
+            margin-bottom: 60px;
+            line-height: 1.6;
+        }
+
+        .back-btn {
+            width: 400px;
+            height: 88px;
+            background-color: #FF6B00;
+            color: #fff;
+            font-size: 32px;
+            border-radius: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* 隐藏元素 */
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 480px) {
+            .content-wrapper {
+                padding: 20px;
+            }
+
+            .user-name {
+                font-size: 32px;
+            }
+
+            .grid-row {
+                flex-direction: column;
+            }
+
+            .info-card.half {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- 顶部安全栏 -->
+        <div class="safety-bar">
+            <span class="safety-icon">⚠️</span>
+            <span class="safety-text">此页面仅供紧急情况下医疗/救援人员查看</span>
+        </div>
+
+        <!-- 加载中状态 -->
+        <div id="loading" class="loading-container">
+            <div class="loading-icon">⏳</div>
+            <div class="loading-text">正在加载急救信息...</div>
+        </div>
+
+        <!-- 有数据时显示内容 -->
+        <div id="content-wrapper" class="content-wrapper hidden">
+            <!-- 身份核验区 -->
+            <div class="info-card header-card">
+                <div class="user-details">
+                    <div class="name-row">
+                        <span class="user-name" id="user-name">未知</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 家人寄语 -->
+            <div class="note-section">
+                <span class="note-text">" 如有不适请出示此卡，请好好爱自己。💝 "</span>
+            </div>
+
+            <!-- 关键医疗信息区 - 网格布局 -->
+            <div class="card-grid">
+                <!-- 第一行：血型和年龄 -->
+                <div class="grid-row">
+                    <div class="info-card half">
+                        <div class="card-label">
+                            <span class="icon">🩸</span>
+                            <span>血型</span>
+                        </div>
+                        <div class="card-value highlight" id="blood-type">未知</div>
+                    </div>
+                    <div class="info-card half">
+                        <div class="card-label">
+                            <span class="icon">👴</span>
+                            <span>年龄</span>
+                        </div>
+                        <div class="card-value" id="age">?</div>
+                    </div>
+                </div>
+
+                <!-- 第二行：过敏史 -->
+                <div class="info-card full">
+                    <div class="card-label">
+                        <div class="icon-allergy"></div>
+                        <span>过敏史</span>
+                    </div>
+                    <div class="tags-container" id="allergy-container">
+                        <span class="empty-text">无已知过敏</span>
+                    </div>
+                </div>
+
+                <!-- 第三行：正在服药 -->
+                <div class="info-card full">
+                    <div class="card-label">
+                        <span class="icon">💊</span>
+                        <span>正在服药</span>
+                    </div>
+                    <div class="tags-container" id="medications-container">
+                        <span class="empty-text">无正在服用药物</span>
+                    </div>
+                </div>
+
+                <!-- 第四行：既往病史 -->
+                <div class="info-card full hidden" id="history-card">
+                    <div class="card-label">
+                        <span class="icon">🏥</span>
+                        <span>既往病史</span>
+                    </div>
+                    <div class="tags-container" id="history-container">
+                        <span class="empty-text">无重大病史</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 最近更新时间 -->
+            <div class="update-time-section">
+                <span class="update-time-text" id="update-time">最后更新：未知</span>
+            </div>
+        </div>
+
+        <!-- 加载完成但没有数据时显示错误 -->
+        <div id="error" class="error-container hidden">
+            <div class="error-icon">❌</div>
+            <div class="error-text">信息获取失败或已失效</div>
+            <div class="error-msg" id="error-msg"></div>
+        </div>
+
+        <!-- 二维码浮层（右下角） -->
+        <div id="qr-fallback-area" class="qr-float-layer hidden">
+            <div class="qr-toggle-btn" id="qr-toggle-btn" onclick="toggleQRFloat()">
+                <div class="qr-icon"></div>
+            </div>
+            <div class="qr-float-content">
+                <div class="qr-text-line">我也想制作急救卡</div>
+                <div class="qr-text-line">请扫二维码开始制作</div>
+                <img src="pinganQrcode.png" id="mp-qrcode-img" class="mp-qrcode" alt="小程序码">
+            </div>
+        </div>
+
+        <!-- 底部固定行动栏 -->
+        <div id="fixed-footer" class="fixed-footer hidden">
+            <a href="#" id="call-btn" class="call-btn">
+                <span class="phone-icon">📞</span>
+                <span>紧急联系人电话</span>
+            </a>
+            <div class="conversion-area">
+                <div class="convert-hint">屏安守护 · 永久免费 · 关爱家人</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ⚠️ 替换为您自己的环境 ID
+        const ENV_ID = 'cloud1-0gum144f4caaf976'; // 从云开发控制台获取
+
+        // 从病史中提取过敏信息
+        function extractAllergy(conditions) {
+            if (!conditions) return '无已知过敏';
+
+            const separators = /[,\n;，；、]/;
+            const items = conditions.split(separators).map(item => item.trim()).filter(item => item.length > 0);
+
+            const allergyKeywords = ['过敏', '过敏史', '过敏源', '不吃', '不服', '不能吃', '不能服', '禁用', '忌用'];
+
+            for (const item of items) {
+                if (allergyKeywords.some(keyword => item.includes(keyword))) {
+                    let cleanedItem = item;
+                    cleanedItem = cleanedItem.replace(/不能吃|不能服|过敏史|过敏源/g, '');
+                    cleanedItem = cleanedItem.replace(/过敏/g, '');
+                    cleanedItem = cleanedItem.replace(/不吃|不服/g, '');
+                    cleanedItem = cleanedItem.replace(/禁用|忌用/g, '');
+                    cleanedItem = cleanedItem.replace(/^对|^的|的对$|的$|对$/g, '');
+                    cleanedItem = cleanedItem.trim();
+
+                    if (cleanedItem.length > 0) {
+                        return cleanedItem + '等';
+                    }
+                }
+            }
+
+            return '无已知过敏';
+        }
+
+        // 将文本解析为标签数组
+        function parseConditionsToTags(text) {
+            if (!text || !text.trim()) {
+                return [];
+            }
+
+            const separators = /[,\n;，；、]/;
+            const tags = text
+                .split(separators)
+                .map(tag => tag.trim())
+                .filter(tag => tag.length > 0);
+
+            return tags;
+        }
+
+        // 格式化日期（处理云数据库返回的时间格式）
+        function formatDate(dateValue) {
+            if (!dateValue) return '未知';
+            
+            let date;
+            try {
+                if (dateValue instanceof Date) {
+                    date = dateValue;
+                } else if (typeof dateValue === 'string') {
+                    date = new Date(dateValue);
+                } else if (dateValue.seconds) {
+                    // 云数据库 Timestamp 对象
+                    date = new Date(dateValue.seconds * 1000);
+                } else {
+                    date = new Date(dateValue);
+                }
+                
+                // 检查日期是否有效
+                if (isNaN(date.getTime())) {
+                    return '未知';
+                }
+                
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            } catch (e) {
+                console.error('日期格式化失败:', e);
+                return '未知';
+            }
+        }
+
+        // 渲染标签到容器
+        function renderTags(containerId, tags, emptyText) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            if (tags && tags.length > 0) {
+                tags.forEach(tag => {
+                    const tagEl = document.createElement('span');
+                    tagEl.className = 'clean-tag';
+                    tagEl.textContent = tag;
+                    container.appendChild(tagEl);
+                });
+            } else {
+                const emptyEl = document.createElement('span');
+                emptyEl.className = 'empty-text';
+                emptyEl.textContent = emptyText;
+                container.appendChild(emptyEl);
+            }
+        }
+
+        async function init() {
+            try {
+                // 1. 初始化 CloudBase
+                const app = cloudbase.init({
+                    env: ENV_ID
+                });
+                const auth = app.auth({
+                    persistence: 'local'
+                });
+
+                // 2. 匿名登录
+                console.log('正在匿名登录...');
+                const loginState = await auth.getLoginState();
+                if (!loginState) {
+                    await auth.signInAnonymously();
+                }
+                console.log('匿名登录成功');
+
+                // 3. 获取 URL 参数 ID
+                const params = new URLSearchParams(window.location.search);
+                const id = params.get('id');
+                if (!id) {
+                    throw new Error('无效的急救卡链接，缺少ID参数');
+                }
+                console.log('卡片ID:', id);
+
+                // 4. 调用安全网关 (云函数)
+                console.log('正在调用云函数获取数据...');
+                const res = await app.callFunction({
+                    name: 'getCardDetail',
+                    data: { cardId: id }
+                });
+
+                console.log('云函数响应:', res);
+
+                if (res.result && res.result.code === 0) {
+                    const data = res.result.data;
+                    console.log('数据获取成功:', data);
+                    renderData(data);
+                } else {
+                    throw new Error(res.result?.msg || '信息获取失败或已删除');
+                }
+
+            } catch (err) {
+                console.error('错误:', err);
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('error').classList.remove('hidden');
+                const errorMsg = document.getElementById('error-msg');
+                if (errorMsg) {
+                    errorMsg.textContent = err.message || '信息获取失败或已失效';
+                }
+            }
+        }
+
+        // 切换二维码浮层展开/收起
+        function toggleQRFloat() {
+            const qrLayer = document.getElementById('qr-fallback-area');
+            const isCollapsed = qrLayer.classList.contains('collapsed');
+            
+            if (isCollapsed) {
+                // 展开
+                qrLayer.classList.remove('collapsed');
+            } else {
+                // 收起
+                qrLayer.classList.add('collapsed');
+            }
+        }
+
+        // 渲染数据
+        function renderData(data) {
+            // 隐藏加载状态
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('content-wrapper').classList.remove('hidden');
+            
+            // 显示二维码浮层
+            const qrLayer = document.getElementById('qr-fallback-area');
+            qrLayer.classList.remove('hidden');
+            
+            // 3秒后自动收起
+            setTimeout(() => {
+                qrLayer.classList.add('collapsed');
+            }, 3000);
+
+            // 渲染姓名
+            document.getElementById('user-name').textContent = data.name || '未知';
+
+            // 渲染血型
+            document.getElementById('blood-type').textContent = data.blood_type || '未知';
+
+            // 渲染年龄
+            document.getElementById('age').textContent = (data.age || '?') + '岁';
+
+            // 处理过敏史
+            const allergyInfo = extractAllergy(data.conditions);
+            if (allergyInfo && allergyInfo !== '无已知过敏') {
+                renderTags('allergy-container', [allergyInfo], '无已知过敏');
+            } else {
+                renderTags('allergy-container', [], '无已知过敏');
+            }
+
+            // 处理正在服药
+            const medicationsTags = data.medications ? parseConditionsToTags(data.medications) : [];
+            renderTags('medications-container', medicationsTags, '无正在服用药物');
+
+            // 处理既往病史（排除过敏相关内容）
+            let historyTags = [];
+            if (data.conditions) {
+                const conditionsTags = parseConditionsToTags(data.conditions);
+                const allergyKeywords = ['过敏', '过敏史', '过敏源', '不吃', '不服', '不能吃', '不能服', '禁用', '忌用'];
+                historyTags = conditionsTags.filter(tag => 
+                    !allergyKeywords.some(keyword => tag.includes(keyword))
+                );
+            }
+            
+            if (historyTags.length > 0) {
+                document.getElementById('history-card').classList.remove('hidden');
+                renderTags('history-container', historyTags, '无重大病史');
+            } else {
+                document.getElementById('history-card').classList.add('hidden');
+            }
+
+            // 渲染更新时间
+            let updateTime = '';
+            if (data.update_time) {
+                updateTime = formatDate(data.update_time);
+            } else if (data.create_time) {
+                updateTime = formatDate(data.create_time);
+            }
+            document.getElementById('update-time').textContent = '最后更新：' + (updateTime || '未知');
+
+            // 渲染紧急联系人电话按钮
+            if (data.contact_phone) {
+                document.getElementById('fixed-footer').classList.remove('hidden');
+                document.getElementById('call-btn').href = `tel:${data.contact_phone}`;
+            } else {
+                document.getElementById('fixed-footer').classList.add('hidden');
+            }
+        }
+
+        // 跳转到小程序 (简化版：直接使用 URL Link)
+        function jumpToMiniProgram() {
+            const btn = document.querySelector('.convert-btn');
+            const originalText = btn.innerText;
+
+            // 1. Loading UI
+            btn.innerText = '正在前往小程序...';
+            btn.style.opacity = '0.7';
+            btn.style.pointerEvents = 'none';
+
+            // 2. 直接跳转
+            // TODO: User needs to replace this URL with the one generated from the Mini Program
+            // Example format: https://wxaurl.cn/AbCdEfG
+            const jumpUrl = 'REPLACE_WITH_YOUR_URL_LINK';
+
+            if (jumpUrl === 'REPLACE_WITH_YOUR_URL_LINK') {
+                alert('请开发者在代码中配置有效的跳转链接');
+                btn.innerText = originalText;
+                btn.style.opacity = '1';
+                btn.style.pointerEvents = 'auto';
+                return;
+            }
+
+            window.location.href = jumpUrl;
+
+            // Reset UI after delay (in case user comes back)
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.opacity = '1';
+                btn.style.pointerEvents = 'auto';
+            }, 3000);
+        }
+
+        // 页面加载完成后初始化（确保 CloudBase SDK 已加载）
+        function startInit() {
+            if (typeof cloudbase === 'undefined') {
+                console.error('CloudBase SDK 未加载，请检查网络连接或 CDN 是否可访问');
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('error').classList.remove('hidden');
+                const errorMsg = document.getElementById('error-msg');
+                if (errorMsg) {
+                    errorMsg.textContent = 'SDK 加载失败，请检查网络连接后刷新页面';
+                }
+                return;
+            }
+            init();
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', startInit);
+        } else {
+            setTimeout(startInit, 100);
+        }
+    </script>
+</body>
+
+</html>

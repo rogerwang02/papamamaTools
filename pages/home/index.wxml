@@ -1,7 +1,7 @@
 <!--pages/home/index.wxml-->
 <view class="container">
   <!-- 顶部欢迎语 -->
-  <view class="header">
+  <view class="header" bindtap="handleSecretTap">
     <text class="welcome-title">您好，守护者</text>
     <text class="welcome-subtitle">今天也要关注家人的健康哦</text>
   </view>
@@ -24,8 +24,8 @@
         </view>
       </view>
       <view class="btn-right">
-        <view class="arrow-circle">
-          <text class="arrow">></text>
+        <view class="cta-capsule">
+          <text>去制作</text>
         </view>
       </view>
     </view>
@@ -145,6 +145,15 @@
   </view>
 
   <view class="footer-space"></view>
+
+  <!-- 开发者工具面板（隐藏） -->
+  <view wx:if="{{isAdmin}}" class="admin-panel">
+    <view class="admin-title">🔧 开发者工具 (仅自己可见)</view>
+    <button class="admin-btn" type="primary" bindtap="generateUrlLink">
+      生成 H5 跳转链接 (30天有效)
+    </button>
+    <view class="admin-hint">点击复制后，去电脑端更新 index.html</view>
+  </view>
 </view>
 
 <!-- 医保凭证提示模态框 -->

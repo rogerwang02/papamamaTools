@@ -19,7 +19,11 @@ Page({
     // 医保凭证提示模态框
     showMedicalCardModal: false,
     // 健康指引功能开关（从全局变量同步）
-    showMedicalGuide: false
+    showMedicalGuide: false,
+    // 管理员模式
+    isAdmin: false, // 是否显示管理员按钮
+    tapCount: 0,    // 连击计数
+    lastTapTime: 0  // 上次点击时间
   },
 
   onLoad(options) {
@@ -603,6 +607,60 @@ Page({
       });
     } catch (err) {
       console.log('Vibration not supported');
+    }
+  },
+
+  // 1. 隐形开关：标题五连击
+  handleSecretTap() {
+    const now = new Date().getTime();
+    // 如果两次点击间隔小于 500ms，算作连击
+    if (now - this.data.lastTapTime < 500) {
+      this.data.tapCount++;
+    } else {
+      this.data.tapCount = 1; // 超时重置
+    }
+
+    this.setData({ lastTapTime: now });
+    if (this.data.tapCount >= 5) {
+      this.setData({ isAdmin: true });
+      wx.showToast({ title: '开发者模式已开启', icon: 'none' });
+    }
+  },
+
+  // 2. 核心功能：生成链接并复制
+  async generateUrlLink() {
+    wx.showLoading({ title: '正在生成链接...' });
+
+    try {
+      // 调用云函数 (urllink.generate)
+      const res = await wx.cloud.callFunction({
+        name: 'getUrlScheme'
+      });
+      console.log('Link Result:', res);
+      // 注意：urllink.generate 返回的字段是 url_link，不是 openlink
+      const url = res.result?.url_link || res.result?.openlink;
+      if (res.result && res.result.code === 0 && url) {
+
+        // 复制到剪贴板
+        wx.setClipboardData({
+          data: url,
+          success: () => {
+            wx.hideLoading();
+            wx.showModal({
+              title: '链接已复制',
+              content: '请将此链接填入 H5 网页代码中。\n有效期：30天。',
+              showCancel: false,
+              confirmText: '好的'
+            });
+          }
+        });
+      } else {
+        throw new Error(res.result?.msg || '生成失败，请检查云函数日志');
+      }
+    } catch (err) {
+      wx.hideLoading();
+      console.error(err);
+      wx.showToast({ title: '调用失败: ' + err.message, icon: 'none', duration: 3000 });
     }
   }
 });

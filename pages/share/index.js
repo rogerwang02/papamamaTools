@@ -1043,6 +1043,52 @@ Page({
     }
   },
 
+  // 📋 复制 NFC 链接
+  copyNfcLink() {
+    // ⚠️ TODO: 替换为实际的静态网站域名
+    // 示例：https://cloud1-0gum144f4caaf976-1258603821.tcloudbaseapp.com/index.html
+    const baseUrl = 'https://cloud1-0gum144f4caaf976-1258603821.tcloudbaseapp.com/index.html';
+
+    if (!this.data.cardId) {
+      wx.showToast({ 
+        title: '缺少卡片ID', 
+        icon: 'none' 
+      });
+      return;
+    }
+
+    const fullUrl = `${baseUrl}?id=${this.data.cardId}`;
+
+    wx.setClipboardData({
+      data: fullUrl,
+      success: () => {
+        wx.showToast({
+          title: '链接已复制',
+          icon: 'success',
+          duration: 2000
+        });
+
+        // Optional: User Guide Modal
+        setTimeout(() => {
+          wx.showModal({
+            title: 'NFC 链接获取成功',
+            content: '您可以购买空白 NFC 贴纸，使用"NFC Tools"等 App 将此链接写入标签。',
+            showCancel: false,
+            confirmText: '我知道了',
+            confirmColor: '#FF8C00'
+          });
+        }, 1500);
+      },
+      fail: (err) => {
+        console.error('复制失败:', err);
+        wx.showToast({
+          title: '复制失败，请重试',
+          icon: 'none'
+        });
+      }
+    });
+  },
+
   // 保存打印图片
   async onSavePrintImage() {
     if (!this.data.qrCodePath) {

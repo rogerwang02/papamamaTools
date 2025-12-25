@@ -291,27 +291,77 @@
   font-weight: 600;
 }
 
+/* Footer Action Bar */
+.footer-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20rpx;
+  gap: 20rpx;
+}
+
 /* 保存按钮 */
 .save-btn {
-  width: 100%;
-  height: 100rpx;
-  border-radius: 50rpx;
-  font-size: 32rpx;
+  height: 96rpx;
+  border-radius: 48rpx;
+  font-size: 34rpx;
   font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 20rpx;
+  margin: 0 !important;
+  box-sizing: border-box;
+}
+
+/* 确保主按钮占据全部可用空间 */
+.save-btn.main-btn {
+  width: 100%;
+  flex: 1;
 }
 
 .save-btn::after {
   border: none;
 }
 
+.main-btn {
+  flex: 1;
+}
+
 .print-btn {
   background: linear-gradient(135deg, #FF6B00 0%, #FF8C00 100%);
   color: #FFFFFF;
   box-shadow: 0 8rpx 20rpx rgba(255, 107, 0, 0.3);
+}
+
+/* NFC 按钮 */
+.side-btn {
+  width: 96rpx;
+  height: 96rpx;
+  background: #FFF7E6;
+  border-radius: 24rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #FF8C00;
+  border: 2rpx solid #FF8C00;
+  box-sizing: border-box;
+  transition: opacity 0.2s;
+}
+
+.side-btn:active {
+  opacity: 0.7;
+  background: #FFE4BA;
+}
+
+.nfc-icon {
+  font-size: 32rpx;
+  margin-bottom: 4rpx;
+}
+
+.nfc-text {
+  font-size: 20rpx;
+  font-weight: bold;
 }
 
 .wallpaper-btn {
