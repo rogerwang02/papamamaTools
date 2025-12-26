@@ -215,9 +215,9 @@ Page({
     wx.makePhoneCall({
       phoneNumber: phone,
       fail: (err) => {
-        console.error('拨打电话失败:', err);
+        console.error('取消拨打电话:', err);
         wx.showToast({
-          title: '拨打电话失败',
+          title: '取消拨打电话',
           icon: 'none'
         });
       }
