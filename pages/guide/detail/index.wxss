@@ -5,38 +5,18 @@
   min-height: 100vh;
 }
 
-.video-wrapper {
+/* 场景图片区域 */
+.scene-image-wrapper {
   width: 100%;
   height: 420rpx;
   background: #000;
+  overflow: hidden;
 }
 
-.video-player {
+.scene-image {
   width: 100%;
   height: 100%;
-}
-
-.no-video {
-  width: 100%;
-  height: 300rpx;
-  background: #F5F5F5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #999;
-  font-size: 28rpx;
-}
-
-/* 视频来源说明 */
-.source-note {
-  padding: 30rpx 30rpx;
-  background-color: #F9F9F9;
-  font-size: 22rpx;
-  color: #999;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  line-height: 1.4;
+  display: block;
 }
 
 .content-body {

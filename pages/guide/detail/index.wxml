@@ -1,23 +1,9 @@
 <!--pages/guide/detail/index.wxml-->
 <view class="container">
-  <view class="video-wrapper" wx:if="{{info.videoUrl}}">
-    <video 
-      class="video-player" 
-      src="{{videoSrc}}" 
-      controls 
-      show-center-play-btn 
-      title="{{info.title}}"
-    ></video>
+  <view class="scene-image-wrapper" wx:if="{{sceneImage}}">
+    <image class="scene-image" src="{{sceneImage}}" mode="aspectFill"></image>
   </view>
-  <view class="no-video" wx:else>
-    <text>暂无演示视频，请阅读下方文字指南</text>
-  </view>
-
-  <view class="source-note" wx:if="{{info.videoUrl}}">
-    <text>视频来源：B站UP主'静思百草园'</text>
-    <text>（仅作公益科普展示，如有侵权请联系删除）</text>
-  </view>
-
+  
   <view class="content-body">
     <view class="detail-header">
       <text class="detail-icon">{{info.icon}}</text>
@@ -52,9 +38,9 @@
 
     <view class="footer-action">
       <button class="more-btn" bindtap="onOpenMoreInfo">
-        📺 观看更多急救知识视频
+        📺 更多急救知识推荐视频
       </button>
-      <text class="tip-text">点击复制链接，请在浏览器或B站打开</text>
+      <text class="tip-text">点击复制链接，请在浏览器中打开</text>
     </view>
   </view>
 </view>
