@@ -143,61 +143,76 @@
   text-overflow: ellipsis;
 }
 
-/* === 2. 模式切换按钮组 (扁平化横排) === */
+/* === 2. 模式切换按钮组 (轻量化卡片风格) === */
 .tab-bar {
   display: flex;
   justify-content: space-between;
   padding: 0 30rpx;
-  /* 关键：强制背景透明，去掉突兀的白条 */
   background-color: transparent !important;
-  /* 移除 box-shadow 和 border-radius，因为不再有容器背景 */
-  /* 关键：大幅减少与上方 Canvas 的距离 */
   margin-top: 20rpx; 
   margin-bottom: 20rpx;
+  gap: 20rpx; /* 按钮之间的间距 */
 }
 
 .tab-item {
-  flex: 1;
-  /* 强制固定高度，变瘦 */
-  height: 88rpx; 
   display: flex;
-  /* 关键：水平排列 (Row) */
-  flex-direction: row; 
+  /* 垂直排列：图标在上，文字在下 */
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  /* 确保按钮本身有背景色 */
-  background-color: #FFFFFF; /* 默认白色背景 */
-  border-radius: 12rpx;
-  margin: 0 12rpx;
+  /* 轻量化卡片样式 */
+  background-color: #F7F8FA; /* 极淡灰色背景 */
+  border-radius: 16rpx;
+  padding: 16rpx 24rpx;
+  min-width: 160rpx; /* 确保三个按钮大小基本一致 */
   transition: all 0.2s;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06); /* 给按钮添加阴影，增强浮起效果 */
+  /* 去除边框，用背景色区分 */
+  border: none;
+}
+
+.tab-item:active {
+  /* 按下反馈 */
+  opacity: 0.8;
+  transform: scale(0.98);
 }
 
 .tab-item.active {
-  background-color: #FF6B00;
-  color: #FFFFFF;
-  font-weight: bold;
+  /* 选中状态：橙色背景 */
+  background-color: #FF9C00;
+  /* 可选：淡橙色阴影 */
+  box-shadow: 0 4rpx 12rpx rgba(255, 156, 0, 0.3);
 }
 
 .tab-icon {
-  width: 36rpx;
-  height: 36rpx;
-  /* 图标在文字左边，右侧留间距 */
-  margin-right: 12rpx;
-  margin-bottom: 0; /* 移除底部间距 */
+  width: var(--icon-size-sm);
+  height: var(--icon-size-sm);
+  font-size: var(--icon-size-sm);
   line-height: 1;
+  margin-bottom: 8rpx; /* 图标和文字之间的间距 */
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .tab-text {
   font-size: var(--font-base);
-  line-height: 1;
-  color: var(--text-sub);
+  color: #333;
+  font-weight: 400;
+  line-height: var(--line-height);
+  transition: all 0.2s;
+}
+
+/* 选中状态：文字变白色 */
+.tab-item.active .tab-text {
+  color: #FFFFFF;
   font-weight: 500;
 }
 
-.tab-item.active .tab-text {
-  color: #FFFFFF;
-  font-weight: 600;
+/* 选中状态：图标处理（针对 Emoji，可以通过 filter 稍微调整） */
+.tab-item.active .tab-icon {
+  /* Emoji 本身无法直接改色，但可以通过 filter 微调亮度 */
+  filter: brightness(1.2);
 }
 
 /* === 3. 底部操作区 (确保紧凑) === */
@@ -369,4 +384,10 @@
   background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
   color: #FFFFFF;
   box-shadow: 0 8rpx 20rpx rgba(74, 144, 226, 0.3);
+}
+
+.recommended-btn {
+  background: linear-gradient(135deg, #FF6B00 0%, #FF8C00 100%);
+  color: #FFFFFF;
+  box-shadow: 0 8rpx 20rpx rgba(255, 107, 0, 0.3);
 }

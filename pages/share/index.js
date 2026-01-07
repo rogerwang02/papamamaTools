@@ -25,7 +25,7 @@ Page({
     isElderMode: false, // 长辈模式状态
     cardId: '',
     qrCodePath: '',
-    currentMode: 'print', // 'print' 或 'wallpaper'
+    currentMode: 'print', // 'print', 'wallpaper' 或 'recommended'
     canvasWidth: 300,
     canvasHeight: 450, // 打印模式默认高度 (300 * 1.5)
     canvasStyleWidth: '280px', // 初始值会在 onLoad 中通过 updateCanvasSize 更新为正确的 px 值
@@ -286,6 +286,21 @@ Page({
       
       this.applyCanvasSize(mode, cssW, cssH, logW, logH);
 
+    } else if (mode === 'recommended') {
+      // [推荐壁纸模式] 使用手机屏幕尺寸，白色卡片居中
+      const sysInfo = wx.getSystemInfoSync();
+      const windowWidth = sysInfo.windowWidth;
+      const windowHeight = sysInfo.windowHeight;
+      
+      // 使用屏幕的实际像素尺寸
+      cssW = windowWidth;
+      cssH = windowHeight;
+      // 逻辑尺寸使用750rpx基准（小程序设计稿宽度）
+      logW = 750;
+      logH = Math.round((windowHeight / windowWidth) * 750); // 保持屏幕比例
+      
+      this.applyCanvasSize(mode, cssW, cssH, logW, logH);
+
     } else {
       // [壁纸模式] 自适应高度
       cssW = 750; // 全屏宽度
@@ -410,6 +425,8 @@ Page({
           if (qrCodePath) {
             if (mode === 'print') {
               this.drawPrintableMode(canvas, ctx, qrCodePath, logW, logH);
+            } else if (mode === 'recommended') {
+              this.drawRecommendedMode(canvas, ctx, qrCodePath, logW, logH);
             } else {
               this.drawWallpaperMode(canvas, ctx, qrCodePath, selectedBgPath, false, true).then(() => {
                 // 初始化 overlay 位置
@@ -430,6 +447,8 @@ Page({
             
             if (mode === 'print') {
               await that.drawPrintableMode(canvas, ctx, qrCodePath, logW, logH);
+            } else if (mode === 'recommended') {
+              await that.drawRecommendedMode(canvas, ctx, qrCodePath, logW, logH);
             } else {
               await that.drawWallpaperMode(canvas, ctx, qrCodePath, selectedBgPath, false, true);
               // 初始化 overlay 位置
@@ -537,6 +556,135 @@ Page({
     ctx.textAlign = 'center';
     ctx.fillText('如遇紧急情况，请扫码查看紧急联系人', width / 2, bottomY + 10);
     ctx.fillText('Please scan for emergency contact', width / 2, bottomY + 30);
+  },
+
+  // 绘制推荐壁纸模式
+  async drawRecommendedMode(canvas, ctx, qrCodePath, width, height) {
+    width = width || 750;
+    height = height || 1334;
+
+    // 清空画布
+    ctx.clearRect(0, 0, width, height);
+    
+    // 1. 绘制浅棕色背景（全屏）
+    ctx.fillStyle = '#F5E6D3'; // 浅棕色
+    ctx.fillRect(0, 0, width, height);
+
+    // 2. 计算白色卡片位置
+    const cardWidth = 600;  // 卡片宽度
+    const cardHeight = 800; // 卡片高度
+    const cardX = (width - cardWidth) / 2;
+    const cardY = (height - cardHeight) / 2;
+
+    // 3. 绘制暖心文案（在卡片上方）
+    // 文案位置：水平居中，卡片顶部上方约 40px 处
+    const textY = cardY - 40;
+    ctx.fillStyle = '#8C7A6B'; // 暖灰色/咖啡色
+    ctx.font = '32px sans-serif'; // 32rpx 转换为 32px（小程序中通常直接使用px值）
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('守护您的每一刻', width / 2, textY);
+
+    // 4. 绘制白色卡片（居中，圆角）
+    const cardRadius = 20;
+
+    // 绘制卡片背景和阴影
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
+    ctx.shadowBlur = 20;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 4;
+    
+    ctx.fillStyle = '#FFFFFF';
+    this.drawRoundRect(ctx, cardX, cardY, cardWidth, cardHeight, cardRadius);
+    ctx.fill();
+    
+    ctx.shadowColor = 'transparent';
+
+    // 3. 绘制标题（打印卡片样式）：图片 Icon + 文字 居中
+    const headerBaseY = cardY + 70; // 文字基线 Y
+    
+    // 计算文字尺寸
+    ctx.font = 'bold 56px sans-serif'; // 根据卡片尺寸放大字体
+    const textStr = '紧急医疗卡';
+    const textWidth = ctx.measureText(textStr).width;
+    
+    const iconSize = 64; // 图标尺寸（放大）
+    const gap = 20;      // 间距
+    const totalWidth = iconSize + gap + textWidth;
+    
+    // 计算居中起始点
+    const startX = cardX + (cardWidth - totalWidth) / 2;
+
+    // 加载并绘制本地图片 Icon
+    try {
+      const iconImg = canvas.createImage();
+      await new Promise((resolve) => {
+        iconImg.onload = resolve;
+        iconImg.onerror = (e) => {
+          console.error('加载 warn.png 失败', e);
+          resolve(); // 失败也要继续画文字
+        };
+        iconImg.src = '../../assets/warn.png';
+      });
+      
+      // 绘制图片 (与文字垂直居中对齐)
+      // 文字基线在 headerBaseY，图标中心应该与文字中心对齐
+      // 图标Y位置 = headerBaseY - 图标高度的一半（考虑文字高度）
+      const iconY = headerBaseY - iconSize * 0.5 - 8; // 微调-8px使视觉上更对齐
+      ctx.drawImage(iconImg, startX, iconY, iconSize, iconSize);
+    } catch (e) {
+      console.error('绘制图标流程出错', e);
+    }
+
+    // 绘制文字 (红色)
+    ctx.fillStyle = '#FF3B30';
+    ctx.textAlign = 'left';
+    ctx.fillText(textStr, startX + iconSize + gap, headerBaseY);
+    
+    // 添加英文副标题
+    ctx.fillStyle = '#333333';
+    ctx.font = '28px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('EMERGENCY MEDICAL CARD', cardX + cardWidth / 2, headerBaseY + 48);
+
+    // 4. 绘制二维码区域（打印卡片样式：白底衬托 + 阴影）
+    const qrSize = cardWidth * 0.6;
+    const qrX = cardX + (cardWidth - qrSize) / 2;
+    const qrY = cardY + (cardHeight - qrSize) / 2 - 20; // 稍微上移
+
+    // 白底衬托二维码
+    ctx.fillStyle = '#FFFFFF';
+    ctx.shadowColor = 'rgba(0,0,0,0.1)';
+    ctx.shadowBlur = 20;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 4;
+    this.drawRoundRect(ctx, qrX - 20, qrY - 20, qrSize + 40, qrSize + 40, 24);
+    ctx.fill();
+    ctx.shadowColor = 'transparent';
+
+    if (qrCodePath) {
+      try {
+        const qrImage = canvas.createImage();
+        await new Promise((resolve, reject) => {
+          qrImage.onload = resolve;
+          qrImage.onerror = reject;
+          qrImage.src = qrCodePath;
+        });
+        ctx.drawImage(qrImage, qrX, qrY, qrSize, qrSize);
+      } catch (e) { 
+        console.error('绘制二维码失败:', e); 
+      }
+    }
+
+    // 5. 底部装饰：心电图 + 提示语（打印卡片样式）
+    const bottomY = cardY + cardHeight - 80;
+    this.drawECGLine(ctx, cardX + 80, bottomY - 60, cardWidth - 160);
+
+    ctx.fillStyle = '#666666';
+    ctx.font = '24px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('如遇紧急情况，请扫码查看紧急联系人', cardX + cardWidth / 2, bottomY - 20);
+    ctx.fillText('Please scan for emergency contact', cardX + cardWidth / 2, bottomY + 10);
   },
 
   // 辅助函数：Promise 化的图片加载器
@@ -1157,6 +1305,60 @@ Page({
   },
 
   // 保存壁纸图片
+  // 保存推荐壁纸
+  async onSaveRecommendedWallpaper() {
+    if (!this.data.qrCodePath) {
+      wx.showToast({
+        title: '二维码未生成',
+        icon: 'none'
+      });
+      return;
+    }
+
+    wx.showLoading({
+      title: '保存中...',
+      mask: true
+    });
+
+    try {
+      const tempFilePath = await this.canvasToTempFilePath();
+      
+      await wx.saveImageToPhotosAlbum({
+        filePath: tempFilePath
+      });
+
+      wx.hideLoading();
+      wx.showToast({
+        title: '保存成功',
+        icon: 'success'
+      });
+    } catch (error) {
+      console.error('保存失败:', error);
+      wx.hideLoading();
+      
+      // FIX: Handle Auth Deny by guiding user to settings
+      if (error.errMsg && error.errMsg.includes('auth deny')) {
+        wx.showModal({
+          title: '需要授权',
+          content: '保存图片需要访问相册权限，请在设置中开启',
+          showCancel: false,
+          confirmText: '去设置',
+          success: (res) => {
+            if (res.confirm) {
+              wx.openSetting();
+            }
+          }
+        });
+      } else {
+        wx.showToast({
+          title: '保存失败: ' + (error.errMsg || '未知错误'),
+          icon: 'none',
+          duration: 3000
+        });
+      }
+    }
+  },
+
   async onSaveWallpaperImage() {
     if (!this.data.qrCodePath) {
       wx.showToast({

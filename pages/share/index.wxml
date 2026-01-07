@@ -37,7 +37,15 @@
       data-mode="print"
     >
       <text class="tab-icon">🖨️</text>
-      <text class="tab-text">实体打印版</text>
+      <text class="tab-text">打印卡片</text>
+    </view>
+    <view 
+      class="tab-item {{currentMode === 'recommended' ? 'active' : ''}}" 
+      bindtap="onTabChange" 
+      data-mode="recommended"
+    >
+      <text class="tab-icon">⭐</text>
+      <text class="tab-text">默认壁纸</text>
     </view>
     <view 
       class="tab-item {{currentMode === 'wallpaper' ? 'active' : ''}}" 
@@ -45,14 +53,21 @@
       data-mode="wallpaper"
     >
       <text class="tab-icon">📱</text>
-      <text class="tab-text">手机壁纸版</text>
+      <text class="tab-text">制作壁纸</text>
     </view>
   </view>
 
   <!-- 底部操作区 -->
   <view class="action-area">
+    <!-- 推荐壁纸操作区 -->
+    <view wx:if="{{currentMode === 'recommended'}}" class="recommended-actions">
+      <view class="footer-action-bar">
+        <button class="save-btn main-btn recommended-btn" bindtap="onSaveRecommendedWallpaper">保存壁纸</button>
+      </view>
+    </view>
+
     <!-- 打印版操作区 -->
-    <view wx:if="{{currentMode === 'print'}}" class="print-actions">
+    <view wx:elif="{{currentMode === 'print'}}" class="print-actions">
       <view class="safety-tip">
         <text class="tip-text">温馨提示：此二维码仅包含紧急联系方式，不含身份证等敏感隐私，请放心扫码。</text>
       </view>
