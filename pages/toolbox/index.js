@@ -4,6 +4,7 @@ const db = wx.cloud.database();
 
 Page({
   data: {
+    isElderMode: false, // 长辈模式状态
     // BMI计算器模态框
     showBMIModal: false,
     bmiHeight: '',
@@ -15,6 +16,8 @@ Page({
   },
 
   onLoad(options) {
+    // 初始化主题模式
+    this.setThemeClass();
     // 页面加载
     // 如果全局变量还是默认值（可能配置还没拉取完成），主动查询一次配置
     if (!app.globalData.enableMedicalGuide) {
@@ -35,9 +38,17 @@ Page({
   },
 
   onShow() {
+    // 更新主题模式
+    this.setThemeClass();
     // 每次显示页面时，从全局变量同步开关状态
     // 这样即使 app.js 拉取稍微慢一点，用户切一下页面也能刷出来
     this.syncMedicalGuideConfig();
+  },
+
+  // 设置主题class到页面根元素
+  setThemeClass() {
+    const isElder = app.globalData.isElderMode || false;
+    this.setData({ isElderMode: isElder });
   },
 
   // 主动查询健康指引配置（页面级查询，不依赖 app.js 的异步加载）

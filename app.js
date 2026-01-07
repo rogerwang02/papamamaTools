@@ -15,6 +15,9 @@ App({
       });
     }
     
+    // 初始化主题模式（从本地存储读取）
+    this.globalData.isElderMode = this.getThemeMode();
+    
     // 启动时获取云端配置
     this.fetchConfig();
   },
@@ -38,9 +41,47 @@ App({
     });
   },
   
+  // 主题管理
+  getThemeMode() {
+    try {
+      return wx.getStorageSync('isElderMode') || false;
+    } catch (e) {
+      console.error('读取主题模式失败', e);
+      return false;
+    }
+  },
+
+  setThemeMode(isElder) {
+    try {
+      wx.setStorageSync('isElderMode', isElder);
+      this.globalData.isElderMode = isElder;
+      // 通知所有页面更新
+      this.updateThemeMode();
+    } catch (e) {
+      console.error('保存主题模式失败', e);
+    }
+  },
+
+  toggleThemeMode() {
+    const newMode = !this.globalData.isElderMode;
+    this.setThemeMode(newMode);
+    return newMode;
+  },
+
+  updateThemeMode() {
+    // 更新所有已加载页面的主题
+    const pages = getCurrentPages();
+    pages.forEach(page => {
+      if (page && typeof page.setThemeClass === 'function') {
+        page.setThemeClass();
+      }
+    });
+  },
+
   globalData: {
     userInfo: null,
     enableMedicalGuide: false, // 🔴 默认为关闭，审核安全第一
+    isElderMode: false, // 长辈模式开关
     firstAidData: [
       {
         id: 'cpr',

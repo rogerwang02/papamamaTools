@@ -1,5 +1,5 @@
 <!--pages/emergency/index.wxml-->
-<view class="container">
+<view class="container {{isElderMode ? 'mode-elder' : ''}}">
   <!-- 顶部安全栏 -->
   <view class="safety-bar">
     <text class="safety-icon">⚠️</text>

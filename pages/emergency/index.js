@@ -1,8 +1,11 @@
 // pages/emergency/index.js
 const db = wx.cloud.database();
 
+const app = getApp();
+
 Page({
   data: {
+    isElderMode: false, // 长辈模式状态
     cardId: '',
     cardData: null,
     loading: true,
@@ -67,6 +70,9 @@ Page({
   },
 
   onLoad(options) {
+    // 初始化主题模式
+    this.setThemeClass();
+    
     let id = options.id;
     
     // 🟢 FIX: Handle QR Code "scene" parameter
@@ -295,6 +301,17 @@ Page({
     wx.switchTab({
       url: '/pages/home/index'
     });
+  },
+
+  // 设置主题class到页面根元素
+  setThemeClass() {
+    const isElder = app.globalData.isElderMode || false;
+    this.setData({ isElderMode: isElder });
+  },
+
+  onShow() {
+    // 更新主题模式
+    this.setThemeClass();
   }
 });
 

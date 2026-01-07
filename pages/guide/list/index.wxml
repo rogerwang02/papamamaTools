@@ -1,5 +1,5 @@
 <!--pages/guide/list/index.wxml-->
-<view class="container">
+<view class="container {{isElderMode ? 'mode-elder' : ''}}">
   <view class="header-area">
     <text class="page-title">急救指南</text>
     <text class="page-desc">关键时刻的救命知识库</text>

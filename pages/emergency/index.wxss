@@ -20,15 +20,15 @@ page {
 }
 
 .safety-icon {
-  font-size: 32rpx;
+  font-size: var(--font-lg);
   margin-right: 12rpx;
 }
 
 .safety-text {
-  font-size: 24rpx;
+  font-size: var(--font-base);
   color: #D32F2F;
   font-weight: 500;
-  line-height: 1.5;
+  line-height: var(--line-height);
 }
 
 /* 内容区域 */
@@ -77,8 +77,8 @@ page {
 }
 
 .avatar-icon {
-  font-size: 64rpx;
-  color: #999;
+  font-size: calc(var(--icon-size) * 0.8);
+  color: var(--text-light);
 }
 
 .user-details {
@@ -94,16 +94,16 @@ page {
 }
 
 .user-name {
-  font-size: 40rpx;
+  font-size: var(--font-xl);
   font-weight: bold;
-  color: #333;
+  color: var(--text-main);
   margin-right: 16rpx;
 }
 
 .verified-badge {
   background: #E3F2FD;
   color: #1976D2;
-  font-size: 20rpx;
+  font-size: var(--font-base);
   padding: 4rpx 12rpx;
   border-radius: 8rpx;
   display: inline-block;
@@ -117,10 +117,10 @@ page {
 }
 
 .note-text {
-  font-size: 28rpx;
-  color: #888;
+  font-size: var(--font-base);
+  color: var(--text-sub);
   font-style: italic;
-  line-height: 1.5;
+  line-height: var(--line-height);
   display: block;
 }
 
@@ -148,9 +148,9 @@ page {
 }
 
 .card-label {
-  font-size: 30rpx;
+  font-size: var(--font-base);
   font-weight: bold;
-  color: #666;
+  color: var(--text-sub);
   margin-bottom: 16rpx;
   display: flex;
   align-items: center;
@@ -158,7 +158,7 @@ page {
 
 .card-label .icon {
   margin-right: 8rpx;
-  font-size: 36rpx;
+  font-size: var(--icon-size-sm);
 }
 
 /* 黄色圆形警告图标 */
@@ -179,21 +179,21 @@ page {
 .icon-allergy::after {
   content: '!';
   color: #FFF;
-  font-size: 20rpx;
+  font-size: var(--font-base);
   font-weight: bold;
   line-height: 1;
   font-family: Arial, sans-serif;
 }
 
 .card-value {
-  font-size: 34rpx;
+  font-size: var(--font-lg);
   font-weight: 600;
-  color: #333;
+  color: var(--text-main);
 }
 
 .card-value.highlight {
   color: #FF8C00; /* Theme Orange for Key Data */
-  font-size: 40rpx;
+  font-size: var(--font-xl);
 }
 
 /* 4. Tags Styles - Unified Orange Theme */
@@ -207,15 +207,15 @@ page {
   /* Subtle Orange Background - Professional & Consistent */
   background-color: #FFF7E6; 
   color: #FF8C00;
-  font-size: 28rpx;
+  font-size: var(--font-base);
   padding: 12rpx 24rpx;
   border-radius: 12rpx;
   font-weight: 500;
 }
 
 .empty-text {
-  color: #ccc;
-  font-size: 28rpx;
+  color: var(--text-light);
+  font-size: var(--font-base);
 }
 
 /* 最近更新时间 */
@@ -226,9 +226,9 @@ page {
 }
 
 .update-time-text {
-  font-size: 24rpx;
-  color: #999;
-  line-height: 1.5;
+  font-size: var(--font-base);
+  color: var(--text-light);
+  line-height: var(--line-height);
 }
 
 /* Footer */
@@ -251,9 +251,9 @@ page {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 34rpx;
+  font-size: var(--font-lg);
   font-weight: bold;
-  height: 90rpx;
+  height: var(--btn-height);
   box-shadow: 0 8rpx 20rpx rgba(255, 59, 48, 0.3);
   width: 100%;
   border: none;
@@ -265,7 +265,7 @@ page {
 
 .phone-icon {
   margin-right: 16rpx;
-  font-size: 36rpx;
+  font-size: var(--icon-size-sm);
 }
 
 /* 错误状态 */
@@ -280,7 +280,7 @@ page {
 }
 
 .loading-icon {
-  font-size: 120rpx;
+  font-size: calc(var(--icon-size) * 1.5);
   display: block;
   margin-bottom: 40rpx;
   animation: rotate 2s linear infinite;
@@ -296,9 +296,9 @@ page {
 }
 
 .loading-text {
-  font-size: 32rpx;
-  color: #666;
-  line-height: 1.6;
+  font-size: var(--font-lg);
+  color: var(--text-sub);
+  line-height: var(--line-height);
 }
 
 .error-container {
@@ -312,23 +312,23 @@ page {
 }
 
 .error-icon {
-  font-size: 100rpx;
+  font-size: calc(var(--icon-size) * 1.25);
   margin-bottom: 40rpx;
 }
 
 .error-text {
-  font-size: 36rpx;
-  color: #666;
+  font-size: var(--font-lg);
+  color: var(--text-sub);
   margin-bottom: 60rpx;
-  line-height: 1.6;
+  line-height: var(--line-height);
 }
 
 .back-btn {
   width: 400rpx;
-  height: 88rpx;
+  height: var(--btn-height);
   background-color: #FF6B00;
   color: #fff;
-  font-size: 32rpx;
+  font-size: var(--font-lg);
   border-radius: 44rpx;
   display: flex;
   align-items: center;

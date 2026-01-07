@@ -4,6 +4,84 @@ page {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
 }
 
+/* ============================================
+   主题变量定义 (Standard Mode - 标准模式)
+   ============================================ */
+page {
+  /* 字体大小 */
+  --font-base: 28rpx;
+  --font-lg: 32rpx;
+  --font-xl: 40rpx;
+  --font-xxl: 48rpx;
+  
+  /* 行高 */
+  --line-height: 1.5;
+  
+  /* 文字颜色 */
+  --text-main: #333333;
+  --text-sub: #666666;
+  --text-light: #999999;
+  
+  /* 图标尺寸 */
+  --icon-size: 80rpx;
+  --icon-size-sm: 36rpx;
+  
+  /* 布局 */
+  --grid-cols: 3; /* 3列网格 */
+  
+  /* 输入框 */
+  --input-height: 80rpx;
+  --input-font-size: 28rpx;
+  
+  /* 按钮 */
+  --btn-radius: 40rpx;
+  --btn-height: 80rpx;
+  
+  /* 间距 */
+  --spacing-base: 20rpx;
+  --spacing-lg: 40rpx;
+}
+
+/* ============================================
+   长辈模式覆盖 (Elder Mode)
+   ============================================ */
+page.mode-elder,
+.mode-elder,
+page .mode-elder {
+  /* 字体大小 - 增大1.3-1.4倍 */
+  --font-base: 36rpx !important;      /* 1.3x larger */
+  --font-lg: 44rpx !important;        /* 1.4x larger */
+  --font-xl: 56rpx !important;        /* Huge headers */
+  --font-xxl: 64rpx !important;
+  
+  /* 行高 - 增加呼吸空间 */
+  --line-height: 1.8 !important;
+  
+  /* 文字颜色 - 高对比度 */
+  --text-main: #000000 !important;    /* Pure black */
+  --text-sub: #333333 !important;     /* Darker grey */
+  --text-light: #666666 !important;
+  
+  /* 图标尺寸 - 更大 */
+  --icon-size: 110rpx !important;     /* Much larger */
+  --icon-size-sm: 48rpx !important;
+  
+  /* 布局 - 2列网格，更容易点击 */
+  --grid-cols: 2 !important;
+  
+  /* 输入框 - 更高 */
+  --input-height: 110rpx !important;
+  --input-font-size: 36rpx !important;
+  
+  /* 按钮 - 更方正，更易点击 */
+  --btn-radius: 20rpx !important;
+  --btn-height: 110rpx !important;
+  
+  /* 间距 - 更大 */
+  --spacing-base: 30rpx !important;
+  --spacing-lg: 60rpx !important;
+}
+
 /* 品牌主题色变量 */
 /* 主色调：守护橙 #FF6B00 */
 /* 辅助色：急救红 #FF3B30 */

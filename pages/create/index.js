@@ -1,8 +1,10 @@
 // pages/create/index.js
 const db = wx.cloud.database();
+const app = getApp();
 
 Page({
   data: {
+    isElderMode: false, // 长辈模式状态
     editId: null, // 编辑模式的卡片ID
     formData: {
       name: '',
@@ -25,6 +27,9 @@ Page({
   },
 
   onLoad(options) {
+    // 初始化主题模式
+    this.setThemeClass();
+    
     // 检查是否是编辑模式
     if (options.id) {
       // 编辑模式
@@ -513,6 +518,17 @@ Page({
         icon: 'none'
       });
     }
+  },
+
+  // 设置主题class到页面根元素
+  setThemeClass() {
+    const isElder = app.globalData.isElderMode || false;
+    this.setData({ isElderMode: isElder });
+  },
+
+  onShow() {
+    // 更新主题模式
+    this.setThemeClass();
   }
 });
 

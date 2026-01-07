@@ -1,5 +1,5 @@
 <!--pages/profile/index.wxml-->
-<view class="container">
+<view class="container {{isElderMode ? 'mode-elder' : ''}}">
   <view class="profile-header">
     <button 
       class="avatar-wrapper" 

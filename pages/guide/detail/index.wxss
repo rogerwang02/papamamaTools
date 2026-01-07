@@ -36,14 +36,14 @@
 }
 
 .detail-icon {
-  font-size: 60rpx;
+  font-size: calc(var(--icon-size) * 0.75);
   margin-right: 20rpx;
 }
 
 .detail-title {
-  font-size: 44rpx;
+  font-size: var(--font-xl);
   font-weight: bold;
-  color: #333;
+  color: var(--text-main);
 }
 
 .section {
@@ -72,9 +72,9 @@
 }
 
 .section-title {
-  font-size: 34rpx;
+  font-size: var(--font-lg);
   font-weight: bold;
-  color: #333;
+  color: var(--text-main);
 }
 
 .step-list {
@@ -89,13 +89,13 @@
 
 .step-num {
   background: #F5F5F5;
-  color: #999;
+  color: var(--text-light);
   width: 40rpx;
   height: 40rpx;
   border-radius: 50%;
   text-align: center;
   line-height: 40rpx;
-  font-size: 24rpx;
+  font-size: var(--font-base);
   margin-right: 20rpx;
   flex-shrink: 0;
   margin-top: 6rpx;
@@ -108,9 +108,10 @@
 }
 
 .step-text {
-  font-size: 30rpx;
-  color: #444;
+  font-size: var(--font-base);
+  color: var(--text-main);
   flex: 1;
+  line-height: var(--line-height);
 }
 
 /* 底部操作按钮 */
@@ -125,7 +126,7 @@
 .more-btn {
   background: #E3F2FD;
   color: #1976D2;
-  font-size: 30rpx;
+  font-size: var(--font-base);
   font-weight: bold;
   border-radius: 50rpx;
   padding: 20rpx 40rpx;
@@ -148,8 +149,8 @@
 }
 
 .tip-text {
-  font-size: 22rpx;
-  color: #999;
+  font-size: var(--font-base);
+  color: var(--text-light);
   margin-top: 16rpx;
 }
 

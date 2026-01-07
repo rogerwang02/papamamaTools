@@ -18,8 +18,11 @@ const safetyQuotes = [
   "慢慢长大，世界等你探索。"
 ];
 
+const app = getApp();
+
 Page({
   data: {
+    isElderMode: false, // 长辈模式状态
     cardId: '',
     qrCodePath: '',
     currentMode: 'print', // 'print' 或 'wallpaper'
@@ -135,6 +138,9 @@ Page({
   },
 
   onLoad(options) {
+    // 初始化主题模式
+    this.setThemeClass();
+    
     const id = options.id;
     if (!id) {
       wx.showToast({
@@ -1644,5 +1650,16 @@ Page({
     } catch (error) {
       console.error('重绘失败:', error);
     }
+  },
+
+  // 设置主题class到页面根元素
+  setThemeClass() {
+    const isElder = app.globalData.isElderMode || false;
+    this.setData({ isElderMode: isElder });
+  },
+
+  onShow() {
+    // 更新主题模式
+    this.setThemeClass();
   }
 });

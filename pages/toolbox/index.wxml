@@ -1,5 +1,5 @@
 <!--pages/toolbox/index.wxml-->
-<view class="container">
+<view class="container {{isElderMode ? 'mode-elder' : ''}}">
   <view class="header">
     <text class="title">实用工具箱</text>
     <text class="subtitle">守护您的健康生活</text>

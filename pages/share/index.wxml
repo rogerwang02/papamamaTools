@@ -1,5 +1,5 @@
 <!--pages/share/index.wxml-->
-<view class="container">
+<view class="container {{isElderMode ? 'mode-elder' : ''}}">
   <!-- Canvas 预览区域 -->
   <view class="canvas-wrapper {{currentMode === 'wallpaper' ? 'wallpaper-mode-wrapper' : ''}}">
     <view class="canvas-container">

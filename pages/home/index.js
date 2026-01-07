@@ -6,6 +6,7 @@ Page({
   data: {
     loading: true,
     cardInfo: null,
+    isElderMode: false, // 长辈模式状态
     habits: [
       { id: 1, text: '按时吃药了没？', icon: '💊', done: false },
       { id: 2, text: '测量血压了没？', icon: '🩺', done: false },
@@ -27,6 +28,9 @@ Page({
   },
 
   onLoad(options) {
+    // 初始化主题模式
+    this.setThemeClass();
+    
     // 页面加载时检查用户身份
     this.checkUserIdentity();
     
@@ -49,12 +53,32 @@ Page({
   },
 
   onShow() {
+    // 更新主题模式（可能在别的页面切换了）
+    this.setThemeClass();
+    
     // 每次显示页面时检查身份（如果用户删除了卡片，需要重新检查）
     // 注意：如果已经跳转到分享页面，这里不会执行
     this.checkUserIdentity();
     
     // 同步健康指引功能开关状态
     this.syncMedicalGuideConfig();
+  },
+
+  // 设置主题class到页面根元素
+  setThemeClass() {
+    const isElder = app.globalData.isElderMode || false;
+    this.setData({ isElderMode: isElder });
+  },
+
+  // 切换长辈模式
+  toggleElderMode() {
+    const newMode = app.toggleThemeMode();
+    this.setData({ isElderMode: newMode });
+    wx.showToast({
+      title: newMode ? '已切换到长辈模式' : '已切换回标准模式',
+      icon: 'none',
+      duration: 1500
+    });
   },
 
   // 主动查询健康指引配置（页面级查询，不依赖 app.js 的异步加载）

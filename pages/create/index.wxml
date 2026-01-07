@@ -1,5 +1,5 @@
 <!--pages/create/index.wxml-->
-<view class="container">
+<view class="container {{isElderMode ? 'mode-elder' : ''}}">
   <view class="header">
     <text class="title">{{editId ? '编辑卡片信息' : '创建紧急联系卡'}}</text>
     <text class="subtitle">{{editId ? '修改卡片信息，确保信息准确无误' : '为需要帮助者填写基本信息，关键时刻能救命'}}</text>

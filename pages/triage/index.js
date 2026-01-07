@@ -1,11 +1,30 @@
 // pages/triage/index.js
 
+const app = getApp();
+
 Page({
   data: {
+    isElderMode: false, // 长辈模式状态
     inputText: '',
     loading: false,
     result: null,
     canAnalyze: false
+  },
+
+  onLoad() {
+    // 初始化主题模式
+    this.setThemeClass();
+  },
+
+  onShow() {
+    // 更新主题模式
+    this.setThemeClass();
+  },
+
+  // 设置主题class到页面根元素
+  setThemeClass() {
+    const isElder = app.globalData.isElderMode || false;
+    this.setData({ isElderMode: isElder });
   },
 
   onInput(e) {

@@ -133,7 +133,8 @@
 .widget-text-title,
 .widget-text-desc {
   /* FIX: Reduce font size to fit within the slimmer widget width */
-  font-size: 22rpx; /* Reduced from 26rpx */
+  /* 浮层二维码文字使用固定大小，不随长辈模式变化 */
+  font-size: 22rpx !important;
   font-weight: bold;
   color: #000;
   line-height: 1.4;
@@ -188,9 +189,9 @@
 }
 
 .tab-text {
-  font-size: 28rpx;
+  font-size: var(--font-base);
   line-height: 1;
-  color: #666;
+  color: var(--text-sub);
   font-weight: 500;
 }
 
@@ -218,9 +219,9 @@
 }
 
 .tip-text {
-  font-size: 24rpx;
-  color: #666;
-  line-height: 1.6;
+  font-size: var(--font-base);
+  color: var(--text-sub);
+  line-height: var(--line-height);
 }
 
 /* 壁纸版操作区 */
@@ -243,13 +244,13 @@
 }
 
 .bg-option-icon {
-  font-size: 48rpx;
+  font-size: var(--icon-size-sm);
   margin-bottom: 12rpx;
 }
 
 .bg-option-text {
-  font-size: 26rpx;
-  color: #333;
+  font-size: var(--font-base);
+  color: var(--text-main);
 }
 
 /* 默认背景列表 */
@@ -281,8 +282,8 @@
 }
 
 .bg-name {
-  font-size: 22rpx;
-  color: #666;
+  font-size: var(--font-base);
+  color: var(--text-sub);
   text-align: center;
 }
 
@@ -302,9 +303,9 @@
 
 /* 保存按钮 */
 .save-btn {
-  height: 96rpx;
+  height: var(--btn-height);
   border-radius: 48rpx;
-  font-size: 34rpx;
+  font-size: var(--font-lg);
   font-weight: bold;
   display: flex;
   align-items: center;
@@ -355,12 +356,12 @@
 }
 
 .nfc-icon {
-  font-size: 32rpx;
+  font-size: var(--icon-size-sm);
   margin-bottom: 4rpx;
 }
 
 .nfc-text {
-  font-size: 20rpx;
+  font-size: var(--font-base);
   font-weight: bold;
 }
 

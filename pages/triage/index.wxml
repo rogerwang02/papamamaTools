@@ -1,5 +1,5 @@
 <!--pages/triage/index.wxml-->
-<view class="container">
+<view class="container {{isElderMode ? 'mode-elder' : ''}}">
   <view class="header">
     <text class="title">📋 科室建议</text>
     <text class="subtitle">描述您的身体不适，系统为您匹配建议</text>

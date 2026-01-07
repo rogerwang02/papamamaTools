@@ -4,12 +4,16 @@ const app = getApp();
 
 Page({
   data: {
+    isElderMode: false, // 长辈模式状态
     id: '',
     info: {},
     sceneImage: ''
   },
 
   onLoad(options) {
+    // 初始化主题模式
+    this.setThemeClass();
+    
     const id = options.id;
     if (!id) {
       wx.showToast({
@@ -116,6 +120,17 @@ Page({
         });
       }
     });
+  },
+
+  // 设置主题class到页面根元素
+  setThemeClass() {
+    const isElder = app.globalData.isElderMode || false;
+    this.setData({ isElderMode: isElder });
+  },
+
+  onShow() {
+    // 更新主题模式
+    this.setThemeClass();
   }
 });
 

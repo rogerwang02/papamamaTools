@@ -10,17 +10,18 @@
 }
 
 .page-title {
-  font-size: 40rpx;
+  font-size: var(--font-xl);
   font-weight: bold;
-  color: #333;
+  color: var(--text-main);
   display: block;
 }
 
 .page-desc {
-  font-size: 28rpx;
-  color: #999;
+  font-size: var(--font-base);
+  color: var(--text-light);
   margin-top: 10rpx;
   display: block;
+  line-height: var(--line-height);
 }
 
 .guide-list {
@@ -44,24 +45,24 @@
 }
 
 .card-title {
-  font-size: 34rpx;
+  font-size: var(--font-lg);
   font-weight: bold;
-  color: #333;
+  color: var(--text-main);
   display: block;
   margin-bottom: 12rpx;
 }
 
 .card-intro {
-  font-size: 26rpx;
-  color: #666;
+  font-size: var(--font-base);
+  color: var(--text-sub);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  line-height: 1.6;
+  line-height: var(--line-height);
 }
 
 .card-icon {
-  font-size: 60rpx;
+  font-size: calc(var(--icon-size) * 0.75);
 }
 

@@ -1,9 +1,16 @@
 <!--pages/home/index.wxml-->
-<view class="container">
+<view class="container {{isElderMode ? 'mode-elder' : ''}}">
   <!-- 顶部欢迎语 -->
   <view class="header" bindtap="handleSecretTap">
-    <text class="welcome-title">您好，守护者</text>
-    <text class="welcome-subtitle">今天也要关注家人的健康哦</text>
+    <view class="header-content">
+      <view class="titles">
+        <text class="welcome-title">您好，守护者</text>
+        <text class="welcome-subtitle" wx:if="{{!isElderMode}}">今天也要关注家人的健康哦</text>
+      </view>
+      <view class="mode-switch" catchtap="toggleElderMode">
+        <text class="mode-switch-text">{{isElderMode ? '退出长辈模式' : '大字版'}}</text>
+      </view>
+    </view>
   </view>
 
   <!-- 核心区域：卡片状态 -->

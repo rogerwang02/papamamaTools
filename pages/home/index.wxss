@@ -7,22 +7,54 @@
 }
 
 .header {
-  margin-bottom: 40rpx;
+  margin-bottom: var(--spacing-lg);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.titles {
+  flex: 1;
 }
 
 .welcome-title {
   display: block;
-  font-size: 48rpx;
+  font-size: var(--font-xxl);
   font-weight: bold;
-  color: #333;
+  color: var(--text-main);
   margin-bottom: 12rpx;
 }
 
 .welcome-subtitle {
   display: block;
-  font-size: 28rpx;
-  color: #666;
-  line-height: 1.5;
+  font-size: var(--font-base);
+  color: var(--text-sub);
+  line-height: var(--line-height);
+}
+
+/* 模式切换按钮 */
+.mode-switch {
+  padding: 12rpx 24rpx;
+  background-color: rgba(255, 107, 0, 0.1);
+  border-radius: 30rpx;
+  border: 2rpx solid #FF6B00;
+  flex-shrink: 0;
+  margin-left: 20rpx;
+}
+
+.mode-switch:active {
+  opacity: 0.8;
+  transform: scale(0.95);
+}
+
+.mode-switch-text {
+  font-size: var(--font-base);
+  color: #FF6B00;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 /* 卡片区域 */
@@ -40,7 +72,7 @@
 }
 
 .loading-icon {
-  font-size: 80rpx;
+  font-size: var(--icon-size);
   display: block;
   margin-bottom: 30rpx;
   animation: rotate 2s linear infinite;
@@ -56,8 +88,8 @@
 }
 
 .loading-text {
-  font-size: 28rpx;
-  color: #999;
+  font-size: var(--font-base);
+  color: var(--text-light);
 }
 
 /* 创建卡片按钮 - 高CTA按钮样式 */
@@ -98,7 +130,7 @@
 }
 
 .empty-icon {
-  font-size: 100rpx;
+  font-size: calc(var(--icon-size) * 1.25);
   display: block;
   margin-right: 24rpx;
   filter: drop-shadow(0 4rpx 8rpx rgba(0, 0, 0, 0.1));
@@ -110,19 +142,19 @@
 }
 
 .main-title {
-  font-size: 36rpx;
+  font-size: var(--font-lg);
   font-weight: bold;
   color: #FFFFFF;
   margin-bottom: 8rpx;
-  line-height: 1.4;
+  line-height: var(--line-height);
 }
 
 .sub-title {
   display: block;
-  font-size: 26rpx;
+  font-size: var(--font-base);
   color: #FFFFFF;
   opacity: 0.9;
-  line-height: 1.5;
+  line-height: var(--line-height);
 }
 
 /* 右侧箭头（点击提示） */
@@ -136,7 +168,7 @@
   color: #FF6600;
   padding: 12rpx 24rpx;
   border-radius: 30rpx;
-  font-size: 26rpx;
+  font-size: var(--font-base);
   font-weight: bold;
   display: flex;
   align-items: center;
@@ -186,9 +218,9 @@
 }
 
 .card-header-title {
-  font-size: 32rpx;
+  font-size: var(--font-lg);
   font-weight: 600;
-  color: #333;
+  color: var(--text-main);
 }
 
 .header-right {
@@ -211,7 +243,7 @@
 }
 
 .status-text {
-  font-size: 24rpx;
+  font-size: var(--font-base);
   color: #52C41A;
   font-weight: 500;
 }
@@ -233,7 +265,7 @@
 }
 
 .delete-icon {
-  font-size: 36rpx;
+  font-size: var(--icon-size-sm);
   line-height: 1;
 }
 
@@ -244,11 +276,11 @@
 
 /* 姓名 - 稍微调小并大幅减少下方留白 */
 .card-name {
-  font-size: 52rpx; /* 原64rpx -> 52rpx，更精致 */
+  font-size: var(--font-xl);
   font-weight: bold;
-  color: #333;
-  margin-bottom: 20rpx; /* 原40rpx -> 20rpx，减少空隙 */
-  line-height: 1.2;
+  color: var(--text-main);
+  margin-bottom: var(--spacing-base);
+  line-height: var(--line-height);
 }
 
 /* 关键信息网格 - 保持但微调 */
@@ -265,30 +297,30 @@
 }
 
 .card-info-label {
-  font-size: 30rpx;      /* 增大字号 (原24rpx -> 30rpx) */
-  font-weight: bold;     /* 加粗 */
-  color: #666;           /* 保持深灰色，对比度够 */
+  font-size: var(--font-base);
+  font-weight: bold;
+  color: var(--text-sub);
   margin-bottom: 10rpx;
 }
 
 .card-info-value {
-  font-size: 30rpx; /* 原32rpx -> 30rpx */
+  font-size: var(--font-base);
   font-weight: bold;
-  color: #333;
-  line-height: 1.4;
-  min-height: 42rpx; /* 保持最小高度防止塌陷 */
+  color: var(--text-main);
+  line-height: var(--line-height);
+  min-height: 42rpx;
 }
 
 .card-info-value.blood-type {
-  font-size: 34rpx; /* 原36rpx -> 34rpx */
+  font-size: var(--font-lg);
   color: #FF3B30;
 }
 
 .card-info-value.conditions {
-  font-size: 28rpx;
+  font-size: var(--font-base);
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap; /* 单行显示，超出用省略号 */
+  white-space: nowrap;
   word-break: break-all;
 }
 
@@ -310,10 +342,10 @@
   transition: all 0.2s ease;
 }
 
-/* 图标圆形按钮 - 稍微缩小 */
+/* 图标圆形按钮 */
 .action-icon-circle {
-  width: 80rpx; /* 原90rpx -> 80rpx */
-  height: 80rpx;
+  width: var(--icon-size);
+  height: var(--icon-size);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -324,7 +356,7 @@
 }
 
 .action-icon {
-  font-size: 36rpx; /* 原40rpx -> 36rpx */
+  font-size: var(--icon-size-sm);
   line-height: 1;
 }
 
@@ -341,10 +373,10 @@
 }
 
 .action-text {
-  font-size: 28rpx;      /* 增大字号 (原24rpx -> 28rpx) */
-  color: #333;           /* 加深颜色 */
-  font-weight: 600;      /* 半粗体，比图标稍微细一点点但要清晰 */
-  line-height: 1.4;
+  font-size: var(--font-base);
+  color: var(--text-main);
+  font-weight: 600;
+  line-height: var(--line-height);
   margin-top: 12rpx;
 }
 
@@ -357,12 +389,13 @@
 
 /* 区域标题 */
 .section-title {
-  font-size: 32rpx;
+  font-size: var(--font-lg);
   font-weight: bold;
-  color: #333;
-  margin: 40rpx 0 20rpx 0;
+  color: var(--text-main);
+  margin: var(--spacing-lg) 0 var(--spacing-base) 0;
   padding-left: 16rpx;
   border-left: 8rpx solid #FF6B00;
+  line-height: var(--line-height);
 }
 
 /* 工具箱区域 */
@@ -371,14 +404,14 @@
 }
 
 .utility-grid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(var(--grid-cols), 1fr);
+  gap: var(--spacing-base);
   padding: 0 10rpx;
   margin-bottom: 20rpx;
 }
 
 .utility-item {
-  width: 33.333%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -388,8 +421,8 @@
 }
 
 .utility-icon-bg {
-  width: 80rpx;
-  height: 80rpx;
+  width: var(--icon-size);
+  height: var(--icon-size);
   border-radius: 24rpx;
   display: flex;
   align-items: center;
@@ -399,15 +432,16 @@
 }
 
 .utility-icon {
-  font-size: 38rpx;
+  font-size: calc(var(--icon-size) * 0.48);
 }
 
 .utility-label {
-  font-size: 30rpx;      /* 增大字号，方便点击阅读 (原24rpx -> 30rpx) */
-  font-weight: bold;     /* 加粗 */
-  color: #333;
+  font-size: var(--font-base);
+  font-weight: bold;
+  color: var(--text-main);
   text-align: center;
   margin-top: 16rpx;
+  line-height: var(--line-height);
 }
 
 /* 工具箱颜色 */
@@ -474,14 +508,15 @@
 }
 
 .habit-icon {
-  font-size: 40rpx;
+  font-size: var(--icon-size-sm);
   margin-right: 24rpx;
 }
 
 .habit-text {
   flex: 1;
-  font-size: 30rpx;
-  color: #333;
+  font-size: var(--font-base);
+  color: var(--text-main);
+  line-height: var(--line-height);
 }
 
 .habit-checkbox {
@@ -513,20 +548,20 @@
 }
 
 .admin-title {
-  font-size: 24rpx;
-  color: #666;
-  margin-bottom: 20rpx;
+  font-size: var(--font-base);
+  color: var(--text-sub);
+  margin-bottom: var(--spacing-base);
   text-align: center;
 }
 
 .admin-btn {
-  font-size: 28rpx;
+  font-size: var(--font-base);
   width: 100%;
 }
 
 .admin-hint {
-  font-size: 20rpx;
-  color: #999;
+  font-size: var(--font-base);
+  color: var(--text-light);
   text-align: center;
   margin-top: 16rpx;
 }
@@ -568,14 +603,14 @@
 }
 
 .bmi-modal-title {
-  font-size: 36rpx;
+  font-size: var(--font-lg);
   font-weight: bold;
-  color: #333;
+  color: var(--text-main);
 }
 
 .bmi-modal-close {
-  font-size: 48rpx;
-  color: #999;
+  font-size: var(--font-xl);
+  color: var(--text-light);
   line-height: 1;
   padding: 0 10rpx;
 }
@@ -594,20 +629,20 @@
 
 .bmi-input-label {
   display: block;
-  font-size: 28rpx;
+  font-size: var(--font-base);
   font-weight: 600;
-  color: #333;
+  color: var(--text-main);
   margin-bottom: 16rpx;
 }
 
 .bmi-input {
   width: 100%;
-  height: 88rpx;
+  height: var(--input-height);
   background-color: #F8F8F8;
   border-radius: 12rpx;
   padding: 0 24rpx;
-  font-size: 32rpx;
-  color: #333;
+  font-size: var(--input-font-size);
+  color: var(--text-main);
   box-sizing: border-box;
 }
 
@@ -623,9 +658,9 @@
 
 .bmi-modal-btn {
   flex: 1;
-  height: 80rpx;
+  height: var(--btn-height);
   border-radius: 12rpx;
-  font-size: 32rpx;
+  font-size: var(--font-lg);
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -640,7 +675,7 @@
 
 .cancel-btn {
   background-color: #F5F5F5;
-  color: #666;
+  color: var(--text-sub);
 }
 
 .confirm-btn {
@@ -679,14 +714,14 @@
 }
 
 .medical-card-modal-title {
-  font-size: 36rpx;
+  font-size: var(--font-lg);
   font-weight: bold;
-  color: #333;
+  color: var(--text-main);
 }
 
 .medical-card-modal-close {
-  font-size: 48rpx;
-  color: #999;
+  font-size: var(--font-xl);
+  color: var(--text-light);
   line-height: 1;
   padding: 0 10rpx;
 }
@@ -701,9 +736,9 @@
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  font-size: 28rpx;
-  color: #666;
-  line-height: 1.8;
+  font-size: var(--font-base);
+  color: var(--text-sub);
+  line-height: var(--line-height);
   gap: 4rpx;
 }
 
@@ -712,7 +747,7 @@
 }
 
 .medical-card-modal-tip .highlight-text {
-  font-size: 36rpx;
+  font-size: var(--font-lg);
   font-weight: bold;
   color: #FF6B00;
   margin: 0 4rpx;
@@ -726,9 +761,9 @@
 
 .medical-card-modal-btn {
   flex: 1;
-  height: 80rpx;
+  height: var(--btn-height);
   border-radius: 12rpx;
-  font-size: 32rpx;
+  font-size: var(--font-lg);
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -743,7 +778,7 @@
 
 .medical-card-modal-btn.cancel-btn {
   background-color: #F5F5F5;
-  color: #666;
+  color: var(--text-sub);
 }
 
 .medical-card-modal-btn.confirm-btn {

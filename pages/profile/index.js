@@ -2,8 +2,11 @@
 const db = wx.cloud.database();
 const defaultAvatar = 'https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwNRna42FI242Lcia07jQodd2FJGIYQfG0LAJGFxM4FbnQP6yfMxBgJ0F3YRqJCJ1aPAK2dQagdusBZg/0';
 
+const app = getApp();
+
 Page({
   data: {
+    isElderMode: false, // 长辈模式状态
     avatarUrl: defaultAvatar,
     nickName: '',
     hasChanges: false,
@@ -15,8 +18,21 @@ Page({
   },
 
   onLoad(options) {
+    // 初始化主题模式
+    this.setThemeClass();
     // 页面加载时获取用户资料
     this.fetchUserProfile();
+  },
+
+  onShow() {
+    // 更新主题模式
+    this.setThemeClass();
+  },
+
+  // 设置主题class到页面根元素
+  setThemeClass() {
+    const isElder = app.globalData.isElderMode || false;
+    this.setData({ isElderMode: isElder });
   },
 
   // 获取用户资料（从独立的用户资料集合加载）
