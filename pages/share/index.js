@@ -552,10 +552,14 @@ Page({
     this.drawECGLine(ctx, 40, bottomY - 30, width - 80);
 
     ctx.fillStyle = '#666666';
-    ctx.font = '12px sans-serif';
+    ctx.font = '18px sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('如遇紧急情况，请扫码查看紧急联系人', width / 2, bottomY + 10);
-    ctx.fillText('Please scan for emergency contact', width / 2, bottomY + 30);
+    // 中文分两行显示，以逗号为分界
+    ctx.fillText('如遇紧急情况，', width / 2, bottomY + 10);
+    ctx.fillText('请用微信扫码查看紧急联系人', width / 2, bottomY + 32);
+    // 英文字体缩小
+    // ctx.font = '14px sans-serif';
+    // ctx.fillText('Please scan for emergency contact', width / 2, bottomY + 56);
   },
 
   // 绘制推荐壁纸模式
@@ -646,6 +650,12 @@ Page({
     ctx.font = '28px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('EMERGENCY MEDICAL CARD', cardX + cardWidth / 2, headerBaseY + 48);
+    
+    // 添加提示文字："请优先拨打120"
+    ctx.fillStyle = '#FF6B00'; // 使用品牌橙色突出提示
+    ctx.font = '24px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('请优先拨打120', cardX + cardWidth / 2, headerBaseY + 88);
 
     // 4. 绘制二维码区域（打印卡片样式：白底衬托 + 阴影）
     const qrSize = cardWidth * 0.6;
@@ -681,10 +691,14 @@ Page({
     this.drawECGLine(ctx, cardX + 80, bottomY - 60, cardWidth - 160);
 
     ctx.fillStyle = '#666666';
-    ctx.font = '24px sans-serif';
+    ctx.font = '30px sans-serif'; // 稍微大一些
     ctx.textAlign = 'center';
-    ctx.fillText('如遇紧急情况，请扫码查看紧急联系人', cardX + cardWidth / 2, bottomY - 20);
-    ctx.fillText('Please scan for emergency contact', cardX + cardWidth / 2, bottomY + 10);
+    // 中文分两行显示，以逗号为分界，行间距加大
+    ctx.fillText('如遇紧急情况，', cardX + cardWidth / 2, bottomY - 20);
+    ctx.fillText('请用微信扫码查看紧急联系人', cardX + cardWidth / 2, bottomY + 16);
+    // 英文字体保持较小
+    // ctx.font = '22px sans-serif';
+    // ctx.fillText('Please scan for emergency contact', cardX + cardWidth / 2, bottomY + 36);
   },
 
   // 辅助函数：Promise 化的图片加载器
@@ -1201,7 +1215,7 @@ Page({
   copyNfcLink() {
     // ⚠️ TODO: 替换为实际的静态网站域名
     // 示例：https://cloud1-0gum144f4caaf976-1258603821.tcloudbaseapp.com/index.html
-    const baseUrl = 'https://cloud1-0gum144f4caaf976-1258603821.tcloudbaseapp.com/index.html';
+    const baseUrl = 'https://sos.lanternlab.cn/index.html';
 
     if (!this.data.cardId) {
       wx.showToast({ 
