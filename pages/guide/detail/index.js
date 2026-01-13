@@ -1,6 +1,7 @@
 // pages/guide/detail/index.js
 
 const app = getApp();
+const imageCache = require('../../../utils/imageCache');
 
 Page({
   data: {
@@ -10,7 +11,7 @@ Page({
     sceneImage: ''
   },
 
-  onLoad(options) {
+  async onLoad(options) {
     // 初始化主题模式
     this.setThemeClass();
     
@@ -57,7 +58,37 @@ Page({
       // 使用videoUrl的路径，将文件名替换为sceneX.jpg
       // 例如：cloud://.../assets/xinfeifusu.mp4 -> cloud://.../assets/scene1.jpg
       const basePath = item.videoUrl.replace(/\/[^\/]+\.mp4$/, '');
-      sceneImage = `${basePath}/scene${sceneNum}.jpg`;
+      const cloudImagePath = `${basePath}/scene${sceneNum}.jpg`;
+      
+      // 判断是否为合法的本地路径（微信小程序中的本地路径标识）
+      const isLocalPath = (path) => {
+        if (!path) return false;
+        // 微信小程序中的本地路径标识
+        if (path.startsWith('http://usr/') || path.startsWith('http://tmp/') || path.startsWith('wxfile://')) {
+          return true;
+        }
+        // 其他本地路径（不以协议开头或相对路径）
+        if (!path.startsWith('http://') && !path.startsWith('https://') && !path.startsWith('cloud://')) {
+          return true;
+        }
+        return false;
+      };
+      
+      // 使用缓存工具获取图片路径（优先使用缓存）
+      try {
+        const cachedPath = await imageCache.getImagePath(cloudImagePath);
+        
+        // 验证返回的路径是本地路径
+        if (cachedPath && isLocalPath(cachedPath)) {
+          sceneImage = cachedPath;
+        } else {
+          console.warn('⚠️ 场景图片缓存路径无效，使用原路径:', cachedPath);
+          sceneImage = cloudImagePath; // 失败时使用原路径
+        }
+      } catch (err) {
+        console.error('加载场景图片失败:', cloudImagePath, err);
+        sceneImage = cloudImagePath; // 失败时使用原路径
+      }
     }
 
     this.setData({

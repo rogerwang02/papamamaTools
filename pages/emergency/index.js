@@ -146,19 +146,59 @@ Page({
         console.log('格式化时间失败:', e);
       }
       
-      // 处理头像 URL：如果是 cloud:// 格式，需要转换为临时 HTTP URL
+      // 处理头像 URL：使用缓存工具获取本地路径
       let avatarUrl = cardDataRaw.avatar || null;
       if (avatarUrl && avatarUrl.startsWith('cloud://')) {
         try {
-          const tempFileRes = await wx.cloud.getTempFileURL({
-            fileList: [avatarUrl]
-          });
-          if (tempFileRes.fileList && tempFileRes.fileList.length > 0 && tempFileRes.fileList[0].tempFileURL) {
-            avatarUrl = tempFileRes.fileList[0].tempFileURL;
+          const imageCache = require('../../utils/imageCache');
+          const cachedPath = await imageCache.getImagePath(avatarUrl);
+          
+          // 判断是否为合法的本地路径（微信小程序中的本地路径标识）
+          const isLocalPath = (path) => {
+            if (!path) return false;
+            // 微信小程序中的本地路径标识
+            if (path.startsWith('http://usr/') || path.startsWith('http://tmp/') || path.startsWith('wxfile://')) {
+              return true;
+            }
+            // 其他本地路径（不以协议开头或相对路径）
+            if (!path.startsWith('http://') && !path.startsWith('https://') && !path.startsWith('cloud://')) {
+              return true;
+            }
+            return false;
+          };
+          
+          // 验证返回的路径是本地路径
+          if (cachedPath && isLocalPath(cachedPath)) {
+            avatarUrl = cachedPath;
+          } else {
+            console.warn('⚠️ 头像缓存路径无效，使用fallback:', cachedPath);
+            // 如果缓存路径无效，尝试使用临时URL作为fallback
+            try {
+              const tempFileRes = await wx.cloud.getTempFileURL({
+                fileList: [cardDataRaw.avatar]
+              });
+              if (tempFileRes.fileList && tempFileRes.fileList.length > 0 && tempFileRes.fileList[0].tempFileURL) {
+                avatarUrl = tempFileRes.fileList[0].tempFileURL;
+              }
+            } catch (fallbackErr) {
+              console.error('获取头像临时URL失败:', fallbackErr);
+              avatarUrl = null; // 获取失败则设为 null，显示占位符
+            }
           }
         } catch (err) {
-          console.error('获取头像临时URL失败:', err);
-          avatarUrl = null; // 获取失败则设为 null，显示占位符
+          console.error('获取头像缓存路径失败:', err);
+          // 如果缓存失败，尝试使用临时URL作为fallback
+          try {
+            const tempFileRes = await wx.cloud.getTempFileURL({
+              fileList: [cardDataRaw.avatar]
+            });
+            if (tempFileRes.fileList && tempFileRes.fileList.length > 0 && tempFileRes.fileList[0].tempFileURL) {
+              avatarUrl = tempFileRes.fileList[0].tempFileURL;
+            }
+          } catch (fallbackErr) {
+            console.error('获取头像临时URL失败:', fallbackErr);
+            avatarUrl = null; // 获取失败则设为 null，显示占位符
+          }
         }
       }
       

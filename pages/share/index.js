@@ -7,6 +7,9 @@ const CLOUD_BASE_ID = 'cloud://cloud1-0gum144f4caaf976.636c-cloud1-0gum144f4caaf
 // Note: We'll construct the full ID dynamically: base + / + filename
 const REMOTE_BGS = ['bg1.jpg', 'bg2.jpg', 'bg3.jpg'];
 
+// 引入图片缓存工具
+const imageCache = require('../../utils/imageCache');
+
 // === 屏安签文 ===
 const safetyQuotes = [
   "点亮屏幕，许你岁岁屏安。",
@@ -701,18 +704,72 @@ Page({
     // ctx.fillText('Please scan for emergency contact', cardX + cardWidth / 2, bottomY + 36);
   },
 
-  // 辅助函数：Promise 化的图片加载器
-  loadImage(canvas, src) {
-    return new Promise((resolve, reject) => {
-      if (!src) return resolve(null);
-      const img = canvas.createImage();
-      img.onload = () => resolve(img);
-      img.onerror = (e) => {
-        console.error('图片加载失败:', src, e);
-        resolve(null); // 返回 null 允许绘制继续
-      };
-      img.src = src;
-    });
+  // 辅助函数：Promise 化的图片加载器（使用缓存）
+  async loadImage(canvas, src) {
+    if (!src) return null;
+    
+    // 判断是否为微信本地路径 (允许 http://usr/, http://tmp/, wxfile://)
+    const isLocalPath = (path) => {
+      return path.startsWith('http://usr/') || 
+             path.startsWith('http://tmp/') || 
+             path.startsWith('wxfile://');
+    };
+    
+    // 如果src已经是本地路径（包括微信小程序的本地路径格式），直接使用
+    // 因为本地路径已经是缓存后的路径，不需要再次处理
+    if (isLocalPath(src) || 
+        (!src.startsWith('cloud://') && !src.startsWith('http://') && !src.startsWith('https://'))) {
+      // 本地路径，直接加载（不会发起网络请求）
+      return new Promise((resolve) => {
+        const img = canvas.createImage();
+        img.onload = () => {
+          console.log('✅ [Canvas] 加载本地图片成功:', src.substring(src.length - 30));
+          resolve(img);
+        };
+        img.onerror = (e) => {
+          console.error('❌ [Canvas] 加载本地图片失败:', src, e);
+          resolve(null);
+        };
+        img.src = src;
+      });
+    }
+    
+    // 云存储或网络图片，使用缓存工具获取本地路径
+    try {
+      console.log('🔄 [Canvas] 获取缓存路径:', src.substring(src.length - 30));
+      const cachedPath = await imageCache.getImagePath(src);
+      
+      // === 核心修改点 ===
+      // 1. 识别微信本地文件协议
+      const isLocalProtocol = cachedPath.startsWith('http://usr/') || 
+                              cachedPath.startsWith('http://tmp/') || 
+                              cachedPath.startsWith('wxfile://');
+
+      // 2. 仅拦截真正的远程路径 (既不是 cloud:// 也不是本地协议的 http/https)
+      // 注意：如果 isLocalProtocol 为 true，则不会进入报错分支
+      if (cachedPath.startsWith('cloud://') || 
+         (!isLocalProtocol && (cachedPath.startsWith('http://') || cachedPath.startsWith('https://')))) {
+        console.error('❌ [Canvas] 缓存路径无效，仍然是远程路径:', cachedPath);
+        return null;
+      }
+      // === 修改结束 ===
+      
+      return new Promise((resolve) => {
+        const img = canvas.createImage();
+        img.onload = () => {
+          console.log('✅ [Canvas] 使用缓存图片成功:', cachedPath.substring(cachedPath.length - 30));
+          resolve(img);
+        };
+        img.onerror = (e) => {
+          console.error('❌ [Canvas] 加载缓存图片失败:', cachedPath, e);
+          resolve(null);
+        };
+        img.src = cachedPath;
+      });
+    } catch (e) {
+      console.error('❌ [Canvas] 获取图片缓存路径失败:', src, e);
+      return null;
+    }
   },
 
   // 绘制壁纸版
@@ -753,14 +810,20 @@ Page({
     // === 3. 绘制 Widget（合成逻辑） ===
     if (!onlyBackground) {
       // --- 布局配置 ---
-      // 检测图片是横版还是竖版
+      // 检测图片是横版还是竖版（使用缓存的图片信息，避免重复网络请求）
       let isLandscape = false;
       if (bgImagePath && !bgImagePath.startsWith('#')) {
         try {
+          // bgImagePath 已经是本地缓存路径，直接使用不会发起网络请求
           const imgInfo = await wx.getImageInfo({ src: bgImagePath });
           isLandscape = imgInfo.width > imgInfo.height;
         } catch(e) {
-          isLandscape = false;
+          // 如果获取图片信息失败，尝试使用缓存的图片对象
+          if (this.bgImageCache && this.bgImageCache.width) {
+            isLandscape = this.bgImageCache.width > this.bgImageCache.height;
+          } else {
+            isLandscape = false;
+          }
         }
       }
       
@@ -1020,66 +1083,73 @@ Page({
 
   // === 初始化远程壁纸（下载并缓存） ===
   async initRemoteWallpapers() {
-    const fs = wx.getFileSystemManager();
+    console.log('🖼️ 开始初始化远程壁纸缓存...');
     const finalPaths = [];
+
+    // 使用统一的图片缓存工具
+    const cloudPaths = REMOTE_BGS.map(fileName => `${CLOUD_BASE_ID}/${fileName}`);
+    console.log('📋 需要缓存的图片:', cloudPaths);
     
-    console.log('Starting cloud wallpaper sync...');
-
-    for (const fileName of REMOTE_BGS) {
-      const cacheKey = `cached_bg_${fileName}`;
-      let localPath = wx.getStorageSync(cacheKey);
-      let needDownload = true;
-
-      // 1. Check Cache
-      if (localPath) {
-        try {
-          fs.accessSync(localPath);
-          needDownload = false;
-          console.log(`Hit cache for ${fileName}`);
-        } catch (e) {
-          console.log(`Cache invalid for ${fileName}, redownloading...`);
-        }
+    // 判断是否为合法的本地路径（微信小程序中的本地路径标识）
+    const isLocalPath = (path) => {
+      if (!path) return false;
+      // 微信小程序中的本地路径标识
+      if (path.startsWith('http://usr/') || path.startsWith('http://tmp/') || path.startsWith('wxfile://')) {
+        return true;
       }
-
-      // 2. Download via Cloud API (Fixes 403)
-      if (needDownload) {
-        try {
-          // Construct FileID: cloud://<env-id>.assets/<filename>
-          const fileID = `${CLOUD_BASE_ID}/${fileName}`;
-          
-          const res = await wx.cloud.downloadFile({
-            fileID: fileID
-          });
-
-          if (res.statusCode === 200 && res.tempFilePath) {
-            const savedFilePath = `${wx.env.USER_DATA_PATH}/${fileName}`;
-            fs.saveFileSync(res.tempFilePath, savedFilePath);
-            
-            localPath = savedFilePath;
-            wx.setStorageSync(cacheKey, localPath);
-            console.log(`Cloud Downloaded & Cached: ${fileName}`);
-          } else {
-            // Download failed - skip this file
-            console.warn(`⚠️ 背景图下载失败: ${fileName}, status: ${res.statusCode || 'UNKNOWN'}`);
-            console.warn('💡 提示：请检查云开发控制台 -> 存储 -> 权限设置，确保文件为"所有用户可读"');
-            localPath = null; // Explicitly set to null, don't add to finalPaths
-          }
-        } catch (err) {
-          console.error(`❌ 背景图加载失败: ${fileName}`, err);
-          console.warn('💡 提示：请检查云开发控制台 -> 存储 -> 权限设置，确保文件为"所有用户可读"');
-          // If download fails, skip this file (don't add undefined to finalPaths)
-          localPath = null;
-        }
+      // 其他本地路径（不以协议开头或相对路径）
+      if (!path.startsWith('http://') && !path.startsWith('https://') && !path.startsWith('cloud://')) {
+        return true;
       }
+      return false;
+    };
+    
+    // 逐个处理，确保每个都成功缓存
+    for (let i = 0; i < cloudPaths.length; i++) {
+      const cloudPath = cloudPaths[i];
+      const fileName = REMOTE_BGS[i];
       
-      if (localPath) {
-        finalPaths.push(localPath);
+      try {
+        const cachedPath = await imageCache.getImagePath(cloudPath);
+        
+        // 验证：必须是本地路径（允许微信小程序的本地路径格式）
+        if (!cachedPath || 
+            cachedPath === 'null' || 
+            cachedPath === 'undefined' ||
+            cachedPath.startsWith('cloud://') ||
+            (!isLocalPath(cachedPath))) {
+          console.error('❌ 壁纸缓存失败，路径无效:', fileName, '->', cachedPath);
+          // 如果路径无效，尝试清除可能存在的错误映射
+          try {
+            const cacheMap = wx.getStorageSync('image_cache_map') || {};
+            delete cacheMap[cloudPath];
+            wx.setStorageSync('image_cache_map', cacheMap);
+          } catch (e) {
+            // 忽略清除映射失败
+          }
+          continue;
+        }
+        
+        // 验证文件是否存在
+        const fs = wx.getFileSystemManager();
+        try {
+          fs.accessSync(cachedPath);
+          finalPaths.push(cachedPath);
+          console.log('✅ 壁纸缓存成功:', fileName, '->', cachedPath.substring(cachedPath.length - 40));
+        } catch (e) {
+          console.error('❌ 壁纸缓存文件不存在:', cachedPath);
+        }
+      } catch (err) {
+        console.error('❌ 壁纸缓存异常:', fileName, err);
       }
     }
 
-    // 3. Update Data
+    // Update Data
     if (finalPaths.length > 0) {
       this.setData({ defaultWallpapers: finalPaths });
+      console.log('✅ 壁纸初始化完成，共', finalPaths.length, '张，全部使用本地缓存');
+    } else {
+      console.error('❌ 没有成功缓存的壁纸，将无法使用默认背景');
     }
   },
 
@@ -1488,7 +1558,7 @@ Page({
           resolve(res.tempFilePath);
         },
         fail: reject
-      }, this);
+      });
     });
   },
 
